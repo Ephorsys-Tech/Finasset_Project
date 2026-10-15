@@ -96,10 +96,10 @@ export const enquiryService = {
 
     await logAdminActivity({
       adminEmail,
-      action: 'UPDATE_ENQUIRY',
+      action: 'STATUS_CHANGE',
       entity: 'Enquiry',
       entityId: id,
-      summary: `Updated enquiry status to ${enquiry.status} for ${enquiry.name} (${enquiry.trackingNumber}).`,
+      summary: `Updated enquiry status to ${enquiry.status} for ${enquiry.name} (${enquiry.trackingNumber || id}).`,
       req,
     });
 

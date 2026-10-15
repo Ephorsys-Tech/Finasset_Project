@@ -2,18 +2,26 @@ import { verifyAdminRequest } from '@/backend/lib/auth';
 import { sendUnauthorized, sendForbidden } from '@/backend/utils/apiResponse';
 
 export async function authenticateAdmin(req) {
-  const result = await verifyAdminRequest(req);
-  if (!result.authorized) {
+  try {
+    const result = await verifyAdminRequest(req);
+    if (!result.authorized) {
+      return {
+        success: false,
+        response: sendUnauthorized(result.error),
+      };
+    }
+    return {
+      success: true,
+      admin: result.admin,
+      tokenData: result.tokenData,
+    };
+  } catch (err) {
+    console.error('Authentication middleware error:', err.message);
     return {
       success: false,
-      response: sendUnauthorized(result.error),
+      response: sendUnauthorized('Unauthorized: Authentication verification failed'),
     };
   }
-  return {
-    success: true,
-    admin: result.admin,
-    tokenData: result.tokenData,
-  };
 }
 
 export default authenticateAdmin;
