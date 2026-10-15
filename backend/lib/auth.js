@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
@@ -68,7 +69,14 @@ export async function verifyAdminRequest(req) {
   let token = null;
 
   // 1. Try to read from Authorization header
-  const authHeader = req.headers.get('authorization');
+  let authHeader = null;
+  if (req && req.headers) {
+    if (typeof req.headers.get === 'function') {
+      authHeader = req.headers.get('authorization');
+    } else if (typeof req.headers === 'object' && req.headers.authorization) {
+      authHeader = req.headers.authorization;
+    }
+  }
   if (authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.substring(7);
   }
@@ -77,21 +85,108 @@ export async function verifyAdminRequest(req) {
   if (!token) {
     try {
       const cookieStore = await cookies();
-      const cookieToken = cookieStore.get(ACCESS_COOKIE_NAME);
+      const cookieToken =
+        cookieStore.get(ACCESS_COOKIE_NAME)?.value ||
+        cookieStore.get('admin_access_token')?.value;
       if (cookieToken) {
-        token = cookieToken.value;
+        token = cookieToken;
       }
     } catch {
       // Cookie reading fallback
     }
   }
 
-  if (!token) {
-    return { authorized: false, error: 'Unauthorized: No token provided' };
+  // 3. Fallback to raw cookie header from request
+  if (!token && req) {
+    try {
+      const rawCookies =
+        (typeof req.headers?.get === 'function'
+          ? req.headers.get('cookie')
+          : req.headers?.cookie) || '';
+      const match = rawCookies.match(/(?:finasset_access_token|admin_access_token)=([^;]+)/);
+      if (match) {
+        token = decodeURIComponent(match[1]);
+      }
+    } catch {
+      // Fallback ignore
+    }
   }
 
-  const decoded = verifyAccessToken(token);
+  let decoded = token ? verifyAccessToken(token) : null;
+
+  // If access token is missing or expired, attempt automatic session recovery via refresh token:
   if (!decoded || !decoded.id) {
+    let refreshToken = null;
+    try {
+      const cookieStore = await cookies();
+      refreshToken =
+        cookieStore.get(REFRESH_COOKIE_NAME)?.value ||
+        cookieStore.get('admin_refresh_token')?.value;
+    } catch {}
+
+    if (!refreshToken && req) {
+      try {
+        const rawCookies =
+          (typeof req.headers?.get === 'function'
+            ? req.headers.get('cookie')
+            : req.headers?.cookie) || '';
+        const match = rawCookies.match(/(?:finasset_refresh_token|admin_refresh_token)=([^;]+)/);
+        if (match) {
+          refreshToken = decodeURIComponent(match[1]);
+        }
+      } catch {}
+    }
+
+    if (refreshToken) {
+      const refreshDecoded = verifyRefreshToken(refreshToken);
+      if (refreshDecoded && refreshDecoded.id) {
+        const tokenHash = crypto.createHash('sha256').update(String(refreshToken)).digest('hex');
+        const stored = await RefreshToken.findOne({
+          $or: [{ tokenHash }, { token: refreshToken }],
+          isRevoked: false,
+          expiresAt: { $gt: new Date() },
+        });
+
+        if (stored) {
+          const admin = await Admin.findById(refreshDecoded.id);
+          if (admin && admin.isActive) {
+            if (admin.lockoutUntil && new Date(admin.lockoutUntil) > new Date()) {
+              return { authorized: false, error: 'Unauthorized: Account is temporarily locked' };
+            }
+
+            // Issue fresh access token (only set cookies on mutating methods to avoid Next.js GET cookie errors)
+            const newAccessToken = generateAccessToken(admin);
+            const reqMethod = req?.method || 'GET';
+            if (reqMethod !== 'GET') {
+              try {
+                const cookieStore = await cookies();
+                const opts = {
+                  httpOnly: true,
+                  secure: process.env.NODE_ENV === 'production',
+                  sameSite: 'lax',
+                  path: '/',
+                  maxAge: 15 * 60,
+                };
+                cookieStore.set(ACCESS_COOKIE_NAME, newAccessToken, opts);
+                cookieStore.set('admin_access_token', newAccessToken, opts);
+              } catch {}
+            }
+
+            return {
+              authorized: true,
+              admin,
+              tokenData: {
+                id: admin._id.toString(),
+                email: admin.email,
+                name: admin.name,
+                role: admin.role,
+              },
+            };
+          }
+        }
+      }
+    }
+
     return { authorized: false, error: 'Unauthorized: Invalid or expired access token', isExpired: true };
   }
 

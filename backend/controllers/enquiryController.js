@@ -49,10 +49,10 @@ export const enquiryController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
+      const body = await req.json().catch(() => ({}));
+      const id = url.searchParams.get('id') || body.id || body._id;
       if (!id) return sendBadRequest('Enquiry ID required');
 
-      const body = await req.json().catch(() => ({}));
       const updated = await enquiryService.updateEnquiry(id, body, auth.admin.email, req);
       return sendSuccess(updated, 'Enquiry updated successfully');
     } catch (err) {
