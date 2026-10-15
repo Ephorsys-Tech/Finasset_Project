@@ -1,0 +1,89 @@
+import { connectToDatabase } from '@/backend/config/db';
+import SiteSettings from '@/backend/models/SiteSettings';
+import HeroSlide from '@/backend/models/HeroSlide';
+import Service from '@/backend/models/Service';
+import InvestorTool from '@/backend/models/InvestorTool';
+import MarketIndex from '@/backend/models/MarketIndex';
+import NewsItem from '@/backend/models/NewsItem';
+import Testimonial from '@/backend/models/Testimonial';
+import Partner from '@/backend/models/Partner';
+import { logAdminActivity } from '@/backend/lib/auth';
+import {
+  fallbackHeroSlides,
+  fallbackServices,
+  fallbackInvestorTools,
+  fallbackMarketIndices,
+  fallbackNewsItems,
+  fallbackTestimonials,
+  fallbackPartners,
+} from '@/lib/fallbackData';
+
+export const homeService = {
+  async getHomeData() {
+    try {
+      await connectToDatabase();
+
+      const [
+        settings,
+        heroSlides,
+        services,
+        investorTools,
+        marketIndices,
+        newsItems,
+        testimonials,
+        partners,
+      ] = await Promise.all([
+        SiteSettings.findOne({}).lean().catch(() => null),
+        HeroSlide.find({ isActive: true }).sort({ order: 1 }).lean().catch(() => []),
+        Service.find({ isPublished: true }).sort({ displayOrder: 1 }).lean().catch(() => []),
+        InvestorTool.find({ isVisible: true }).sort({ order: 1 }).lean().catch(() => []),
+        MarketIndex.find({}).sort({ symbol: 1 }).lean().catch(() => []),
+        NewsItem.find({ isPublished: true }).sort({ order: 1, publishedAt: -1 }).lean().catch(() => []),
+        Testimonial.find({ isPublished: true }).sort({ order: 1 }).lean().catch(() => []),
+        Partner.find({ isPublished: true }).sort({ order: 1 }).lean().catch(() => []),
+      ]);
+
+      return {
+        settings: settings || {},
+        heroSlides: (heroSlides && heroSlides.length) ? heroSlides : fallbackHeroSlides,
+        services: (services && services.length) ? services : fallbackServices,
+        investorTools: (investorTools && investorTools.length) ? investorTools : fallbackInvestorTools,
+        marketIndices: (marketIndices && marketIndices.length) ? marketIndices : fallbackMarketIndices,
+        newsItems: (newsItems && newsItems.length) ? newsItems : fallbackNewsItems,
+        testimonials: (testimonials && testimonials.length) ? testimonials : fallbackTestimonials,
+        partners: (partners && partners.length) ? partners : fallbackPartners,
+      };
+    } catch (err) {
+      console.warn('⚠️ Serving cached fallback home data:', err.message);
+      return {
+        settings: {},
+        heroSlides: fallbackHeroSlides,
+        services: fallbackServices,
+        investorTools: fallbackInvestorTools,
+        marketIndices: fallbackMarketIndices,
+        newsItems: fallbackNewsItems,
+        testimonials: fallbackTestimonials,
+        partners: fallbackPartners,
+        isFallback: true,
+      };
+    }
+  },
+
+  async updateHeroSlides(slides, adminEmail, req) {
+    await connectToDatabase();
+    await HeroSlide.deleteMany({});
+    const inserted = await HeroSlide.insertMany(slides);
+
+    await logAdminActivity({
+      adminEmail,
+      action: 'UPDATE_HERO_SLIDES',
+      entity: 'HeroSlide',
+      summary: `Updated ${inserted.length} homepage hero slides.`,
+      req,
+    });
+
+    return inserted;
+  },
+};
+
+export default homeService;
