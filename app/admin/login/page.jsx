@@ -49,15 +49,15 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#10243A] flex flex-col justify-center items-center p-4 selection:bg-[#C7A76C] selection:text-[#10243A]">
+    <div className="min-h-screen bg-[#0f2b44] flex flex-col justify-center items-center p-4 selection:bg-[#f87b1f] selection:text-white">
       <div className="w-full max-w-md space-y-8">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-[#C7A76C] text-[#10243A] flex items-center justify-center mx-auto shadow-lg">
+          <div className="w-14 h-14 rounded-2xl bg-[#f87b1f] text-white flex items-center justify-center mx-auto shadow-lg shadow-[#f87b1f]/20">
             <TrendingUp className="w-8 h-8 stroke-[2.5]" />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            FINASSET <span className="text-[#C7A76C]">WEALTH</span>
+            FINASSET <span className="text-[#2376b8]">WEALTH</span>
           </h1>
           <p className="text-xs text-slate-400 font-medium">
             Administrative CMS & Portfolio Control Center
@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
           <div className="border-b border-slate-800 pb-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#C7A76C]" />
+              <Lock className="w-4 h-4 text-[#f87b1f]" />
               <span>Administrator Authentication</span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
@@ -96,7 +96,7 @@ export default function AdminLoginPage() {
                   placeholder="admin@finassetwealth.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#2376b8]"
                 />
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
                 </label>
                 <Link
                   href="/admin/forgot-password"
-                  className="text-xs text-[#C7A76C] hover:underline font-semibold"
+                  className="text-xs text-[#f87b1f] hover:underline font-semibold"
                 >
                   Forgot?
                 </Link>
@@ -121,7 +121,7 @@ export default function AdminLoginPage() {
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                  className="w-full pl-10 pr-10 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#2376b8]"
                 />
                 <button
                   type="button"
@@ -137,7 +137,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 text-[#10243A] font-extrabold text-sm py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-[#f87b1f]/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>{loading ? 'Authenticating...' : 'Sign In to Admin CMS'}</span>
                 <ArrowRight className="w-4 h-4" />

@@ -41,7 +41,7 @@ export default function AdminForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#10243A] flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-[#0f2b44] flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md space-y-6">
         <Link
           href="/admin/login"
@@ -53,7 +53,7 @@ export default function AdminForgotPasswordPage() {
 
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
           <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-xl bg-white/10 text-[#C7A76C] flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-xl bg-white/10 text-[#f87b1f] flex items-center justify-center mx-auto">
               <KeyRound className="w-6 h-6" />
             </div>
             <h1 className="text-xl font-bold text-white">Reset Admin Password</h1>
@@ -64,14 +64,14 @@ export default function AdminForgotPasswordPage() {
 
           {successMsg ? (
             <div className="bg-emerald-950/60 border border-emerald-500/50 p-5 rounded-2xl text-center space-y-3">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+              <CheckCircle2 className="w-8 h-8 text-[#89b441] mx-auto" />
               <p className="text-xs text-slate-200 leading-relaxed">{successMsg}</p>
               {devResetUrl && (
                 <div className="pt-2">
                   <span className="text-[10px] text-slate-400 block mb-1">Development Quick Link:</span>
                   <Link
                     href={devResetUrl}
-                    className="inline-block bg-[#C7A76C] text-[#10243A] font-bold text-xs px-4 py-2 rounded-lg"
+                    className="inline-block bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors shadow"
                   >
                     Open Reset Password Page
                   </Link>
@@ -92,7 +92,7 @@ export default function AdminForgotPasswordPage() {
                     placeholder="admin@finassetwealth.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#2376b8]"
                   />
                 </div>
               </div>
@@ -100,7 +100,7 @@ export default function AdminForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 text-[#10243A] font-bold text-sm py-3.5 rounded-xl transition-all"
+                className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-lg shadow-[#f87b1f]/20"
               >
                 {loading ? 'Dispatching...' : 'Send Password Reset Token'}
               </button>

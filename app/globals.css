@@ -3,22 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --primary-navy: #10243A;
-  --primary-navy-light: #1b3858;
-  --primary-navy-dark: #0a1624;
-  --accent-gold: #C7A76C;
-  --accent-gold-light: #dfc593;
-  --accent-gold-dark: #a88547;
-  --bg-warm: #F8F7F3;
+  --brand-blue: #2376b8;
+  --brand-blue-light: #3b8ecf;
+  --brand-blue-dark: #1b5d92;
+  --brand-blue-deep: #0f2b44;
+  --brand-blue-tint: #f0f6fb;
+
+  --brand-orange: #f87b1f;
+  --brand-orange-light: #fb994b;
+  --brand-orange-dark: #d9620b;
+  --brand-orange-tint: #fff7ed;
+
+  --brand-green: #89b441;
+  --brand-green-light: #a1c95b;
+  --brand-green-dark: #6e9331;
+  --brand-green-tint: #f4f8ee;
+
+  --primary-navy: #0f2b44;
+  --primary-navy-light: #164366;
+  --primary-navy-dark: #0a1d2e;
+  --accent-gold: #f87b1f;
+  --accent-gold-light: #fb994b;
+  --accent-gold-dark: #d9620b;
+  --bg-warm: #f8fafc;
   --surface-white: #FFFFFF;
-  --text-dark: #0f172a;
+  --text-dark: #0f2b44;
   --text-muted: #64748b;
   --border-subtle: #e2e8f0;
 }
 
 @layer base {
   body {
-    background-color: var(--bg-warm);
+    background-color: #f8fafc;
     color: var(--text-dark);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -50,20 +66,36 @@
   background: #94a3b8;
 }
 
-/* Gold Gradient text helper */
+/* Brand Gradient text helpers */
+.brand-gradient-text {
+  background: linear-gradient(135deg, #2376b8 0%, #1b5d92 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.orange-gradient-text {
+  background: linear-gradient(135deg, #fb994b 0%, #f87b1f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .gold-gradient-text {
-  background: linear-gradient(135deg, #dfc593 0%, #C7A76C 50%, #a88547 100%);
+  background: linear-gradient(135deg, #fb994b 0%, #f87b1f 50%, #d9620b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .navy-gradient-bg {
-  background: linear-gradient(135deg, #10243A 0%, #1b3858 100%);
+  background: linear-gradient(135deg, #0f2b44 0%, #164366 100%);
+}
+
+.brand-hero-bg {
+  background: linear-gradient(135deg, #0c2338 0%, #0f2b44 50%, #164366 100%);
 }
 
 /* Subtle card shadow */
 .card-premium-shadow {
-  box-shadow: 0 4px 20px -2px rgba(16, 36, 58, 0.06), 0 2px 6px -1px rgba(16, 36, 58, 0.04);
+  box-shadow: 0 4px 20px -2px rgba(35, 118, 184, 0.08), 0 2px 6px -1px rgba(15, 43, 68, 0.04);
 }
 
 .card-hover-lift {
@@ -71,5 +103,5 @@
 }
 .card-hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px -4px rgba(16, 36, 58, 0.12), 0 4px 10px -2px rgba(16, 36, 58, 0.06);
+  box-shadow: 0 12px 30px -4px rgba(35, 118, 184, 0.15), 0 4px 10px -2px rgba(15, 43, 68, 0.08);
 }

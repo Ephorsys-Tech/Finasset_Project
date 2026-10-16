@@ -56,12 +56,12 @@ export default function FinancialCalculatorPage() {
   }
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 text-center">
+      <section className="bg-[#0f2b44] text-white py-16 text-center">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <Calculator className="w-3.5 h-3.5 text-[#C7A76C]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/30 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
+            <Calculator className="w-3.5 h-3.5 text-[#2376b8]" />
             <span>Interactive Compounding Engine</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
@@ -83,8 +83,8 @@ export default function FinancialCalculatorPage() {
                 onClick={() => setMode('sip')}
                 className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
                   mode === 'sip'
-                    ? 'bg-[#10243A] text-white shadow-md'
-                    : 'text-slate-600 hover:text-[#10243A]'
+                    ? 'bg-[#0f2b44] text-white shadow-md'
+                    : 'text-slate-600 hover:text-[#2376b8]'
                 }`}
               >
                 SIP (Monthly Investment)
@@ -93,8 +93,8 @@ export default function FinancialCalculatorPage() {
                 onClick={() => setMode('lumpsum')}
                 className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
                   mode === 'lumpsum'
-                    ? 'bg-[#10243A] text-white shadow-md'
-                    : 'text-slate-600 hover:text-[#10243A]'
+                    ? 'bg-[#0f2b44] text-white shadow-md'
+                    : 'text-slate-600 hover:text-[#2376b8]'
                 }`}
               >
                 Lumpsum (One-Time Investment)
@@ -110,10 +110,10 @@ export default function FinancialCalculatorPage() {
                   {/* Monthly Investment */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#10243A]">
+                      <label className="font-bold text-sm text-[#0f2b44]">
                         Monthly Investment Amount
                       </label>
-                      <span className="text-lg font-extrabold text-[#10243A] bg-[#F8F7F3] px-4 py-1.5 rounded-lg border border-slate-200">
+                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
                         {formatINR(sipMonthly)}
                       </span>
                     </div>
@@ -124,7 +124,7 @@ export default function FinancialCalculatorPage() {
                       step={1000}
                       value={sipMonthly}
                       onChange={(e) => setSipMonthly(Number(e.target.value))}
-                      className="w-full accent-[#C7A76C] h-2 bg-slate-200 rounded-lg cursor-pointer"
+                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
                       <span>₹1,000</span>
@@ -136,10 +136,10 @@ export default function FinancialCalculatorPage() {
                   {/* Return Rate */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#10243A]">
+                      <label className="font-bold text-sm text-[#0f2b44]">
                         Expected Annual Return Rate (% p.a.)
                       </label>
-                      <span className="text-lg font-extrabold text-[#10243A] bg-[#F8F7F3] px-4 py-1.5 rounded-lg border border-slate-200">
+                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
                         {sipRate}%
                       </span>
                     </div>
@@ -150,7 +150,7 @@ export default function FinancialCalculatorPage() {
                       step={0.5}
                       value={sipRate}
                       onChange={(e) => setSipRate(Number(e.target.value))}
-                      className="w-full accent-[#C7A76C] h-2 bg-slate-200 rounded-lg cursor-pointer"
+                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
                       <span>6% (Conservative Debt)</span>
@@ -162,10 +162,10 @@ export default function FinancialCalculatorPage() {
                   {/* Time Horizon */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#10243A]">
+                      <label className="font-bold text-sm text-[#0f2b44]">
                         Investment Time Period
                       </label>
-                      <span className="text-lg font-extrabold text-[#10243A] bg-[#F8F7F3] px-4 py-1.5 rounded-lg border border-slate-200">
+                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
                         {sipYears} {sipYears === 1 ? 'Year' : 'Years'}
                       </span>
                     </div>
@@ -176,7 +176,7 @@ export default function FinancialCalculatorPage() {
                       step={1}
                       value={sipYears}
                       onChange={(e) => setSipYears(Number(e.target.value))}
-                      className="w-full accent-[#C7A76C] h-2 bg-slate-200 rounded-lg cursor-pointer"
+                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
                       <span>1 Year</span>
@@ -190,10 +190,10 @@ export default function FinancialCalculatorPage() {
                   {/* Lumpsum Amount */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#10243A]">
+                      <label className="font-bold text-sm text-[#0f2b44]">
                         Total Lumpsum Investment
                       </label>
-                      <span className="text-lg font-extrabold text-[#10243A] bg-[#F8F7F3] px-4 py-1.5 rounded-lg border border-slate-200">
+                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
                         {formatINR(lumpsumPrincipal)}
                       </span>
                     </div>
@@ -204,7 +204,7 @@ export default function FinancialCalculatorPage() {
                       step={25000}
                       value={lumpsumPrincipal}
                       onChange={(e) => setLumpsumPrincipal(Number(e.target.value))}
-                      className="w-full accent-[#C7A76C] h-2 bg-slate-200 rounded-lg cursor-pointer"
+                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
                       <span>₹25,000</span>
@@ -216,10 +216,10 @@ export default function FinancialCalculatorPage() {
                   {/* Return Rate */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#10243A]">
+                      <label className="font-bold text-sm text-[#0f2b44]">
                         Expected Annual Return Rate (% p.a.)
                       </label>
-                      <span className="text-lg font-extrabold text-[#10243A] bg-[#F8F7F3] px-4 py-1.5 rounded-lg border border-slate-200">
+                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
                         {lumpsumRate}%
                       </span>
                     </div>
@@ -230,7 +230,7 @@ export default function FinancialCalculatorPage() {
                       step={0.5}
                       value={lumpsumRate}
                       onChange={(e) => setLumpsumRate(Number(e.target.value))}
-                      className="w-full accent-[#C7A76C] h-2 bg-slate-200 rounded-lg cursor-pointer"
+                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
                       <span>6% (Debt/FD)</span>
@@ -242,10 +242,10 @@ export default function FinancialCalculatorPage() {
                   {/* Time Horizon */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#10243A]">
+                      <label className="font-bold text-sm text-[#0f2b44]">
                         Investment Time Period
                       </label>
-                      <span className="text-lg font-extrabold text-[#10243A] bg-[#F8F7F3] px-4 py-1.5 rounded-lg border border-slate-200">
+                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
                         {lumpsumYears} {lumpsumYears === 1 ? 'Year' : 'Years'}
                       </span>
                     </div>
@@ -256,7 +256,7 @@ export default function FinancialCalculatorPage() {
                       step={1}
                       value={lumpsumYears}
                       onChange={(e) => setLumpsumYears(Number(e.target.value))}
-                      className="w-full accent-[#C7A76C] h-2 bg-slate-200 rounded-lg cursor-pointer"
+                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
                       <span>1 Year</span>
@@ -269,7 +269,7 @@ export default function FinancialCalculatorPage() {
 
               {/* Explanatory Note */}
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 flex items-start gap-2.5">
-                <Info className="w-4 h-4 text-[#C7A76C] shrink-0 mt-0.5" />
+                <Info className="w-4 h-4 text-[#2376b8] shrink-0 mt-0.5" />
                 <span>
                   <strong>Did you know?</strong> An investment of ₹15,000/month compounding at 12.5% for 20 years yields approximately ₹1.48 Crore against an actual out-of-pocket investment of just ₹36 Lakhs. Time is your greatest wealth creator.
                 </span>
@@ -278,8 +278,8 @@ export default function FinancialCalculatorPage() {
 
             {/* Right Results & Visuals (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="bg-[#10243A] text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-800">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#dfc593] block mb-1">
+              <div className="bg-[#0f2b44] text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] block mb-1">
                   Projected Wealth Outcome
                 </span>
                 <div className="text-4xl sm:text-5xl font-extrabold text-white mt-2 tracking-tight">
@@ -297,7 +297,7 @@ export default function FinancialCalculatorPage() {
 
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-slate-400">Estimated Wealth Gain:</span>
-                    <span className="font-bold text-emerald-400">
+                    <span className="font-bold text-[#89b441]">
                       +{formatINR(activeResult.estimatedReturns)}
                     </span>
                   </div>
@@ -307,22 +307,22 @@ export default function FinancialCalculatorPage() {
                     <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden flex">
                       <div
                         style={{ width: `${investedPct}%` }}
-                        className="bg-slate-400 transition-all duration-500"
+                        className="bg-[#2376b8] transition-all duration-500"
                         title={`Invested: ${investedPct}%`}
                       />
                       <div
                         style={{ width: `${returnsPct}%` }}
-                        className="bg-[#C7A76C] transition-all duration-500"
+                        className="bg-[#89b441] transition-all duration-500"
                         title={`Returns: ${returnsPct}%`}
                       />
                     </div>
                     <div className="flex justify-between text-[11px] text-slate-400 mt-2">
                       <span className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#2376b8]" />
                         Invested ({investedPct}%)
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#C7A76C]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#89b441]" />
                         Gains ({returnsPct}%)
                       </span>
                     </div>
@@ -332,7 +332,7 @@ export default function FinancialCalculatorPage() {
                 <div className="mt-8 pt-6 border-t border-slate-800">
                   <Link
                     href="/contact-us#callback"
-                    className="w-full bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-sm py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#f87b1f]/20"
                   >
                     <span>Start This Investment Journey</span>
                     <ArrowRight className="w-4 h-4" />
@@ -349,7 +349,7 @@ export default function FinancialCalculatorPage() {
 
           {/* Year-by-Year Growth Table */}
           <div className="mt-16 bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
-            <h2 className="text-xl font-bold text-[#10243A] mb-4">
+            <h2 className="text-xl font-bold text-[#0f2b44] mb-4">
               Year-by-Year Compounding Progression
             </h2>
             <div className="overflow-x-auto">
@@ -365,10 +365,10 @@ export default function FinancialCalculatorPage() {
                 <tbody className="divide-y divide-slate-100">
                   {yearsArray.map((row) => (
                     <tr key={row.year} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-4 font-bold text-[#10243A]">End of Year {row.year}</td>
+                      <td className="py-3 px-4 font-bold text-[#0f2b44]">End of Year {row.year}</td>
                       <td className="py-3 px-4 text-slate-600">{formatINR(row.investedAmount)}</td>
-                      <td className="py-3 px-4 text-emerald-600 font-semibold">+{formatINR(row.estimatedReturns)}</td>
-                      <td className="py-3 px-4 font-bold text-[#10243A]">{formatINR(row.totalValue)}</td>
+                      <td className="py-3 px-4 text-[#89b441] font-semibold">+{formatINR(row.estimatedReturns)}</td>
+                      <td className="py-3 px-4 font-bold text-[#0f2b44]">{formatINR(row.totalValue)}</td>
                     </tr>
                   ))}
                 </tbody>

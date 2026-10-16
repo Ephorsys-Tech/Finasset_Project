@@ -29,12 +29,12 @@ export default function BuyMfOnlinePage() {
   const externalBuyUrl = settings?.externalBuyMfUrl || 'https://invest.finassetwealth.com';
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 text-center">
+      <section className="bg-[#0f2b44] text-white py-16 text-center">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <Zap className="w-3.5 h-3.5 text-[#C7A76C]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/30 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
+            <Zap className="w-3.5 h-3.5 text-[#2376b8]" />
             <span>Direct Digital Execution</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
@@ -50,9 +50,9 @@ export default function BuyMfOnlinePage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           {/* Main Action Box */}
-          <div className="bg-gradient-to-r from-[#10243A] to-[#1b3858] rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="bg-gradient-to-r from-[#0f2b44] to-[#1b3e63] rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="space-y-4 max-w-xl">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#dfc593]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f]">
                 Instant Execution Portal
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
@@ -68,7 +68,7 @@ export default function BuyMfOnlinePage() {
                 href={externalBuyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-extrabold text-sm px-8 py-4 rounded-xl shadow-lg transition-all"
+                className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-[#f87b1f] hover:bg-[#d9620b] text-white font-extrabold text-sm px-8 py-4 rounded-xl shadow-lg shadow-[#f87b1f]/20 transition-all"
               >
                 <span>Launch Mutual Fund Platform</span>
                 <ExternalLink className="w-4 h-4" />
@@ -82,40 +82,40 @@ export default function BuyMfOnlinePage() {
           {/* 3-Step Process for New Investors */}
           <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-sm space-y-8">
             <div className="text-center max-w-2xl mx-auto">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8]">
                 Simple Onboarding
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#10243A] mt-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#0f2b44] mt-1">
                 How to Start in 3 Easy Steps
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-[#F8F7F3] p-6 rounded-2xl border border-slate-200/80 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#10243A] text-[#C7A76C] flex items-center justify-center font-bold text-sm">
+              <div className="bg-[#f8fafc] p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0f2b44] text-[#89b441] flex items-center justify-center font-bold text-sm">
                   1
                 </div>
-                <h3 className="font-bold text-[#10243A] text-base">Digital KYC Verification</h3>
+                <h3 className="font-bold text-[#0f2b44] text-base">Digital KYC Verification</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Complete your PAN and Aadhaar paperless digital KYC in under 5 minutes without visiting any physical branch.
                 </p>
               </div>
 
-              <div className="bg-[#F8F7F3] p-6 rounded-2xl border border-slate-200/80 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#10243A] text-[#C7A76C] flex items-center justify-center font-bold text-sm">
+              <div className="bg-[#f8fafc] p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0f2b44] text-[#89b441] flex items-center justify-center font-bold text-sm">
                   2
                 </div>
-                <h3 className="font-bold text-[#10243A] text-base">Bank Mandate Automation</h3>
+                <h3 className="font-bold text-[#0f2b44] text-base">Bank Mandate Automation</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Set up an e-Mandate or Net Banking auto-debit so your monthly SIP investments are never missed or delayed.
                 </p>
               </div>
 
-              <div className="bg-[#F8F7F3] p-6 rounded-2xl border border-slate-200/80 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-[#10243A] text-[#C7A76C] flex items-center justify-center font-bold text-sm">
+              <div className="bg-[#f8fafc] p-6 rounded-2xl border border-slate-200/80 space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0f2b44] text-[#89b441] flex items-center justify-center font-bold text-sm">
                   3
                 </div>
-                <h3 className="font-bold text-[#10243A] text-base">Select Portfolio & Execute</h3>
+                <h3 className="font-bold text-[#0f2b44] text-base">Select Portfolio & Execute</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Pick from our certified research-backed scheme recommendations or consult our advisors for bespoke allocation.
                 </p>
@@ -126,14 +126,14 @@ export default function BuyMfOnlinePage() {
           {/* Need Assistance Callout */}
           <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-[#10243A]">Need assistance with KYC or fund selection?</h3>
+              <h3 className="text-lg font-bold text-[#0f2b44]">Need assistance with KYC or fund selection?</h3>
               <p className="text-xs text-slate-600">
                 Our team at Bhubaneswar is available on phone or in-person to guide you step-by-step.
               </p>
             </div>
             <Link
               href="/contact-us#callback"
-              className="bg-[#10243A] hover:bg-[#1b3858] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl transition-all shrink-0"
+              className="bg-[#2376b8] hover:bg-[#1b5e93] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl transition-all shrink-0 shadow"
             >
               Request Onboarding Support
             </Link>

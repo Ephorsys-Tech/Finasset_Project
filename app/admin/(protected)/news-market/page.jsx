@@ -126,15 +126,21 @@ export default function AdminNewsMarketPage() {
           Benchmark Indices Snapshot
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {indices.map((idx) => (
-            <div key={idx.symbol} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
-              <div className="font-bold text-[#10243A]">{idx.name}</div>
-              <div className="text-xl font-extrabold text-[#10243A] mt-1">{formatINR(idx.currentValue)}</div>
-              <div className={idx.change >= 0 ? 'text-emerald-600 font-semibold mt-0.5' : 'text-rose-600 font-semibold mt-0.5'}>
-                {idx.change >= 0 ? '+' : ''}{idx.change} ({idx.percentChange}%)
+          {indices.map((idx, index) => {
+            const changeVal = Number(idx?.change ?? 0);
+            const percentVal = Number(idx?.percentChange ?? idx?.changePercent ?? 0);
+            const isPositive = idx?.isPositive !== undefined ? Boolean(idx.isPositive) : changeVal >= 0;
+            const displayVal = idx?.currentValue ?? idx?.currentPrice ?? 0;
+            return (
+              <div key={idx?.symbol || idx?.name || index} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+                <div className="font-bold text-[#10243A]">{idx?.name || idx?.symbol}</div>
+                <div className="text-xl font-extrabold text-[#10243A] mt-1">{formatINR(displayVal)}</div>
+                <div className={isPositive ? 'text-emerald-600 font-semibold mt-0.5' : 'text-rose-600 font-semibold mt-0.5'}>
+                  {isPositive ? '+' : ''}{changeVal.toFixed(2)} ({isPositive ? '+' : ''}{percentVal.toFixed(2)}%)
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
