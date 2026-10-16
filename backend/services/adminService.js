@@ -4,6 +4,8 @@ import Service from '@/backend/models/Service';
 import BlogPost from '@/backend/models/BlogPost';
 import ActivityLog from '@/backend/models/ActivityLog';
 import Media from '@/backend/models/Media';
+import Partner from '@/backend/models/Partner';
+import Testimonial from '@/backend/models/Testimonial';
 import { logAdminActivity } from '@/backend/lib/auth';
 import { cloudinary } from '@/backend/config/cloudinary';
 import { config } from '@/backend/config/env';
@@ -15,33 +17,56 @@ export const adminService = {
     const [
       totalEnquiries,
       newEnquiries,
-      inProgressEnquiries,
-      resolvedEnquiries,
+      contactedEnquiries,
+      closedEnquiries,
       servicesCount,
       blogCount,
+      partnersCount,
+      testimonialsCount,
+      mediaCount,
       recentEnquiries,
       recentActivities,
     ] = await Promise.all([
       Enquiry.countDocuments({}),
       Enquiry.countDocuments({ status: 'NEW' }),
-      Enquiry.countDocuments({ status: 'IN_PROGRESS' }),
-      Enquiry.countDocuments({ status: 'RESOLVED' }),
+      Enquiry.countDocuments({ status: 'CONTACTED' }),
+      Enquiry.countDocuments({ status: 'CLOSED' }),
       Service.countDocuments({ isPublished: true }),
       BlogPost.countDocuments({ isPublished: true }),
-      Enquiry.find({}).sort({ createdAt: -1 }).limit(6).lean(),
-      ActivityLog.find({}).sort({ createdAt: -1 }).limit(8).lean(),
+      Partner.countDocuments({ isActive: true }).catch(() => 0),
+      Testimonial.countDocuments({ isActive: true }).catch(() => 0),
+      Media.countDocuments({}).catch(() => 0),
+      Enquiry.find({}).sort({ createdAt: -1 }).limit(8).lean(),
+      ActivityLog.find({}).sort({ createdAt: -1 }).limit(10).lean(),
     ]);
 
     return {
       metrics: {
         totalEnquiries,
         newEnquiries,
-        inProgressEnquiries,
-        resolvedEnquiries,
+        inProgressEnquiries: contactedEnquiries,
+        resolvedEnquiries: closedEnquiries,
         servicesCount,
         blogCount,
+        partnersCount,
+        testimonialsCount,
+        mediaCount,
+      },
+      enquiries: {
+        total: totalEnquiries,
+        new: newEnquiries,
+        contacted: contactedEnquiries,
+        closed: closedEnquiries,
+      },
+      kpis: {
+        services: servicesCount,
+        publishedBlogs: blogCount,
+        activePartners: partnersCount,
+        testimonials: testimonialsCount,
+        mediaFiles: mediaCount,
       },
       recentEnquiries,
+      recentActivity: recentActivities,
       recentActivities,
     };
   },

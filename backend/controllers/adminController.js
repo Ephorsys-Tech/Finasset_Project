@@ -4,13 +4,14 @@ import { authenticateAdmin } from '@/backend/middleware/authMiddleware';
 
 export const adminController = {
   async getDashboard(req) {
-    const auth = await authenticateAdmin(req);
-    if (!auth.success) return auth.response;
-
     try {
+      const auth = await authenticateAdmin(req);
+      if (!auth.success) return auth.response;
+
       const data = await adminService.getDashboard();
       return sendSuccess(data);
     } catch (err) {
+      console.error('getDashboard Error:', err);
       return sendError(err.message, 500, err);
     }
   },

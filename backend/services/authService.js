@@ -13,11 +13,53 @@ import {
   REFRESH_COOKIE_NAME,
   logAdminActivity,
 } from '@/backend/lib/auth';
+import { hashValue } from '@/backend/utils/authHelpers';
 
 const MAX_FAILED_LOGINS = 5;
 const LOCKOUT_MINUTES = 15;
 
 export const authService = {
+  async register({ name, email, password, role = 'ADMIN', req }) {
+    await connectToDatabase();
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const existing = await Admin.findOne({ email: normalizedEmail });
+    if (existing) {
+      throw new Error(`An administrator account with email "${normalizedEmail}" already exists.`);
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const admin = await Admin.create({
+      name: name || 'Finasset Administrator',
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: 'ADMIN',
+      isActive: true,
+      failedLogins: 0,
+      lastLogin: null,
+      lastActive: new Date(),
+    });
+
+    await logAdminActivity({
+      adminEmail: admin.email,
+      action: 'ADMIN_REGISTERED',
+      entity: 'Admin',
+      entityId: admin._id,
+      summary: `New administrator account registered: ${admin.email} (${admin.name}).`,
+      req,
+    });
+
+    return {
+      id: admin._id,
+      name: admin.name,
+      email: admin.email,
+      role: admin.role,
+      isActive: admin.isActive,
+      createdAt: admin.createdAt,
+    };
+  },
+
   async login({ email, password, req }) {
     await connectToDatabase();
 
@@ -71,31 +113,37 @@ export const authService = {
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin, family);
 
-    // Save refresh token record
+    // Save refresh token record in DB with tokenHash and 7-day expiration
+    const tokenHash = hashValue(refreshToken);
     await RefreshToken.create({
+      tokenHash,
       token: refreshToken,
       adminId: admin._id,
       family,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
-    // Set Cookies
+    // Set Cookies (both finasset and admin cookies for full compatibility)
     const cookieStore = await cookies();
-    cookieStore.set(ACCESS_COOKIE_NAME, accessToken, {
+    const accessCookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 15 * 60, // 15 mins
-    });
+      maxAge: 15 * 60, // 15 mins (short-term)
+    };
+    const refreshCookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 days (long-term)
+    };
 
-    cookieStore.set(REFRESH_COOKIE_NAME, refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-    });
+    cookieStore.set(ACCESS_COOKIE_NAME, accessToken, accessCookieOptions);
+    cookieStore.set('admin_access_token', accessToken, accessCookieOptions);
+    cookieStore.set(REFRESH_COOKIE_NAME, refreshToken, refreshCookieOptions);
+    cookieStore.set('admin_refresh_token', refreshToken, refreshCookieOptions);
 
     await logAdminActivity({
       adminEmail: admin.email,
@@ -120,7 +168,9 @@ export const authService = {
   async refreshTokens() {
     await connectToDatabase();
     const cookieStore = await cookies();
-    const oldRefreshToken = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
+    const oldRefreshToken =
+      cookieStore.get(REFRESH_COOKIE_NAME)?.value ||
+      cookieStore.get('admin_refresh_token')?.value;
 
     if (!oldRefreshToken) {
       throw new Error('No refresh token provided');
@@ -131,7 +181,10 @@ export const authService = {
       throw new Error('Invalid refresh token');
     }
 
-    const storedToken = await RefreshToken.findOne({ token: oldRefreshToken });
+    const oldTokenHash = hashValue(oldRefreshToken);
+    const storedToken = await RefreshToken.findOne({
+      $or: [{ tokenHash: oldTokenHash }, { token: oldRefreshToken }],
+    });
 
     // Reuse detection
     if (!storedToken) {
@@ -152,28 +205,34 @@ export const authService = {
     const newAccessToken = generateAccessToken(admin);
     const newRefreshToken = generateRefreshToken(admin, storedToken.family);
 
+    const newTokenHash = hashValue(newRefreshToken);
     await RefreshToken.create({
+      tokenHash: newTokenHash,
       token: newRefreshToken,
       adminId: admin._id,
       family: storedToken.family,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
-    cookieStore.set(ACCESS_COOKIE_NAME, newAccessToken, {
+    const accessCookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 15 * 60,
-    });
-
-    cookieStore.set(REFRESH_COOKIE_NAME, newRefreshToken, {
+    };
+    const refreshCookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60,
-    });
+    };
+
+    cookieStore.set(ACCESS_COOKIE_NAME, newAccessToken, accessCookieOptions);
+    cookieStore.set('admin_access_token', newAccessToken, accessCookieOptions);
+    cookieStore.set(REFRESH_COOKIE_NAME, newRefreshToken, refreshCookieOptions);
+    cookieStore.set('admin_refresh_token', newRefreshToken, refreshCookieOptions);
 
     return {
       accessToken: newAccessToken,
@@ -189,14 +248,21 @@ export const authService = {
   async logout({ req }) {
     await connectToDatabase();
     const cookieStore = await cookies();
-    const token = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
+    const token =
+      cookieStore.get(REFRESH_COOKIE_NAME)?.value ||
+      cookieStore.get('admin_refresh_token')?.value;
 
     if (token) {
-      await RefreshToken.deleteOne({ token });
+      const tokenHash = hashValue(token);
+      await RefreshToken.deleteOne({
+        $or: [{ tokenHash }, { token }],
+      }).catch(() => {});
     }
 
     cookieStore.delete(ACCESS_COOKIE_NAME);
+    cookieStore.delete('admin_access_token');
     cookieStore.delete(REFRESH_COOKIE_NAME);
+    cookieStore.delete('admin_refresh_token');
 
     return true;
   },

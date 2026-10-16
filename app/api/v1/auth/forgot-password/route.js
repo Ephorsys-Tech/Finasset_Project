@@ -1,5 +1,5 @@
-import { authController } from '@/backend/controllers/authController';
+import { forgetPasswordAdmin } from '@/backend/controllers/authController';
 
 export async function POST(req) {
-  return authController.forgotPassword(req);
+  return forgetPasswordAdmin(req);
 }
