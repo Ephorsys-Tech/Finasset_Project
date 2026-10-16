@@ -8,11 +8,25 @@ const EnquiryNoteSchema = new mongoose.Schema({
 
 const EnquirySchema = new mongoose.Schema(
   {
+    trackingNumber: {
+      type: String,
+      default: '',
+    },
     type: {
       type: String,
       required: true,
-      enum: ['callback', 'contact', 'career', 'consultation'],
-      default: 'callback',
+      enum: [
+        'callback',
+        'contact',
+        'career',
+        'consultation',
+        'CALLBACK',
+        'CONTACT',
+        'CAREER',
+        'CONSULTATION',
+        'SERVICE_CONSULTATION',
+      ],
+      default: 'consultation',
     },
     name: {
       type: String,

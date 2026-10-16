@@ -26,6 +26,10 @@ const ServiceSchema = new mongoose.Schema(
       type: String,
       default: 'TrendingUp',
     },
+    image: {
+      type: String,
+      default: '',
+    },
     bannerImage: {
       type: String,
       default: '',

@@ -60,6 +60,23 @@ export const enquiryController = {
     }
   },
 
+  async deleteEnquiry(req) {
+    const auth = await authenticateAdmin(req);
+    if (!auth.success) return auth.response;
+
+    try {
+      const url = new URL(req.url);
+      const body = await req.json().catch(() => ({}));
+      const id = url.searchParams.get('id') || body.id || body._id;
+      if (!id) return sendBadRequest('Enquiry ID required');
+
+      await enquiryService.deleteEnquiry(id, auth.admin.email, req);
+      return sendSuccess(null, 'Enquiry deleted successfully');
+    } catch (err) {
+      return sendError(err.message, 500, err);
+    }
+  },
+
   async exportCsv(req) {
     const auth = await authenticateAdmin(req);
     if (!auth.success) return auth.response;

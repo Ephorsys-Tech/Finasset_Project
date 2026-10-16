@@ -39,7 +39,7 @@ export const serviceController = {
 
     try {
       const body = await req.json().catch(() => ({}));
-      if (!body.title || !body.slug) return sendBadRequest('Title and slug are required');
+      if (!body.name || !body.slug) return sendBadRequest('Name and slug are required');
       const service = await serviceService.createService(body, auth.admin.email, req);
       return sendSuccess(service, 'Service created successfully', 201);
     } catch (err) {
@@ -53,11 +53,15 @@ export const serviceController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
+      const queryId = url.searchParams.get('id');
+      const body = await req.json().catch(() => ({}));
+      // Accept id from query string OR from request body
+      const id = queryId || body.id;
       if (!id) return sendBadRequest('Service ID required');
 
-      const body = await req.json().catch(() => ({}));
-      const service = await serviceService.updateService(id, body, auth.admin.email, req);
+      // Remove _id and id from the update payload to avoid Mongo immutable field errors
+      const { id: _bodyId, _id, ...updateData } = body;
+      const service = await serviceService.updateService(id, updateData, auth.admin.email, req);
       return sendSuccess(service, 'Service updated successfully');
     } catch (err) {
       return sendError(err.message, 500, err);
