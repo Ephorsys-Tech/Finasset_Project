@@ -37,8 +37,19 @@ export default function AdminProtectedLayout({ children }) {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch('/api/v1/auth/me');
-        const json = await res.json();
+        let res = await fetch('/api/v1/auth/me');
+        let json = await res.json();
+
+        // If not authenticated, attempt refresh token exchange
+        if (!json.success || !json.data) {
+          const refRes = await fetch('/api/v1/auth/refresh', { method: 'POST' });
+          const refJson = await refRes.json();
+          if (refJson.success) {
+            res = await fetch('/api/v1/auth/me');
+            json = await res.json();
+          }
+        }
+
         if (json.success && json.data) {
           setAdmin(json.data);
         } else {
@@ -51,6 +62,33 @@ export default function AdminProtectedLayout({ children }) {
       }
     }
     checkAuth();
+
+    // Auto-refresh interceptor: when any admin API returns 401 or 409, refresh token and retry
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      let response = await originalFetch(...args);
+      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+
+      if ((response.status === 401 || response.status === 409) && url.includes('/api/v1/admin/')) {
+        try {
+          const refreshRes = await originalFetch('/api/v1/auth/refresh', { method: 'POST' });
+          const refreshJson = await refreshRes.json();
+          if (refreshJson.success) {
+            // Retry the original request with the renewed access token cookie
+            response = await originalFetch(...args);
+          } else {
+            router.push('/admin/login');
+          }
+        } catch {
+          router.push('/admin/login');
+        }
+      }
+      return response;
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
   }, [router]);
 
   const handleLogout = async () => {
