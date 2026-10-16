@@ -27,7 +27,9 @@ export default function ServiceDetailPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
   const [inquiryName, setInquiryName] = useState('');
+  const [inquiryEmail, setInquiryEmail] = useState('');
   const [inquiryPhone, setInquiryPhone] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
   const [inquirySubmitting, setInquirySubmitting] = useState(false);
 
@@ -41,29 +43,97 @@ export default function ServiceDetailPage({ params }) {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  const handleNameChange = (e) => {
+    // Strictly prevent numbers in the name
+    const val = e.target.value.replace(/[0-9]/g, '');
+    setInquiryName(val);
+    if (formErrors.name) {
+      setFormErrors((prev) => ({ ...prev, name: '' }));
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    // Strictly prevent special characters and limit to 10 digits
+    const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+    setInquiryPhone(val);
+    if (formErrors.phone) {
+      setFormErrors((prev) => ({ ...prev, phone: '' }));
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    setInquiryEmail(e.target.value);
+    if (formErrors.email) {
+      setFormErrors((prev) => ({ ...prev, email: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Name: no numbers, minimum 2 characters
+    if (!inquiryName.trim()) {
+      errors.name = 'Full name is required';
+    } else if (/\d/.test(inquiryName)) {
+      errors.name = 'Name must not contain any numbers';
+    } else if (inquiryName.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!inquiryEmail.trim()) {
+      errors.email = 'Email address is required';
+    } else if (!emailRegex.test(inquiryEmail.trim())) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    // Phone: strictly 10 digits, no special characters
+    const phoneRegex = /^\d{10}$/;
+    if (!inquiryPhone.trim()) {
+      errors.phone = 'Mobile number is required';
+    } else if (/[^0-9]/.test(inquiryPhone)) {
+      errors.phone = 'Phone number must not contain special characters';
+    } else if (!phoneRegex.test(inquiryPhone.trim())) {
+      errors.phone = 'Phone number must be exactly 10 digits';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInquiry = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setInquirySubmitting(true);
+    setFormErrors({});
+
     try {
       const res = await fetch('/api/v1/public/enquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: inquiryName,
-          phone: inquiryPhone,
+          name: inquiryName.trim(),
+          email: inquiryEmail.trim().toLowerCase(),
+          phone: inquiryPhone.trim(),
           serviceOfInterest: serviceData?.service?.name || 'Service Consultation',
-          sourcePage: `Service Page: ${slug}`,
+          sourcePage: `Service Page: ${serviceData?.service?.name || slug} (/services/${slug})`,
           type: 'consultation',
+          message: `Consultation request regarding ${serviceData?.service?.name || slug}`,
         }),
       });
       const data = await res.json();
       if (data.success) {
         setInquirySubmitted(true);
         setInquiryName('');
+        setInquiryEmail('');
         setInquiryPhone('');
+      } else {
+        setFormErrors({ submit: data.message || 'Submission failed. Please check your inputs.' });
       }
     } catch {
-      alert('Failed to submit consultation request. Please call our Bhubaneswar office.');
+      setFormErrors({ submit: 'Failed to submit consultation request. Please call our Bhubaneswar office.' });
     } finally {
       setInquirySubmitting(false);
     }
@@ -102,10 +172,10 @@ export default function ServiceDetailPage({ params }) {
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
       <section className="bg-[#0f2b44] text-white py-16 sm:py-20 relative overflow-hidden">
-        {service.bannerImage && (
+        {(service.bannerImage || service.image) && (
           <div
             className="absolute inset-0 bg-cover bg-center opacity-15"
-            style={{ backgroundImage: `url(${service.bannerImage})` }}
+            style={{ backgroundImage: `url(${service.bannerImage || service.image})` }}
           />
         )}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,13 +187,21 @@ export default function ServiceDetailPage({ params }) {
             <span className="text-white">{service.name}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-            {service.name}
-          </h1>
-
-          <p className="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
-            {service.shortDescription}
-          </p>
+          <div className="flex items-start gap-6">
+            {service.image && (
+              <div className="hidden sm:block w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl shrink-0">
+                <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div>
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+                {service.name}
+              </h1>
+              <p className="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
+                {service.shortDescription}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -231,35 +309,78 @@ export default function ServiceDetailPage({ params }) {
                 </p>
 
                 {inquirySubmitted ? (
-                  <div className="bg-emerald-950/60 border border-emerald-500/50 p-4 rounded-xl text-center space-y-2">
+                  <div className="bg-emerald-950/60 border border-emerald-500/50 p-5 rounded-xl text-center space-y-2.5">
                     <CheckCircle2 className="w-8 h-8 text-[#89b441] mx-auto" />
                     <h4 className="text-sm font-bold text-white">Consultation Requested</h4>
-                    <p className="text-xs text-slate-300">
-                      Our advisory desk will contact you within business hours.
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Thank you! Our advisory desk in Bhubaneswar will contact you shortly regarding {service.name}.
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => setInquirySubmitted(false)}
+                      className="text-xs text-[#f87b1f] hover:underline font-semibold mt-2 inline-block cursor-pointer"
+                    >
+                      Request another consultation
+                    </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleInquiry} className="space-y-3">
-                    <input
-                      type="text"
-                      required
-                      placeholder="Your Full Name"
-                      value={inquiryName}
-                      onChange={(e) => setInquiryName(e.target.value)}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]"
-                    />
-                    <input
-                      type="tel"
-                      required
-                      placeholder="10-Digit Mobile Number"
-                      value={inquiryPhone}
-                      onChange={(e) => setInquiryPhone(e.target.value)}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]"
-                    />
+                  <form onSubmit={handleInquiry} className="space-y-3.5" noValidate>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Your Full Name (letters only)"
+                        value={inquiryName}
+                        onChange={handleNameChange}
+                        className={`w-full bg-slate-800/80 border ${
+                          formErrors.name ? 'border-rose-500' : 'border-slate-700'
+                        } rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]`}
+                      />
+                      {formErrors.name && (
+                        <p className="text-[11px] text-rose-400 mt-1 font-medium">{formErrors.name}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <input
+                        type="email"
+                        placeholder="Your Email Address"
+                        value={inquiryEmail}
+                        onChange={handleEmailChange}
+                        className={`w-full bg-slate-800/80 border ${
+                          formErrors.email ? 'border-rose-500' : 'border-slate-700'
+                        } rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]`}
+                      />
+                      {formErrors.email && (
+                        <p className="text-[11px] text-rose-400 mt-1 font-medium">{formErrors.email}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <input
+                        type="tel"
+                        maxLength={10}
+                        placeholder="10-Digit Mobile Number (digits only)"
+                        value={inquiryPhone}
+                        onChange={handlePhoneChange}
+                        className={`w-full bg-slate-800/80 border ${
+                          formErrors.phone ? 'border-rose-500' : 'border-slate-700'
+                        } rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]`}
+                      />
+                      {formErrors.phone && (
+                        <p className="text-[11px] text-rose-400 mt-1 font-medium">{formErrors.phone}</p>
+                      )}
+                    </div>
+
+                    {formErrors.submit && (
+                      <div className="bg-rose-950/60 border border-rose-500/50 p-2.5 rounded-lg text-rose-300 text-xs">
+                        {formErrors.submit}
+                      </div>
+                    )}
+
                     <button
                       type="submit"
                       disabled={inquirySubmitting}
-                      className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-md shadow-[#f87b1f]/20"
+                      className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-md shadow-[#f87b1f]/20 cursor-pointer"
                     >
                       {inquirySubmitting ? 'Submitting...' : 'Request Consultation'}
                     </button>
@@ -278,42 +399,6 @@ export default function ServiceDetailPage({ params }) {
                 </div>
               </div>
 
-              {/* Other Services Navigation */}
-              <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#0f2b44] mb-4 pb-2 border-b border-slate-100">
-                  Other Wealth Disciplines
-                </h3>
-                <div className="space-y-2">
-                  {otherServices.map((os) => (
-                    <Link
-                      key={os.slug}
-                      href={`/services/${os.slug}`}
-                      className="block p-2.5 rounded-lg hover:bg-slate-50 transition-colors group"
-                    >
-                      <div className="text-sm font-semibold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors flex items-center justify-between">
-                        <span>{os.name}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#2376b8] transition-colors" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quick Risk Profile CTA */}
-              <div className="bg-[#2376b8]/10 border border-[#2376b8]/20 rounded-2xl p-6 text-center space-y-3">
-                <h4 className="font-bold text-sm text-[#0f2b44]">
-                  Know Your Asset Allocation
-                </h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Take our 2-minute psychometric test to discover how much equity and debt is right for you.
-                </p>
-                <Link
-                  href="/investor/risk-profile"
-                  className="inline-block bg-[#0f2b44] hover:bg-[#2376b8] text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors"
-                >
-                  Start Risk Profile Test
-                </Link>
-              </div>
             </div>
           </div>
         </div>

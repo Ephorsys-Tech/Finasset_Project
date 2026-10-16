@@ -18,14 +18,31 @@ import {
   Building,
   Landmark,
   PieChart,
+  ShieldCheck,
   Sparkles,
 } from 'lucide-react';
+
+// Map icon name strings (stored in DB) to Lucide components
+function ServiceIcon({ iconName, className = 'w-4 h-4' }) {
+  const icons = {
+    TrendingUp,
+    Compass,
+    ShieldCheck,
+    Shield,
+    Building,
+    Landmark,
+    PieChart,
+  };
+  const Icon = icons[iconName] || TrendingUp;
+  return <Icon className={className} />;
+}
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdown, setServicesDropdown] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [servicesList, setServicesList] = useState([]);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -43,49 +60,24 @@ export default function Navbar() {
     setMobileServicesOpen(false);
   }, [pathname]);
 
+  // Fetch published services for the dropdown
+  useEffect(() => {
+    fetch('/api/v1/public/services')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data)) {
+          setServicesList(json.data);
+        }
+      })
+      .catch(() => {
+        // Silently fail — dropdown will be empty or show fallback
+      });
+  }, []);
+
   // Don't render public navbar inside /admin routes
   if (pathname.startsWith('/admin')) {
     return null;
   }
-
-  const servicesList = [
-    {
-      name: 'Financial Planning',
-      href: '/services/financial-planning',
-      desc: 'Holistic wealth blueprints & retirement freedom',
-      icon: Compass,
-    },
-    {
-      name: 'Mutual Funds',
-      href: '/services/mutual-funds',
-      desc: 'Disciplined SIPs & top-tier AMC portfolios',
-      icon: TrendingUp,
-    },
-    {
-      name: 'Insurance Planning',
-      href: '/services/insurance',
-      desc: 'Pure term cover & family health protection',
-      icon: Shield,
-    },
-    {
-      name: 'Real Estate Advisory',
-      href: '/services/real-estate',
-      desc: 'RERA-compliant property & commercial yields',
-      icon: Building,
-    },
-    {
-      name: 'Fixed Deposits & Bonds',
-      href: '/services/fixed-deposits-bonds',
-      desc: 'AAA corporate FDs & sovereign gold bonds',
-      icon: Landmark,
-    },
-    {
-      name: 'Portfolio Management (PMS)',
-      href: '/services/portfolio-management-service',
-      desc: 'Bespoke direct-equity portfolios for HNIs',
-      icon: PieChart,
-    },
-  ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white transition-all duration-300">
@@ -159,7 +151,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Navigation Links: Home, Services, NRI Corner, Taxation, Blog, About Us */}
+          {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center gap-1 xl:gap-2">
             {/* 1. Home */}
             <Link
@@ -180,7 +172,7 @@ export default function Navbar() {
               />
             </Link>
 
-            {/* 2. Services (with Luxury Dropdown) */}
+            {/* 2. Services (with Dynamic Dropdown) */}
             <div
               className="relative"
               onMouseEnter={() => setServicesDropdown(true)}
@@ -211,7 +203,7 @@ export default function Navbar() {
                 />
               </Link>
 
-              {/* Dropdown Menu with Smooth Transition */}
+              {/* Dropdown Menu */}
               <div
                 className={`absolute top-full left-0 w-96 bg-white/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-100 py-3.5 px-3 z-50 transition-all duration-300 transform origin-top ${
                   servicesDropdown
@@ -234,16 +226,19 @@ export default function Navbar() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-1">
-                  {servicesList.map((s) => {
-                    const IconComponent = s.icon;
-                    return (
+                  {servicesList.length > 0 ? (
+                    servicesList.map((s) => (
                       <Link
-                        key={s.href}
-                        href={s.href}
+                        key={s.slug}
+                        href={`/services/${s.slug}`}
                         className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#f0f6fb] transition-all duration-200 group/item"
                       >
                         <div className="w-8 h-8 rounded-lg bg-[#2376b8]/10 group-hover/item:bg-[#2376b8] text-[#2376b8] group-hover/item:text-white flex items-center justify-center shrink-0 transition-colors duration-200 mt-0.5">
-                          <IconComponent className="w-4 h-4" />
+                          {s.image ? (
+                            <img src={s.image} alt={s.name} className="w-full h-full object-cover rounded-lg" />
+                          ) : (
+                            <ServiceIcon iconName={s.iconName} />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-semibold text-[#0f2b44] group-hover/item:text-[#2376b8] transition-colors duration-200 flex items-center justify-between">
@@ -251,12 +246,16 @@ export default function Navbar() {
                             <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200 text-[#f87b1f]" />
                           </div>
                           <div className="text-xs text-slate-500 line-clamp-1 mt-0.5">
-                            {s.desc}
+                            {s.shortDescription}
                           </div>
                         </div>
                       </Link>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-xs text-slate-400">
+                      Loading services…
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -338,7 +337,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Right CTA Button (Eye-catching Vibrant Orange) */}
+          {/* Desktop Right CTA Button */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/contact-us#callback"
@@ -406,15 +405,24 @@ export default function Navbar() {
 
               {mobileServicesOpen && (
                 <div className="pl-4 pr-2 space-y-1 mt-1 border-l-2 border-[#2376b8] animate-in fade-in duration-200">
-                  {servicesList.map((s) => (
-                    <Link
-                      key={s.href}
-                      href={s.href}
-                      className="block py-2 px-2 text-sm font-medium text-slate-700 hover:text-[#2376b8] hover:bg-[#f0f6fb] rounded-lg transition-colors"
-                    >
-                      {s.name}
-                    </Link>
-                  ))}
+                  {servicesList.length > 0 ? (
+                    servicesList.map((s) => (
+                      <Link
+                        key={s.slug}
+                        href={`/services/${s.slug}`}
+                        className={`flex items-center gap-2 py-2 px-2 text-sm font-medium rounded-lg transition-colors ${
+                          pathname === `/services/${s.slug}`
+                            ? 'text-[#2376b8] bg-[#f0f6fb] font-bold'
+                            : 'text-slate-700 hover:text-[#2376b8] hover:bg-[#f0f6fb]'
+                        }`}
+                      >
+                        <ServiceIcon iconName={s.iconName} className="w-3.5 h-3.5 text-[#2376b8] shrink-0" />
+                        <span>{s.name}</span>
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-400 py-2 px-2">Loading…</p>
+                  )}
                 </div>
               )}
             </div>
@@ -517,4 +525,3 @@ export default function Navbar() {
     </header>
   );
 }
-

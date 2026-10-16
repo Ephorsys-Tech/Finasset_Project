@@ -5,7 +5,7 @@ import { logAdminActivity } from '@/backend/lib/auth';
 // In-memory rate limiting tracker (per IP)
 const ipRateMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const MAX_REQUESTS_PER_WINDOW = 5;
+const MAX_REQUESTS_PER_WINDOW = 10;
 
 function checkRateLimit(ip) {
   const now = Date.now();
@@ -36,17 +36,18 @@ export const enquiryService = {
     }
 
     const trackingNumber = `FIN-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+    const normalizedType = (data.type || 'consultation').toLowerCase();
 
     const enquiry = await Enquiry.create({
       trackingNumber,
       name: data.name,
       phone: data.phone,
       email: data.email || '',
-      type: (data.type || 'CALLBACK').toUpperCase(),
+      type: normalizedType,
       serviceOfInterest: data.serviceOfInterest || 'General Wealth Advisory',
       preferredTime: data.preferredTime || 'Anytime',
       message: data.message || '',
-      sourcePage: data.sourcePage || 'Website Contact Form',
+      sourcePage: data.sourcePage || 'Website Form',
       status: 'NEW',
       ipAddress,
     });
@@ -62,7 +63,7 @@ export const enquiryService = {
       query.status = status;
     }
     if (type && type !== 'ALL') {
-      query.type = type.toUpperCase();
+      query.type = { $regex: new RegExp(`^${type}$`, 'i') };
     }
     if (search) {
       query.$or = [
@@ -70,6 +71,7 @@ export const enquiryService = {
         { phone: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
         { trackingNumber: { $regex: search, $options: 'i' } },
+        { serviceOfInterest: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -79,11 +81,19 @@ export const enquiryService = {
       Enquiry.countDocuments(query),
     ]);
 
+    const totalPages = Math.ceil(total / Number(limit)) || 1;
+
     return {
       enquiries,
       total,
       page: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
+      totalPages,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages,
+      },
     };
   },
 
@@ -100,6 +110,25 @@ export const enquiryService = {
       entity: 'Enquiry',
       entityId: id,
       summary: `Updated enquiry status to ${enquiry.status} for ${enquiry.name} (${enquiry.trackingNumber || id}).`,
+      req,
+    });
+
+    return enquiry;
+  },
+
+  async deleteEnquiry(id, adminEmail, req) {
+    await connectToDatabase();
+    const enquiry = await Enquiry.findByIdAndDelete(id);
+    if (!enquiry) {
+      throw new Error('Enquiry not found');
+    }
+
+    await logAdminActivity({
+      adminEmail,
+      action: 'DELETE',
+      entity: 'Enquiry',
+      entityId: id,
+      summary: `Deleted enquiry from ${enquiry.name} (${enquiry.phone || 'No phone'}).`,
       req,
     });
 

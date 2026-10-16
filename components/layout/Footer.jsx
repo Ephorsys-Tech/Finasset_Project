@@ -170,12 +170,7 @@ export default function Footer() {
                   <span>Financial Calculator</span>
                 </Link>
               </li>
-              <li>
-                <Link href="/investor/risk-profile" className="text-slate-400 hover:text-[#89b441] transition-colors flex items-center gap-1.5 group">
-                  <ArrowRight className="w-3 h-3 text-[#89b441] group-hover:translate-x-1 transition-transform" />
-                  <span>Know Your Risk Profile</span>
-                </Link>
-              </li>
+
               <li>
                 <Link href="/investor/financial-fitness" className="text-slate-400 hover:text-[#89b441] transition-colors flex items-center gap-1.5 group">
                   <ArrowRight className="w-3 h-3 text-[#89b441] group-hover:translate-x-1 transition-transform" />
