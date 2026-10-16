@@ -16,6 +16,7 @@ import {
   fallbackNewsItems,
   fallbackTestimonials,
   fallbackPartners,
+  fallbackFinancialVideo,
 } from '@/lib/fallbackData';
 
 export const homeService = {
@@ -52,6 +53,7 @@ export const homeService = {
         newsItems: (newsItems && newsItems.length) ? newsItems : fallbackNewsItems,
         testimonials: (testimonials && testimonials.length) ? testimonials : fallbackTestimonials,
         partners: (partners && partners.length) ? partners : fallbackPartners,
+        financialVideo: settings?.financialVideo || fallbackFinancialVideo,
       };
     } catch (err) {
       console.warn('⚠️ Serving cached fallback home data:', err.message);
@@ -64,6 +66,7 @@ export const homeService = {
         newsItems: fallbackNewsItems,
         testimonials: fallbackTestimonials,
         partners: fallbackPartners,
+        financialVideo: fallbackFinancialVideo,
         isFallback: true,
       };
     }

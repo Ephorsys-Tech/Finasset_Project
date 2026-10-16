@@ -1,10 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,jsx}",
-    "./components/**/*.{js,jsx}",
-    "./lib/**/*.{js,jsx}",
-    "./backend/**/*.{js,jsx}",
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
+    "./lib/**/*.{js,jsx,ts,tsx}",
+    "./backend/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
@@ -42,8 +42,20 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Georgia', 'Cambria', 'serif'],
+        sans: ["'IBM Plex Serif'", 'Georgia', 'serif'],
+        serif: ["'IBM Plex Serif'", 'Georgia', 'serif'],
+      },
+      animation: {
+        marquee: 'marquee var(--duration, 30s) linear infinite',
+        'marquee-reverse': 'marquee-reverse var(--duration, 30s) linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          to: { transform: 'translateX(-50%)' },
+        },
+        'marquee-reverse': {
+          to: { transform: 'translateX(50%)' },
+        },
       },
     },
   },
