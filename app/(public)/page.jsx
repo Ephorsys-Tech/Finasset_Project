@@ -15,10 +15,11 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Phone,
   Mail,
   Clock,
-  Sparkles,
   ExternalLink,
   Award,
   Users,
@@ -31,11 +32,26 @@ import {
   Star,
 } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
+import HeroSlider from '@/components/home/HeroSlider';
+import FeatureCarousel from '@/components/ui/feature-carousel';
+import { Marquee } from '@/components/ui/marquee';
+import { fallbackMarketIndices, fallbackServices, fallbackNewsItems, fallbackFinancialVideo, fallbackPartners } from '@/lib/fallbackData';
+
+function getEmbedUrl(url) {
+  if (!url) return 'https://www.youtube.com/embed/1-S_q_kUeYw';
+  if (url.includes('embed')) return url;
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+  if (match && match[1]) {
+    return `https://www.youtube.com/embed/${match[1]}?rel=0&modestbranding=1`;
+  }
+  return url;
+}
 
 export default function HomePage() {
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showAllServices, setShowAllServices] = useState(false);
+  const [selectedNewsIndex, setSelectedNewsIndex] = useState(0);
   const [newsTab, setNewsTab] = useState('popular');
   const [callbackForm, setCallbackForm] = useState({
     name: '',
@@ -65,24 +81,30 @@ export default function HomePage() {
     fetchHomeData();
   }, []);
 
-  // Slide carousel timer
-  useEffect(() => {
-    if (!homeData?.heroSlides?.length) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % homeData.heroSlides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [homeData?.heroSlides]);
-
   const slides = homeData?.heroSlides || [];
   const services = homeData?.services || [];
+  const displayServices = (services && services.length > 0) ? services : fallbackServices;
+  const visibleServices = showAllServices ? displayServices : displayServices.slice(0, 3);
   const investorTools = homeData?.investorTools || [];
   const marketIndices = homeData?.marketIndices || [];
+  const displayIndices = (marketIndices && marketIndices.length > 0) ? marketIndices : fallbackMarketIndices;
+  const tickerItems = [...displayIndices, ...displayIndices];
   const newsItems = homeData?.newsItems || [];
+  const displayNews = (newsItems && newsItems.length > 0) ? newsItems : fallbackNewsItems;
+  const activeNews = displayNews[selectedNewsIndex] || displayNews[0];
   const testimonials = homeData?.testimonials || [];
-  const partners = homeData?.partners || [];
+  const partners = (homeData?.partners && homeData.partners.length > 0) ? homeData.partners : fallbackPartners;
+  const financialVideo = homeData?.financialVideo || fallbackFinancialVideo;
 
-  const filteredNews = newsItems.filter((n) => n.tab === newsTab);
+  const handleSelectNews = (idx) => {
+    setSelectedNewsIndex(idx);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      const el = document.getElementById('featured-news-card');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  };
 
   const handleCallbackSubmit = async (e) => {
     e.preventDefault();
@@ -159,535 +181,410 @@ export default function HomePage() {
   return (
     <div className="w-full">
       {/* 1. HERO BANNER CAROUSEL */}
-      <section className="relative w-full min-h-[580px] lg:min-h-[640px] bg-[#0f2b44] text-white flex items-center overflow-hidden">
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0f2b44] via-[#0f2b44]/95 to-[#164366]/75 z-10" />
+      <HeroSlider slides={slides} />
 
-        {/* Slide Background Image */}
-        {slides.length > 0 && (slides[currentSlide]?.bgImageUrl || slides[currentSlide]?.imageUrl) && (
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-all duration-1000 transform scale-105"
-            style={{ backgroundImage: `url(${slides[currentSlide].bgImageUrl || slides[currentSlide].imageUrl})` }}
-          />
-        )}
+      {/* Scoped Keyframes for Smooth Marquee Auto-Scroll & Hover-Pause */}
+      <style jsx>{`
+        @keyframes marketTickerScroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .ticker-track {
+          display: flex;
+          width: max-content;
+          animation: marketTickerScroll 32s linear infinite;
+        }
+        .ticker-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
 
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="max-w-3xl">
-            {/* Slide Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/40 text-[#f87b1f] text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm">
-              <Sparkles className="w-3.5 h-3.5 text-[#f87b1f]" />
-              <span>{slides[currentSlide]?.badge || slides[currentSlide]?.badgeText || 'Finasset Wealth Management'}</span>
+      {/* 2. MARKET WATCH STRIP (Sensex, Nifty, Bank Nifty, Gold) */}
+      <section className="my-6 sm:my-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow py-3 px-4 sm:px-6 flex items-center justify-between gap-4 overflow-hidden">
+            {/* Label */}
+            <div className="flex items-center gap-2 shrink-0 z-10 bg-white pr-2">
+              <span className="w-1.5 h-3.5 bg-[#2376b8] rounded-full inline-block" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[#0f2b44] whitespace-nowrap">
+                Market Watch
+              </span>
             </div>
 
-            {/* Slide Title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-6">
-              {slides[currentSlide]?.title || 'Architecting Generational Wealth for Discerning Families'}
-            </h1>
+            {/* Seamless Auto-Scrolling Ticker (No Bottom Scrollbar, Pauses on Hover) */}
+            <div className="relative flex-1 overflow-hidden mx-1 sm:mx-3 py-1">
+              {/* Subtle edge fade overlays for ultra-modern look */}
+              <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-            {/* Slide Subtitle */}
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
-              {slides[currentSlide]?.description || slides[currentSlide]?.subtitle ||
-                'Personalized wealth management, structured portfolio strategies, and bespoke financial solutions guided by seasoned advisors in Bhubaneswar.'}
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4">
-              <Link
-                href={slides[currentSlide]?.cta1Url || '/services'}
-                className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-lg shadow-[#f87b1f]/25 hover:shadow-xl hover:shadow-[#f87b1f]/35 transition-all flex items-center gap-2 group"
-              >
-                <span>{slides[currentSlide]?.cta1Text || 'Explore Our Services'}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-
-              <Link
-                href={slides[currentSlide]?.cta2Url || '/investor/financial-calculator'}
-                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all backdrop-blur-sm flex items-center gap-2 group"
-              >
-                <Calculator className="w-4 h-4 text-[#89b441] group-hover:scale-110 transition-transform" />
-                <span>{slides[currentSlide]?.cta2Text || 'Calculate Your Wealth'}</span>
-              </Link>
-            </div>
-
-            {/* Trust Pill */}
-            {slides[currentSlide]?.statsHighlight && (
-              <div className="mt-10 pt-6 border-t border-slate-700/60 inline-flex items-center gap-4 text-xs sm:text-sm text-slate-300">
-                <div className="flex items-center gap-1.5 text-[#89b441] font-semibold">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>{slides[currentSlide].statsHighlight.label}:</span>
-                </div>
-                <span className="text-white font-bold">{slides[currentSlide].statsHighlight.value}</span>
+              <div className="ticker-track">
+                {tickerItems.map((idx, index) => {
+                  const changeVal = Number(idx?.change ?? 0);
+                  const percentVal = Number(idx?.percentChange ?? idx?.changePercent ?? 0);
+                  const isPositive = idx?.isPositive !== undefined ? Boolean(idx.isPositive) : changeVal >= 0;
+                  const displayVal = idx?.currentValue ?? idx?.currentPrice ?? 0;
+                  return (
+                    <div
+                      key={`${idx?.symbol || idx?.name || 'idx'}-${index}`}
+                      className="flex items-center gap-2.5 whitespace-nowrap bg-slate-50 hover:bg-slate-100/90 px-3.5 py-1.5 rounded-xl border border-slate-200/60 transition-colors mx-2 cursor-pointer"
+                    >
+                      <span className="font-bold text-slate-700">{idx?.name || idx?.symbol || 'Index'}</span>
+                      <span className="font-extrabold text-slate-900 tracking-tight">{formatINR(displayVal)}</span>
+                      <span
+                        className={`font-bold text-[11px] px-2 py-0.5 rounded-lg flex items-center gap-1 ${
+                          isPositive
+                            ? 'bg-[#89b441]/15 text-[#5e8424]'
+                            : 'bg-rose-50 text-rose-600'
+                        }`}
+                      >
+                        <span>{isPositive ? '▲' : '▼'}</span>
+                        <span>
+                          {isPositive ? '+' : ''}
+                          {changeVal.toFixed(2)} ({isPositive ? '+' : ''}
+                          {percentVal.toFixed(2)}%)
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
+
+            {/* Action Link */}
+            <Link
+              href="/market-update"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2376b8] hover:text-[#1b5d92] bg-[#2376b8]/5 hover:bg-[#2376b8]/10 px-3.5 py-1.5 rounded-xl transition-all group shrink-0 whitespace-nowrap z-10"
+            >
+              <span>Full Indices &amp; IPOs</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. OUR SERVICES (Minimalist Bento Layout Matching Shared Image) */}
+      <section id="services" className="py-16 sm:py-24 bg-white scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header (Aligned to right side) */}
+          <div className="max-w-3xl ml-auto text-right mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-slate-900 tracking-tight mb-3">
+              Our Services
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+              Comprehensive, data-driven wealth creation and advisory solutions customized to power your long-term financial security and portfolio growth.
+            </p>
           </div>
 
-          {/* Carousel Arrows & Dots */}
-          {slides.length > 1 && (
-            <div className="flex items-center gap-4 mt-8">
+          {/* Service Cards Grid (1st full-screen horizontal, 2nd & 3rd 1:1 side by side, repeating on expand) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {visibleServices.map((service, index) => {
+              const title = service.title || service.name;
+              const desc = service.shortDescription || service.description;
+              const href = `/services/${service.slug}`;
+              const img = service.imageUrl || service.image;
+              const isFullSpan = index % 3 === 0; // 1st card (0) and 4th card (3) cover full screen width
+
+              if (isFullSpan) {
+                return (
+                  <Link
+                    key={service.slug || index}
+                    href={href}
+                    className="group flex flex-col md:flex-row bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 md:col-span-2"
+                  >
+                    {/* Left Image Area (Horizontal fill) */}
+                    <div className="md:w-1/2 bg-[#f4f4f5] h-64 sm:h-72 md:h-auto min-h-[260px] overflow-hidden flex items-center justify-center relative">
+                      {img ? (
+                        <img
+                          src={img}
+                          alt={title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-2xl bg-slate-200/60 flex items-center justify-center text-slate-400">
+                          <Building className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Content Area */}
+                    <div className="md:w-1/2 p-7 sm:p-10 bg-white flex flex-col justify-center text-left">
+                      <h3 className="font-semibold text-xl sm:text-2xl text-slate-900 group-hover:text-[#2376b8] transition-colors">
+                        {title}
+                      </h3>
+                      <p className="text-slate-500 text-sm sm:text-base leading-relaxed mt-3">
+                        {desc}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              }
+
+              return (
+                <Link
+                  key={service.slug || index}
+                  href={href}
+                  className="group flex flex-col bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 md:col-span-1"
+                >
+                  {/* Top Image Container (1:1 ratio style) */}
+                  <div className="relative h-56 sm:h-64 bg-[#f4f4f5] overflow-hidden flex items-center justify-center">
+                    {img ? (
+                      <img
+                        src={img}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-slate-200/60 flex items-center justify-center text-slate-400">
+                        <Building className="w-8 h-8" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom Content Container */}
+                  <div className="p-6 sm:p-7 bg-white flex flex-col justify-start flex-1 text-left">
+                    <h3 className="font-semibold text-lg sm:text-xl text-slate-900 group-hover:text-[#2376b8] transition-colors">
+                      {title}
+                    </h3>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mt-2">
+                      {desc}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Explore all services button */}
+          {displayServices.length > 3 && (
+            <div className="mt-10 sm:mt-12 flex justify-center">
               <button
-                onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10"
-                aria-label="Previous slide"
+                onClick={() => setShowAllServices(!showAllServices)}
+                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-slate-900 hover:bg-[#2376b8] text-white text-xs sm:text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-md group"
               >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <div className="flex gap-1.5">
-                {slides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentSlide(idx)}
-                    className={`h-2 rounded-full transition-all ${
-                      currentSlide === idx ? 'w-8 bg-[#f87b1f]' : 'w-2 bg-white/30'
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="w-5 h-5" />
+                <span>{showAllServices ? 'Show Less Services' : 'Explore all services'}</span>
+                <ArrowRight className={`w-4 h-4 transition-transform duration-300 ${showAllServices ? '-rotate-90' : 'group-hover:translate-x-1'}`} />
               </button>
             </div>
           )}
         </div>
       </section>
 
-      {/* 2. MARKET WATCH STRIP (Sensex, Nifty, Bank Nifty, Gold) */}
-      <section className="bg-white border-b border-slate-200 py-3 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0f2b44]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#89b441] animate-pulse" />
-              <span>Market Watch</span>
-            </div>
-
-            <div className="flex items-center gap-6 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 text-xs">
-              {marketIndices.map((idx, index) => {
-                const changeVal = Number(idx?.change ?? 0);
-                const percentVal = Number(idx?.percentChange ?? idx?.changePercent ?? 0);
-                const isPositive = idx?.isPositive !== undefined ? Boolean(idx.isPositive) : changeVal >= 0;
-                const displayVal = idx?.currentValue ?? idx?.currentPrice ?? 0;
-                return (
-                  <div key={idx?.symbol || idx?.name || index} className="flex items-center gap-2 whitespace-nowrap">
-                    <span className="font-bold text-slate-700">{idx?.name || idx?.symbol || 'Index'}</span>
-                    <span className="font-semibold text-slate-900">{formatINR(displayVal)}</span>
-                    <span
-                      className={`font-semibold flex items-center ${
-                        isPositive ? 'text-[#89b441]' : 'text-rose-600'
-                      }`}
-                    >
-                      {isPositive ? '+' : ''}
-                      {changeVal.toFixed(2)} ({isPositive ? '+' : ''}
-                      {percentVal.toFixed(2)}%)
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <Link
-              href="/market-update"
-              className="text-xs font-bold text-[#2376b8] hover:text-[#1b5d92] flex items-center gap-1 shrink-0"
-            >
-              <span>Full Indices & IPOs</span>
-              <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. INTRODUCTION TO FINASSET WEALTH (NLF Adhira Asset Services LLP) */}
-      <section className="py-20 bg-[#f8fafc]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#2376b8]/10 border border-[#2376b8]/20 text-[#2376b8] text-xs font-bold uppercase tracking-wider mb-4">
-                <Award className="w-3.5 h-3.5 text-[#2376b8]" />
-                <span>Bhubaneswar Wealth Advisory</span>
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44] tracking-tight leading-tight mb-6">
-                Disciplined Wealth Creation Grounded in Fiduciary Integrity
-              </h2>
-
-              <p className="text-slate-600 leading-relaxed mb-6">
-                <strong>Finasset Wealth</strong> is a dedicated wealth management advisory firm, a proud group of <strong>NLF Adhira Asset Services LLP</strong>, headquartered in Bhubaneswar, Odisha. We partner with families, professionals, doctors, and business leaders to navigate financial complexities and build resilient, multi-generational legacies.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
-                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-bold text-sm text-[#0f2b44]">Goal-Based Portfolios</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">SIPs mapped to tangible retirement and education goals.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
-                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-bold text-sm text-[#0f2b44]">35+ Leading AMCs</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Unbiased fund selection across top mutual fund houses.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
-                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-bold text-sm text-[#0f2b44]">Comprehensive Protection</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">High-cover pure term and indemnity health insurance.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
-                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-bold text-sm text-[#0f2b44]">Global NRI Solutions</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">FEMA, NRE/NRO banking & repatriation assistance.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 flex-wrap">
-                <Link
-                  href="/about-us"
-                  className="bg-[#2376b8] hover:bg-[#1b5d92] text-white font-bold text-sm px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 group"
-                >
-                  <span>Learn Our Philosophy</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-                <Link
-                  href="/contact-us"
-                  className="text-[#f87b1f] hover:text-[#d9620b] font-bold text-sm hover:underline flex items-center gap-1.5 transition-colors"
-                >
-                  <span>Visit Our Bhubaneswar Office</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Visual Box / Image */}
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                <img
-                  src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=1200&auto=format&fit=crop"
-                  alt="Finasset Wealth Financial Advisory"
-                  className="w-full h-[440px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f2b44] via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-xs font-bold text-[#f87b1f] uppercase tracking-wider block">
-                    Our Commitment
-                  </span>
-                  <p className="text-lg font-bold leading-snug mt-1">
-                    &quot;We don&apos;t just allocate funds; we engineer your family&apos;s peace of mind.&quot;
-                  </p>
-                </div>
-              </div>
-
-              {/* Floating Stat Card */}
-              <div className="absolute -bottom-6 -right-4 sm:right-6 bg-white p-4 rounded-xl shadow-xl border border-slate-100 max-w-xs hidden sm:block">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#2376b8] to-[#0f2b44] flex items-center justify-center text-[#89b441]">
-                    <Shield className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="text-xl font-extrabold text-[#0f2b44]">15+ Years</div>
-                    <div className="text-xs text-slate-500 font-medium">Trusted Advisory in Odisha</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. OUR SERVICES (6 Core Services) */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
-              Holistic Wealth Solutions
+      {/* 4. INVESTOR'S CORNER (Interactive Feature Carousel) */}
+      <section id="investors-corner" className="py-16 sm:py-24 bg-[#f8fafc] scroll-mt-20 border-t border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
+          <div className="max-w-3xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/10 px-3.5 py-1 rounded-full border border-[#f87b1f]/20 inline-block mb-3">
+              Investor Empowerment
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44] tracking-tight">
-              Bespoke Advisory Built Around Your Life Goals
+            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-slate-900 tracking-tight mb-3">
+              Investor&apos;s Corner
             </h2>
-            <p className="text-slate-600 mt-4 leading-relaxed">
-              Every financial journey is distinct. Explore our six core wealth disciplines designed to grow, safeguard, and transition your assets seamlessly.
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+              Equip yourself with institutional-grade financial utilities. Calculate compounding wealth, test your risk tolerance, and explore personalized advisory tools.
+            </p>
+          </div>
+        </div>
+
+        <FeatureCarousel />
+      </section>
+
+      {/* 5. NEWS FEED (Interactive Split Layout Matching Reference Image) */}
+      <section id="news-feed" className="py-16 sm:py-24 bg-white scroll-mt-20 border-t border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#2376b8]/10 px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
+                Market Intelligence
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-slate-900 tracking-tight">
+                News Feed
+              </h2>
+            </div>
+            <p className="text-slate-500 text-xs sm:text-sm max-w-md text-left sm:text-right leading-relaxed">
+              Curated market reports, macroeconomic shifts, and fiduciary advisory commentary updated regularly.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, idx) => {
-              const serviceBenefits = (service.keyBenefits && service.keyBenefits.length > 0)
-                ? service.keyBenefits
-                : (service.features ? service.features.map((f) => (typeof f === 'string' ? { title: f } : f)) : []);
-
-              return (
+          {/* News Feed Grid (Left: Active Featured Story, Right: Interactive List) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Left Side: Featured / Selected News in Detail */}
+            <div id="featured-news-card" className="lg:col-span-7 xl:col-span-8 scroll-mt-24">
+              <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 h-[440px] sm:h-[500px] lg:h-[540px] flex flex-col justify-between p-6 sm:p-10 group">
+                {/* Background Image with smooth transition */}
                 <div
-                  key={service.slug || service._id || `service-${idx}`}
-                  className="bg-[#f8fafc] rounded-2xl p-7 border border-slate-200/90 hover:border-[#2376b8]/60 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0f2b44] to-[#164366] flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform">
-                      {getServiceIcon(service.iconName)}
-                    </div>
+                  key={activeNews?._id || activeNews?.title || selectedNewsIndex}
+                  className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-105 animate-in fade-in duration-500"
+                  style={{
+                    backgroundImage: `url('${activeNews?.imageUrl || 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1200&q=80'}')`,
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/20 z-10" />
 
-                    <h3 className="text-xl font-bold text-[#0f2b44] mb-3 group-hover:text-[#2376b8] transition-colors">
-                      {service.name || service.title}
-                    </h3>
+                {/* Top-Left Badge: Matching Screenshot "Featured Post" pill */}
+                <div className="relative z-20 self-start">
+                  <span className="px-4 py-1.5 rounded-full bg-white text-slate-900 font-bold text-xs shadow-lg tracking-wide border border-white/80">
+                    {activeNews?.badge || 'Featured Post'}
+                  </span>
+                </div>
 
-                    <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
-                      {service.shortDescription || service.description || service.tagline}
-                    </p>
-
-                    {/* Key Benefits Preview */}
-                    {serviceBenefits.length > 0 && (
-                      <ul className="space-y-2 mb-6 border-t border-slate-200/80 pt-4">
-                        {serviceBenefits.slice(0, 2).map((b, i) => (
-                          <li key={i} className="text-xs text-slate-700 flex items-center gap-2">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#89b441] shrink-0" />
-                            <span className="font-medium line-clamp-1">{b.title}</span>
-                          </li>
-                        ))}
-                      </ul>
+                {/* Bottom News Details */}
+                <div className="relative z-20 flex flex-col justify-end text-left">
+                  {/* Publish Date & Meta */}
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-300 mb-2.5">
+                    <span>
+                      {activeNews?.publishedAt
+                        ? (typeof activeNews.publishedAt === 'string'
+                            ? activeNews.publishedAt
+                            : new Date(activeNews.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))
+                        : 'Recent'}
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-slate-400" />
+                    <span>{activeNews?.readTime || '5 min Read'}</span>
+                    {activeNews?.source && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-slate-400" />
+                        <span className="text-[#89b441]">{activeNews.source}</span>
+                      </>
                     )}
                   </div>
 
-                  <Link
-                    href={`/services/${service.slug || ''}`}
-                    className="inline-flex items-center gap-2 text-sm font-bold text-[#2376b8] group-hover:text-[#f87b1f] transition-colors mt-2"
-                  >
-                    <span>Explore {service.name || service.title}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-2 text-sm font-bold text-[#2376b8] hover:text-[#f87b1f] transition-colors"
-            >
-              <span>View All Financial Advisory Disciplines</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. INVESTOR'S CORNER (5 Configurable Interactive Tiles) */}
-      <section className="py-20 bg-[#0f2b44] text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#2376b8]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#f87b1f]/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/15 px-3.5 py-1 rounded-full border border-[#f87b1f]/30 inline-block mb-3">
-              Investor Empowerment
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Investor&apos;s Corner — Interactive Tools & Portals
-            </h2>
-            <p className="text-slate-300 mt-4 leading-relaxed">
-              Equip yourself with institutional-grade financial utilities. Calculate compounding wealth, test your risk tolerance, diagnose financial wellness, and transact seamlessly.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {investorTools.map((tool, idx) => (
-              <div
-                key={tool.key || tool.slug || tool._id || tool.url || tool.href || `tool-${idx}`}
-                className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-[#2376b8]/60 transition-all duration-300 flex flex-col justify-between group backdrop-blur-sm"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                      {getToolIcon(tool.iconName)}
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/15 px-2.5 py-1 rounded-full border border-[#f87b1f]/30">
-                      {tool.badge || tool.badgeText || 'Interactive Tool'}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#f87b1f] transition-colors">
-                    {tool.title}
+                  {/* Title */}
+                  <h3 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-white leading-tight tracking-tight mb-3 group-hover:text-blue-100 transition-colors">
+                    {activeNews?.title}
                   </h3>
 
-                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                    {tool.shortDescription || tool.description}
+                  {/* Subtitle / Description */}
+                  <p className="text-slate-200 text-xs sm:text-sm sm:leading-relaxed line-clamp-3 mb-5 max-w-2xl">
+                    {activeNews?.summary || activeNews?.description}
                   </p>
-                </div>
 
-                <Link
-                  href={tool.url || tool.href || '#'}
-                  className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-md group-hover:shadow-[#f87b1f]/20"
-                >
-                  <span>{tool.actionText || 'Launch Tool'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                  {/* Action Link */}
+                  {activeNews?.url && (
+                    <Link
+                      href={activeNews.url}
+                      className="inline-flex items-center gap-2 text-xs font-bold text-white bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-2 rounded-xl transition-all w-fit"
+                    >
+                      <span>Read Full Story</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Right Side: Other News List (Scrollable when more feeds exist) */}
+            <div className="lg:col-span-5 xl:col-span-4 flex flex-col lg:h-[540px]">
+              {/* Header / Feed indicator */}
+              <div className="flex items-center justify-between pb-3 px-1 border-b border-slate-100 mb-2 shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#2376b8] animate-pulse" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Latest Stories <span className="text-slate-400 font-semibold">({displayNews.length})</span>
+                  </span>
+                </div>
+                {displayNews.length > 3 && (
+                  <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+                    <span>Scroll for more</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-[#2376b8] animate-bounce" />
+                  </span>
+                )}
+              </div>
+
+              {/* Scroll Container with smooth scroll effect and sleek styling */}
+              <div className="flex-1 overflow-y-auto pr-1.5 sm:pr-2 space-y-3 sm:space-y-3.5 news-feed-scroll max-h-[440px] sm:max-h-[480px] lg:max-h-none overscroll-contain">
+                {displayNews.map((item, idx) => {
+                  const isSelected = idx === selectedNewsIndex;
+                  const dateStr = item?.publishedAt
+                    ? (typeof item.publishedAt === 'string'
+                        ? item.publishedAt
+                        : new Date(item.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))
+                    : 'Recent';
+
+                  return (
+                    <button
+                      key={item?._id || item?.title || idx}
+                      type="button"
+                      onClick={() => handleSelectNews(idx)}
+                      className={`w-full text-left flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer group relative ${
+                        isSelected
+                          ? 'border-[#2376b8] ring-2 ring-[#2376b8]/15 bg-[#f0f6fb]/80 shadow-md'
+                          : 'border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-md'
+                      }`}
+                    >
+                      {/* Thumbnail Image */}
+                      <div className="w-20 sm:w-28 h-18 sm:h-20 rounded-xl overflow-hidden shrink-0 relative bg-slate-100 border border-slate-200/60">
+                        <img
+                          src={item?.imageUrl || 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=400&q=80'}
+                          alt={item?.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      {/* Content Area */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        {/* Top Row: Date & Read Time */}
+                        <div className="flex items-center justify-between text-[11px] sm:text-xs text-slate-400 font-medium mb-1">
+                          <span>{dateStr}</span>
+                          <span className="flex items-center gap-1.5">
+                            {isSelected && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#2376b8]" />
+                            )}
+                            {item?.readTime || '4 min Read'}
+                          </span>
+                        </div>
+
+                        {/* Main Title */}
+                        <h4
+                          className={`font-bold text-xs sm:text-sm line-clamp-2 leading-snug transition-colors ${
+                            isSelected ? 'text-[#2376b8]' : 'text-slate-900 group-hover:text-[#2376b8]'
+                          }`}
+                        >
+                          {item?.title}
+                        </h4>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* 6. NEWS TABS (Popular, IPO, Market) */}
-      <section className="py-20 bg-white">
+ 
+      {/* 6. FINANCIAL VIDEO (Cinematic Full-Width Showcase with In-Video Bottom-Right Title) */}
+      <section id="financial-video" className="py-12 sm:py-16 lg:py-20 bg-white scroll-mt-20 border-t border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2">
-                Market Intelligence
-              </span>
-              <h2 className="text-3xl font-extrabold text-[#0f2b44] tracking-tight">
-                Latest Financial Insights & Market News
+          {/* Video Covering Page Length-Wise (Full Width & Responsive 16:9) */}
+          <div className="relative w-full aspect-video rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border border-slate-200/80">
+            <iframe
+              src={getEmbedUrl(financialVideo?.embedUrl || financialVideo?.videoUrl || 'https://www.youtube.com/embed/1-S_q_kUeYw')}
+              title={financialVideo?.title || 'Financial Video'}
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+            />
+
+            {/* Title Inside Video (Bottom-Right Position, Right-Aligned Plain Text) */}
+            <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-20 pointer-events-none text-right max-w-[85%] sm:max-w-md lg:max-w-xl">
+              <h2 className="text-sm sm:text-base lg:text-xl font-extrabold text-white tracking-tight leading-snug drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] text-right">
+                {financialVideo?.title || 'The Power of Compounding & Wealth Creation: Practical Advisory Guide'}
               </h2>
             </div>
-
-            {/* Tab Buttons */}
-            <div className="flex items-center bg-[#f8fafc] p-1.5 rounded-xl border border-slate-200">
-              <button
-                onClick={() => setNewsTab('popular')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  newsTab === 'popular'
-                    ? 'bg-[#2376b8] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#2376b8]'
-                }`}
-              >
-                Popular
-              </button>
-              <button
-                onClick={() => setNewsTab('ipo')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  newsTab === 'ipo'
-                    ? 'bg-[#2376b8] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#2376b8]'
-                }`}
-              >
-                IPO Watch
-              </button>
-              <button
-                onClick={() => setNewsTab('market')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  newsTab === 'market'
-                    ? 'bg-[#2376b8] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#2376b8]'
-                }`}
-              >
-                Market Desk
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredNews.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-[#f8fafc] rounded-2xl p-6 border border-slate-200/80 hover:border-[#2376b8]/50 hover:shadow-md transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
-                    <span className="font-semibold text-[#0f2b44] bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                      {item.badge}
-                    </span>
-                    <span>{item.source}</span>
-                  </div>
-
-                  <h3 className="text-lg font-bold text-[#0f2b44] mb-3 leading-snug hover:text-[#2376b8] transition-colors">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                    {item.summary}
-                  </p>
-                </div>
-
-                <Link
-                  href={item.url || '/market-update'}
-                  className="text-xs font-bold text-[#f87b1f] hover:text-[#d9620b] flex items-center gap-1.5 transition-colors"
-                >
-                  <span>Read Full Market Brief</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* 7. FINANCIAL VIDEO SECTION */}
-      <section className="py-20 bg-[#f8fafc] border-y border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-[#0f2b44] via-[#0f2b44] to-[#164366] rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-12 text-white">
-            <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/40 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4 w-fit">
-                <Play className="w-3 h-3 text-[#f87b1f]" />
-                <span>Financial Literacy Desk</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight mb-4">
-                The Science of Wealth: How SIP Compounding Beats Market Timing
-              </h2>
-
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                Understand why volatility is your best friend when investing for the long term. Learn how rupee-cost averaging systematically lowers your acquisition cost, multiplying your portfolio value over 10, 15, and 20 years.
-              </p>
-
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0" />
-                  <span>Historical rolling returns of Nifty 50 over 15 years</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0" />
-                  <span>The psychological trap of waiting for market corrections</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0" />
-                  <span>Step-up SIP strategies for salaried and business clients</span>
-                </div>
-              </div>
-
-              <Link
-                href="/investor/financial-calculator"
-                className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm px-6 py-3.5 rounded-xl w-fit shadow-md hover:shadow-lg transition-all flex items-center gap-2"
-              >
-                <span>Simulate Your Compounding</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Video Thumbnail / Mockup */}
-            <div className="lg:col-span-6 relative bg-slate-900 flex items-center justify-center p-8 min-h-[320px]">
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer">
-                <img
-                  src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=1200&auto=format&fit=crop"
-                  alt="Financial Planning Video"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-[#f87b1f] text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                    <Play className="w-7 h-7 fill-current ml-1" />
-                  </div>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4 bg-black/70 backdrop-blur-sm p-3 rounded-lg text-xs text-white">
-                  Finasset Wealth Masterclass: Disciplined Rupee Compounding (Odisha Edition)
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. MOBILE APP PROMO SECTION */}
-      <section className="py-20 bg-white">
+      {/* 7. MOBILE APP PROMO SECTION */}
+      <section className="py-20 bg-white border-t border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-r from-[#0f2b44] to-[#164366] rounded-3xl p-8 sm:p-14 text-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center shadow-xl">
             <div className="lg:col-span-7 space-y-6">
@@ -824,31 +721,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 10. PARTNERS LOGOS */}
-      <section className="py-16 bg-white border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-              Partnering with India&apos;s Leading Asset Management Companies & Insurers
-            </span>
-          </div>
+      {/* 8. PARTNERS LOGOS (Marquee Infinite Scroll) */}
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-200/80 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-6 sm:mb-8">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#2376b8]/10 px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
+            Institutional Alliances
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44] tracking-tight">
+            Partnering with India's Leading Asset Management Companies &amp; Insurers
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm mt-2 max-w-2xl mx-auto">
+            Direct fiduciary empanelment across India's foremost mutual fund houses, portfolio managers, and insurance underwriters.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 items-center">
+        {/* Marquee with Soft Edge Gradients */}
+        <div className="relative w-full overflow-hidden">
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-l from-white to-transparent" />
+
+          <Marquee pauseOnHover={true} speed={30} className="mt-0 sm:mt-0">
             {partners.map((p, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] p-4 rounded-xl border border-slate-200/80 text-center hover:border-[#2376b8] hover:shadow-sm transition-all"
+                className="mx-2 sm:mx-3 flex items-center gap-3.5 bg-[#f8fafc] hover:bg-white px-5 py-3 rounded-2xl border border-slate-200/80 hover:border-[#2376b8]/40 hover:shadow-lg transition-all duration-300 cursor-pointer group shrink-0"
               >
-                <span className="text-xs font-bold text-[#0f2b44] block">{p.name}</span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">{p.category}</span>
+                {/* Brand Logo Symbol */}
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-xs shadow-xs border transition-transform duration-300 group-hover:scale-105 shrink-0"
+                  style={{
+                    backgroundColor: `${p.badgeColor || '#004c8f'}12`,
+                    borderColor: `${p.badgeColor || '#004c8f'}30`,
+                    color: p.badgeColor || '#004c8f',
+                  }}
+                >
+                  {p.shortName || (p.name ? p.name.substring(0, 3).toUpperCase() : 'AMC')}
+                </div>
+
+                {/* Brand Name & Category */}
+                <div className="text-left">
+                  <div className="text-xs sm:text-sm font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors whitespace-nowrap">
+                    {p.name}
+                  </div>
+                  <div className="text-[10px] sm:text-[11px] text-slate-400 font-medium">
+                    {p.category}
+                  </div>
+                </div>
               </div>
             ))}
-          </div>
+          </Marquee>
         </div>
       </section>
 
       {/* 11. REQUEST A CALL BACK FORM (Working End-to-End) */}
-      <section id="callback" className="py-20 bg-[#0f2b44] text-white">
+      <section id="contact" className="py-20 bg-[#0f2b44] text-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto bg-slate-900/90 rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-2xl backdrop-blur-sm">
             <div className="text-center max-w-2xl mx-auto mb-10">
