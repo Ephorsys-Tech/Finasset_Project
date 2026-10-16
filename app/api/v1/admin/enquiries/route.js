@@ -7,3 +7,7 @@ export async function GET(req) {
 export async function PUT(req) {
   return enquiryController.updateEnquiry(req);
 }
+
+export async function DELETE(req) {
+  return enquiryController.deleteEnquiry(req);
+}
