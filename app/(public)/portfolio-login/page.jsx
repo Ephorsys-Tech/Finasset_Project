@@ -29,12 +29,12 @@ export default function PortfolioLoginPage() {
     settings?.externalPortfolioUrl || 'https://investor.finassetwealth.com/login';
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 text-center">
+      <section className="bg-[#0f2b44] text-white py-16 text-center">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <Lock className="w-3.5 h-3.5 text-[#C7A76C]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/30 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4">
+            <Lock className="w-3.5 h-3.5 text-[#f87b1f]" />
             <span>Secure Client Portal</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
@@ -49,13 +49,13 @@ export default function PortfolioLoginPage() {
       {/* Main Login Card */}
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-xl space-y-8 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#10243A] text-[#C7A76C] flex items-center justify-center mx-auto shadow-md">
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-xl space-y-8 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0f2b44] to-[#164366] text-[#f87b1f] flex items-center justify-center mx-auto shadow-md">
               <KeyRound className="w-8 h-8" />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#10243A]">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44]">
                 Finasset Wealth Investor Access
               </h2>
               <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
@@ -68,7 +68,7 @@ export default function PortfolioLoginPage() {
                 href={externalPortfolioUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-extrabold text-sm sm:text-base px-10 py-4 rounded-xl shadow-lg transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#f87b1f] hover:bg-[#d9620b] text-white font-extrabold text-sm sm:text-base px-10 py-4 rounded-xl shadow-lg shadow-[#f87b1f]/25 transition-all"
               >
                 <span>Launch Client Login Portal</span>
                 <ExternalLink className="w-4 h-4" />
@@ -81,26 +81,26 @@ export default function PortfolioLoginPage() {
             {/* Checklist */}
             <div className="pt-8 border-t border-slate-100 text-left grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600">
               <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0 mt-0.5" />
                 <span>Consolidated Net Asset Value (NAV) updated daily</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0 mt-0.5" />
                 <span>Instant Capital Gains Statement downloads for ITR</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0 mt-0.5" />
                 <span>Family grouping to view aggregate household wealth</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0 mt-0.5" />
                 <span>Track active and upcoming monthly SIP debits</span>
               </div>
             </div>
           </div>
 
           {/* Helpdesk Callout */}
-          <div className="bg-[#10243A] text-white rounded-3xl p-8 border border-slate-800 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="bg-[#0f2b44] text-white rounded-3xl p-8 border border-slate-800 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1">
               <h3 className="text-base font-bold text-white">First-time login or forgot your password?</h3>
               <p className="text-xs text-slate-300">
@@ -110,7 +110,7 @@ export default function PortfolioLoginPage() {
             <div className="flex items-center gap-3 shrink-0">
               <a
                 href="tel:+919437012345"
-                className="inline-flex items-center gap-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-[#C7A76C] px-4 py-2.5 rounded-lg border border-white/10 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-[#89b441] hover:text-white px-4 py-2.5 rounded-lg border border-white/10 transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>Call Helpdesk</span>

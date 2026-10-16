@@ -72,7 +72,7 @@ export default function ServiceDetailPage({ params }) {
   if (loading) {
     return (
       <div className="py-24 text-center text-slate-500">
-        <div className="animate-spin w-8 h-8 border-4 border-[#10243A] border-t-transparent rounded-full mx-auto mb-4" />
+        <div className="animate-spin w-8 h-8 border-4 border-[#2376b8] border-t-transparent rounded-full mx-auto mb-4" />
         <p className="text-sm font-semibold">Loading service details...</p>
       </div>
     );
@@ -84,13 +84,13 @@ export default function ServiceDetailPage({ params }) {
   if (!service) {
     return (
       <div className="py-24 text-center max-w-xl mx-auto px-4">
-        <h1 className="text-2xl font-bold text-[#10243A]">Service Not Found</h1>
+        <h1 className="text-2xl font-bold text-[#0f2b44]">Service Not Found</h1>
         <p className="text-slate-500 text-sm mt-2">
           The requested financial discipline does not exist or has been modified.
         </p>
         <Link
           href="/services"
-          className="mt-6 inline-block bg-[#10243A] text-white px-5 py-2.5 rounded-lg text-sm font-semibold"
+          className="mt-6 inline-block bg-[#0f2b44] text-white px-5 py-2.5 rounded-lg text-sm font-semibold"
         >
           View All Services
         </Link>
@@ -99,9 +99,9 @@ export default function ServiceDetailPage({ params }) {
   }
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 sm:py-20 relative overflow-hidden">
+      <section className="bg-[#0f2b44] text-white py-16 sm:py-20 relative overflow-hidden">
         {service.bannerImage && (
           <div
             className="absolute inset-0 bg-cover bg-center opacity-15"
@@ -109,7 +109,7 @@ export default function ServiceDetailPage({ params }) {
           />
         )}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-xs text-[#dfc593] uppercase tracking-wider mb-4 font-semibold">
+          <div className="flex items-center gap-2 text-xs text-blue-200 uppercase tracking-wider mb-4 font-semibold">
             <Link href="/" className="hover:underline">Home</Link>
             <span>/</span>
             <Link href="/services" className="hover:underline">Services</Link>
@@ -135,10 +135,10 @@ export default function ServiceDetailPage({ params }) {
             <div className="lg:col-span-8 space-y-12">
               {/* Detailed Overview */}
               <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] block mb-2">
                   Comprehensive Overview
                 </span>
-                <h2 className="text-2xl font-bold text-[#10243A] mb-4">
+                <h2 className="text-2xl font-bold text-[#0f2b44] mb-4">
                   The Strategic Role of {service.name}
                 </h2>
                 <p className="text-slate-700 leading-relaxed text-sm sm:text-base">
@@ -149,18 +149,18 @@ export default function ServiceDetailPage({ params }) {
               {/* Key Benefits */}
               {service.keyBenefits && service.keyBenefits.length > 0 && (
                 <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] block mb-2">
                     Why Finasset Wealth
                   </span>
-                  <h2 className="text-2xl font-bold text-[#10243A] mb-6">
+                  <h2 className="text-2xl font-bold text-[#0f2b44] mb-6">
                     Core Benefits & Capabilities
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {service.keyBenefits.map((b, i) => (
-                      <div key={i} className="flex items-start gap-3 bg-[#F8F7F3] p-4 rounded-xl border border-slate-200/60">
-                        <CheckCircle2 className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                      <div key={i} className="flex items-start gap-3 bg-[#f8fafc] p-4 rounded-xl border border-slate-200/60">
+                        <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
                         <div>
-                          <h3 className="font-bold text-sm text-[#10243A]">{b.title}</h3>
+                          <h3 className="font-bold text-sm text-[#0f2b44]">{b.title}</h3>
                           <p className="text-xs text-slate-600 mt-1 leading-relaxed">{b.description}</p>
                         </div>
                       </div>
@@ -174,7 +174,7 @@ export default function ServiceDetailPage({ params }) {
                 <div className="space-y-8">
                   {service.contentSections.map((sec, idx) => (
                     <div key={idx} className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm">
-                      <h2 className="text-2xl font-bold text-[#10243A] mb-4">{sec.title}</h2>
+                      <h2 className="text-2xl font-bold text-[#0f2b44] mb-4">{sec.title}</h2>
                       <p className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line">
                         {sec.content}
                       </p>
@@ -187,15 +187,15 @@ export default function ServiceDetailPage({ params }) {
               {service.faqs && service.faqs.length > 0 && (
                 <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm">
                   <div className="flex items-center gap-2 mb-6">
-                    <HelpCircle className="w-5 h-5 text-[#C7A76C]" />
-                    <h2 className="text-2xl font-bold text-[#10243A]">Frequently Asked Questions</h2>
+                    <HelpCircle className="w-5 h-5 text-[#2376b8]" />
+                    <h2 className="text-2xl font-bold text-[#0f2b44]">Frequently Asked Questions</h2>
                   </div>
                   <div className="space-y-4">
                     {service.faqs.map((faq, i) => (
                       <div key={i} className="border border-slate-200 rounded-xl overflow-hidden">
                         <button
                           onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                          className="w-full text-left p-4 font-bold text-sm sm:text-base text-[#10243A] flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition-colors"
+                          className="w-full text-left p-4 font-bold text-sm sm:text-base text-[#0f2b44] flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition-colors"
                         >
                           <span>{faq.question}</span>
                           <ChevronDown
@@ -219,8 +219,8 @@ export default function ServiceDetailPage({ params }) {
             {/* Right Sidebar (4 Cols) */}
             <div className="lg:col-span-4 space-y-8">
               {/* Consultation Quick Box */}
-              <div className="bg-[#10243A] text-white rounded-2xl p-6 shadow-xl border border-slate-800">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#dfc593] block mb-1">
+              <div className="bg-[#0f2b44] text-white rounded-2xl p-6 shadow-xl border border-slate-800">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#f87b1f] block mb-1">
                   Connect With Advisor
                 </span>
                 <h3 className="text-xl font-bold text-white mb-2">
@@ -232,7 +232,7 @@ export default function ServiceDetailPage({ params }) {
 
                 {inquirySubmitted ? (
                   <div className="bg-emerald-950/60 border border-emerald-500/50 p-4 rounded-xl text-center space-y-2">
-                    <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+                    <CheckCircle2 className="w-8 h-8 text-[#89b441] mx-auto" />
                     <h4 className="text-sm font-bold text-white">Consultation Requested</h4>
                     <p className="text-xs text-slate-300">
                       Our advisory desk will contact you within business hours.
@@ -246,7 +246,7 @@ export default function ServiceDetailPage({ params }) {
                       placeholder="Your Full Name"
                       value={inquiryName}
                       onChange={(e) => setInquiryName(e.target.value)}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]"
                     />
                     <input
                       type="tel"
@@ -254,12 +254,12 @@ export default function ServiceDetailPage({ params }) {
                       placeholder="10-Digit Mobile Number"
                       value={inquiryPhone}
                       onChange={(e) => setInquiryPhone(e.target.value)}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#f87b1f]"
                     />
                     <button
                       type="submit"
                       disabled={inquirySubmitting}
-                      className="w-full bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 text-[#10243A] font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all"
+                      className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-lg transition-all shadow-md shadow-[#f87b1f]/20"
                     >
                       {inquirySubmitting ? 'Submitting...' : 'Request Consultation'}
                     </button>
@@ -268,11 +268,11 @@ export default function ServiceDetailPage({ params }) {
 
                 <div className="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400 flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5 text-[#C7A76C]" />
+                    <Phone className="w-3.5 h-3.5 text-[#89b441]" />
                     <span>+91 94370 12345 / +91 674 2548900</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-[#C7A76C]" />
+                    <Mail className="w-3.5 h-3.5 text-[#2376b8]" />
                     <span>contact@finassetwealth.com</span>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export default function ServiceDetailPage({ params }) {
 
               {/* Other Services Navigation */}
               <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#10243A] mb-4 pb-2 border-b border-slate-100">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-[#0f2b44] mb-4 pb-2 border-b border-slate-100">
                   Other Wealth Disciplines
                 </h3>
                 <div className="space-y-2">
@@ -290,9 +290,9 @@ export default function ServiceDetailPage({ params }) {
                       href={`/services/${os.slug}`}
                       className="block p-2.5 rounded-lg hover:bg-slate-50 transition-colors group"
                     >
-                      <div className="text-sm font-semibold text-[#10243A] group-hover:text-[#C7A76C] transition-colors flex items-center justify-between">
+                      <div className="text-sm font-semibold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors flex items-center justify-between">
                         <span>{os.name}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#C7A76C] transition-colors" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#2376b8] transition-colors" />
                       </div>
                     </Link>
                   ))}
@@ -300,8 +300,8 @@ export default function ServiceDetailPage({ params }) {
               </div>
 
               {/* Quick Risk Profile CTA */}
-              <div className="bg-[#C7A76C]/10 border border-[#C7A76C]/30 rounded-2xl p-6 text-center space-y-3">
-                <h4 className="font-bold text-sm text-[#10243A]">
+              <div className="bg-[#2376b8]/10 border border-[#2376b8]/20 rounded-2xl p-6 text-center space-y-3">
+                <h4 className="font-bold text-sm text-[#0f2b44]">
                   Know Your Asset Allocation
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
@@ -309,7 +309,7 @@ export default function ServiceDetailPage({ params }) {
                 </p>
                 <Link
                   href="/investor/risk-profile"
-                  className="inline-block bg-[#10243A] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#1b3858] transition-colors"
+                  className="inline-block bg-[#0f2b44] hover:bg-[#2376b8] text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors"
                 >
                   Start Risk Profile Test
                 </Link>

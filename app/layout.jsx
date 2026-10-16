@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#F8F7F3] text-slate-800 antialiased selection:bg-[#C7A76C] selection:text-[#10243A]">
+      <body className="min-h-screen flex flex-col bg-[#f8fafc] text-slate-800 antialiased selection:bg-[#f87b1f] selection:text-white">
         <Providers>
           <Navbar />
           <main className="flex-grow">{children}</main>

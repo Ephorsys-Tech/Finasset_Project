@@ -217,11 +217,11 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-[#C7A76C] text-[#10243A] flex items-center justify-center mx-auto shadow-lg">
+          <div className="w-14 h-14 rounded-2xl bg-[#f87b1f] text-white flex items-center justify-center mx-auto shadow-lg shadow-[#f87b1f]/20">
             <TrendingUp className="w-8 h-8 stroke-[2.5]" />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            FINASSET <span className="text-[#C7A76C]">WEALTH</span>
+            FINASSET <span className="text-[#2376b8]">WEALTH</span>
           </h1>
           <p className="text-xs text-slate-400 font-medium">
             Administrative CMS & Portfolio Control Center

@@ -123,45 +123,45 @@ export default function HomePage() {
   const getServiceIcon = (iconName) => {
     switch (iconName) {
       case 'Compass':
-        return <Compass className="w-6 h-6 text-[#C7A76C]" />;
+        return <Compass className="w-6 h-6 text-[#2376b8]" />;
       case 'TrendingUp':
-        return <TrendingUp className="w-6 h-6 text-[#C7A76C]" />;
+        return <TrendingUp className="w-6 h-6 text-[#2376b8]" />;
       case 'ShieldCheck':
-        return <ShieldCheck className="w-6 h-6 text-[#C7A76C]" />;
+        return <ShieldCheck className="w-6 h-6 text-[#89b441]" />;
       case 'Building':
-        return <Building className="w-6 h-6 text-[#C7A76C]" />;
+        return <Building className="w-6 h-6 text-[#2376b8]" />;
       case 'Landmark':
-        return <Landmark className="w-6 h-6 text-[#C7A76C]" />;
+        return <Landmark className="w-6 h-6 text-[#2376b8]" />;
       case 'PieChart':
-        return <PieChart className="w-6 h-6 text-[#C7A76C]" />;
+        return <PieChart className="w-6 h-6 text-[#f87b1f]" />;
       default:
-        return <TrendingUp className="w-6 h-6 text-[#C7A76C]" />;
+        return <TrendingUp className="w-6 h-6 text-[#2376b8]" />;
     }
   };
 
   const getToolIcon = (iconName) => {
     switch (iconName) {
       case 'Calculator':
-        return <Calculator className="w-7 h-7 text-[#C7A76C]" />;
+        return <Calculator className="w-7 h-7 text-[#89b441]" />;
       case 'Target':
-        return <Target className="w-7 h-7 text-[#C7A76C]" />;
+        return <Target className="w-7 h-7 text-[#f87b1f]" />;
       case 'Activity':
-        return <TrendingUp className="w-7 h-7 text-[#C7A76C]" />;
+        return <TrendingUp className="w-7 h-7 text-[#2376b8]" />;
       case 'CreditCard':
-        return <CreditCard className="w-7 h-7 text-[#C7A76C]" />;
+        return <CreditCard className="w-7 h-7 text-[#89b441]" />;
       case 'Zap':
-        return <Zap className="w-7 h-7 text-[#C7A76C]" />;
+        return <Zap className="w-7 h-7 text-[#f87b1f]" />;
       default:
-        return <Calculator className="w-7 h-7 text-[#C7A76C]" />;
+        return <Calculator className="w-7 h-7 text-[#89b441]" />;
     }
   };
 
   return (
     <div className="w-full">
       {/* 1. HERO BANNER CAROUSEL */}
-      <section className="relative w-full min-h-[580px] lg:min-h-[640px] bg-[#10243A] text-white flex items-center overflow-hidden">
+      <section className="relative w-full min-h-[580px] lg:min-h-[640px] bg-[#0f2b44] text-white flex items-center overflow-hidden">
         {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#10243A] via-[#10243A]/90 to-[#10243A]/60 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0f2b44] via-[#0f2b44]/95 to-[#164366]/75 z-10" />
 
         {/* Slide Background Image */}
         {slides.length > 0 && (slides[currentSlide]?.bgImageUrl || slides[currentSlide]?.imageUrl) && (
@@ -174,8 +174,8 @@ export default function HomePage() {
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
           <div className="max-w-3xl">
             {/* Slide Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/40 text-[#dfc593] text-xs font-semibold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-[#C7A76C]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/40 text-[#f87b1f] text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm">
+              <Sparkles className="w-3.5 h-3.5 text-[#f87b1f]" />
               <span>{slides[currentSlide]?.badge || slides[currentSlide]?.badgeText || 'Finasset Wealth Management'}</span>
             </div>
 
@@ -194,7 +194,7 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href={slides[currentSlide]?.cta1Url || '/services'}
-                className="bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-sm sm:text-base px-6 py-3.5 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 group"
+                className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-lg shadow-[#f87b1f]/25 hover:shadow-xl hover:shadow-[#f87b1f]/35 transition-all flex items-center gap-2 group"
               >
                 <span>{slides[currentSlide]?.cta1Text || 'Explore Our Services'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -202,9 +202,9 @@ export default function HomePage() {
 
               <Link
                 href={slides[currentSlide]?.cta2Url || '/investor/financial-calculator'}
-                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-lg transition-all backdrop-blur-sm flex items-center gap-2"
+                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all backdrop-blur-sm flex items-center gap-2 group"
               >
-                <Calculator className="w-4 h-4 text-[#C7A76C]" />
+                <Calculator className="w-4 h-4 text-[#89b441] group-hover:scale-110 transition-transform" />
                 <span>{slides[currentSlide]?.cta2Text || 'Calculate Your Wealth'}</span>
               </Link>
             </div>
@@ -212,7 +212,7 @@ export default function HomePage() {
             {/* Trust Pill */}
             {slides[currentSlide]?.statsHighlight && (
               <div className="mt-10 pt-6 border-t border-slate-700/60 inline-flex items-center gap-4 text-xs sm:text-sm text-slate-300">
-                <div className="flex items-center gap-1.5 text-[#C7A76C] font-semibold">
+                <div className="flex items-center gap-1.5 text-[#89b441] font-semibold">
                   <ShieldCheck className="w-4 h-4" />
                   <span>{slides[currentSlide].statsHighlight.label}:</span>
                 </div>
@@ -237,7 +237,7 @@ export default function HomePage() {
                     key={idx}
                     onClick={() => setCurrentSlide(idx)}
                     className={`h-2 rounded-full transition-all ${
-                      currentSlide === idx ? 'w-8 bg-[#C7A76C]' : 'w-2 bg-white/30'
+                      currentSlide === idx ? 'w-8 bg-[#f87b1f]' : 'w-2 bg-white/30'
                     }`}
                     aria-label={`Go to slide ${idx + 1}`}
                   />
@@ -259,26 +259,29 @@ export default function HomePage() {
       <section className="bg-white border-b border-slate-200 py-3 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#10243A]">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0f2b44]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#89b441] animate-pulse" />
               <span>Market Watch</span>
             </div>
 
             <div className="flex items-center gap-6 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 text-xs">
-              {marketIndices.map((idx) => {
-                const isPositive = idx.change >= 0;
+              {marketIndices.map((idx, index) => {
+                const changeVal = Number(idx?.change ?? 0);
+                const percentVal = Number(idx?.percentChange ?? idx?.changePercent ?? 0);
+                const isPositive = idx?.isPositive !== undefined ? Boolean(idx.isPositive) : changeVal >= 0;
+                const displayVal = idx?.currentValue ?? idx?.currentPrice ?? 0;
                 return (
-                  <div key={idx.symbol} className="flex items-center gap-2 whitespace-nowrap">
-                    <span className="font-bold text-slate-700">{idx.name}</span>
-                    <span className="font-semibold text-slate-900">{formatINR(idx.currentValue)}</span>
+                  <div key={idx?.symbol || idx?.name || index} className="flex items-center gap-2 whitespace-nowrap">
+                    <span className="font-bold text-slate-700">{idx?.name || idx?.symbol || 'Index'}</span>
+                    <span className="font-semibold text-slate-900">{formatINR(displayVal)}</span>
                     <span
                       className={`font-semibold flex items-center ${
-                        isPositive ? 'text-emerald-600' : 'text-rose-600'
+                        isPositive ? 'text-[#89b441]' : 'text-rose-600'
                       }`}
                     >
                       {isPositive ? '+' : ''}
-                      {idx.change.toFixed(2)} ({isPositive ? '+' : ''}
-                      {idx.percentChange.toFixed(2)}%)
+                      {changeVal.toFixed(2)} ({isPositive ? '+' : ''}
+                      {percentVal.toFixed(2)}%)
                     </span>
                   </div>
                 );
@@ -287,7 +290,7 @@ export default function HomePage() {
 
             <Link
               href="/market-update"
-              className="text-xs font-semibold text-[#C7A76C] hover:text-[#a88547] flex items-center gap-1 shrink-0"
+              className="text-xs font-bold text-[#2376b8] hover:text-[#1b5d92] flex items-center gap-1 shrink-0"
             >
               <span>Full Indices & IPOs</span>
               <ArrowRight className="w-3 h-3" />
@@ -297,16 +300,16 @@ export default function HomePage() {
       </section>
 
       {/* 3. INTRODUCTION TO FINASSET WEALTH (NLF Adhira Asset Services LLP) */}
-      <section className="py-20 bg-[#F8F7F3]">
+      <section className="py-20 bg-[#f8fafc]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10243A]/5 border border-[#10243A]/10 text-[#10243A] text-xs font-bold uppercase tracking-wider mb-4">
-                <Award className="w-3.5 h-3.5 text-[#C7A76C]" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#2376b8]/10 border border-[#2376b8]/20 text-[#2376b8] text-xs font-bold uppercase tracking-wider mb-4">
+                <Award className="w-3.5 h-3.5 text-[#2376b8]" />
                 <span>Bhubaneswar Wealth Advisory</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10243A] tracking-tight leading-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44] tracking-tight leading-tight mb-6">
                 Disciplined Wealth Creation Grounded in Fiduciary Integrity
               </h2>
 
@@ -315,51 +318,51 @@ export default function HomePage() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-                  <CheckCircle2 className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
+                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-bold text-sm text-[#10243A]">Goal-Based Portfolios</h3>
+                    <h3 className="font-bold text-sm text-[#0f2b44]">Goal-Based Portfolios</h3>
                     <p className="text-xs text-slate-500 mt-0.5">SIPs mapped to tangible retirement and education goals.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-                  <CheckCircle2 className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
+                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-bold text-sm text-[#10243A]">35+ Leading AMCs</h3>
+                    <h3 className="font-bold text-sm text-[#0f2b44]">35+ Leading AMCs</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Unbiased fund selection across top mutual fund houses.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-                  <CheckCircle2 className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
+                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-bold text-sm text-[#10243A]">Comprehensive Protection</h3>
+                    <h3 className="font-bold text-sm text-[#0f2b44]">Comprehensive Protection</h3>
                     <p className="text-xs text-slate-500 mt-0.5">High-cover pure term and indemnity health insurance.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-                  <CheckCircle2 className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm hover:border-[#2376b8]/40 transition-colors">
+                  <CheckCircle2 className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-bold text-sm text-[#10243A]">Global NRI Solutions</h3>
+                    <h3 className="font-bold text-sm text-[#0f2b44]">Global NRI Solutions</h3>
                     <p className="text-xs text-slate-500 mt-0.5">FEMA, NRE/NRO banking & repatriation assistance.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <Link
                   href="/about-us"
-                  className="bg-[#10243A] hover:bg-[#1b3858] text-white font-semibold text-sm px-5 py-3 rounded-lg transition-all flex items-center gap-2"
+                  className="bg-[#2376b8] hover:bg-[#1b5d92] text-white font-bold text-sm px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 group"
                 >
                   <span>Learn Our Philosophy</span>
-                  <ArrowRight className="w-4 h-4 text-[#C7A76C]" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                 <Link
                   href="/contact-us"
-                  className="text-[#10243A] font-semibold text-sm hover:underline flex items-center gap-1.5"
+                  className="text-[#f87b1f] hover:text-[#d9620b] font-bold text-sm hover:underline flex items-center gap-1.5 transition-colors"
                 >
                   <span>Visit Our Bhubaneswar Office</span>
                   <ArrowRight className="w-4 h-4" />
@@ -375,9 +378,9 @@ export default function HomePage() {
                   alt="Finasset Wealth Financial Advisory"
                   className="w-full h-[440px] object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#10243A] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f2b44] via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-xs font-bold text-[#C7A76C] uppercase tracking-wider block">
+                  <span className="text-xs font-bold text-[#f87b1f] uppercase tracking-wider block">
                     Our Commitment
                   </span>
                   <p className="text-lg font-bold leading-snug mt-1">
@@ -389,11 +392,11 @@ export default function HomePage() {
               {/* Floating Stat Card */}
               <div className="absolute -bottom-6 -right-4 sm:right-6 bg-white p-4 rounded-xl shadow-xl border border-slate-100 max-w-xs hidden sm:block">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-[#10243A] flex items-center justify-center text-[#C7A76C]">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#2376b8] to-[#0f2b44] flex items-center justify-center text-[#89b441]">
                     <Shield className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className="text-xl font-extrabold text-[#10243A]">15+ Years</div>
+                    <div className="text-xl font-extrabold text-[#0f2b44]">15+ Years</div>
                     <div className="text-xs text-slate-500 font-medium">Trusted Advisory in Odisha</div>
                   </div>
                 </div>
@@ -407,10 +410,10 @@ export default function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
               Holistic Wealth Solutions
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10243A] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44] tracking-tight">
               Bespoke Advisory Built Around Your Life Goals
             </h2>
             <p className="text-slate-600 mt-4 leading-relaxed">
@@ -419,52 +422,58 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <div
-                key={service.slug}
-                className="bg-[#F8F7F3] rounded-2xl p-7 border border-slate-200/80 hover:border-[#C7A76C]/60 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="w-14 h-14 rounded-xl bg-[#10243A] flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform">
-                    {getServiceIcon(service.iconName)}
+            {services.map((service, idx) => {
+              const serviceBenefits = (service.keyBenefits && service.keyBenefits.length > 0)
+                ? service.keyBenefits
+                : (service.features ? service.features.map((f) => (typeof f === 'string' ? { title: f } : f)) : []);
+
+              return (
+                <div
+                  key={service.slug || service._id || `service-${idx}`}
+                  className="bg-[#f8fafc] rounded-2xl p-7 border border-slate-200/90 hover:border-[#2376b8]/60 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0f2b44] to-[#164366] flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform">
+                      {getServiceIcon(service.iconName)}
+                    </div>
+
+                    <h3 className="text-xl font-bold text-[#0f2b44] mb-3 group-hover:text-[#2376b8] transition-colors">
+                      {service.name || service.title}
+                    </h3>
+
+                    <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
+                      {service.shortDescription || service.description || service.tagline}
+                    </p>
+
+                    {/* Key Benefits Preview */}
+                    {serviceBenefits.length > 0 && (
+                      <ul className="space-y-2 mb-6 border-t border-slate-200/80 pt-4">
+                        {serviceBenefits.slice(0, 2).map((b, i) => (
+                          <li key={i} className="text-xs text-slate-700 flex items-center gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#89b441] shrink-0" />
+                            <span className="font-medium line-clamp-1">{b.title}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
-                  <h3 className="text-xl font-bold text-[#10243A] mb-3 group-hover:text-[#C7A76C] transition-colors">
-                    {service.name}
-                  </h3>
-
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
-                    {service.shortDescription}
-                  </p>
-
-                  {/* Key Benefits Preview */}
-                  {service.keyBenefits && service.keyBenefits.length > 0 && (
-                    <ul className="space-y-2 mb-6 border-t border-slate-200/60 pt-4">
-                      {service.keyBenefits.slice(0, 2).map((b, i) => (
-                        <li key={i} className="text-xs text-slate-700 flex items-center gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#C7A76C] shrink-0" />
-                          <span className="font-medium line-clamp-1">{b.title}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <Link
+                    href={`/services/${service.slug || ''}`}
+                    className="inline-flex items-center gap-2 text-sm font-bold text-[#2376b8] group-hover:text-[#f87b1f] transition-colors mt-2"
+                  >
+                    <span>Explore {service.name || service.title}</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
-
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-[#10243A] group-hover:text-[#C7A76C] transition-colors mt-2"
-                >
-                  <span>Explore {service.name}</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="text-center mt-12">
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 text-sm font-bold text-[#10243A] hover:text-[#C7A76C] transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-bold text-[#2376b8] hover:text-[#f87b1f] transition-colors"
             >
               <span>View All Financial Advisory Disciplines</span>
               <ArrowRight className="w-4 h-4" />
@@ -474,13 +483,13 @@ export default function HomePage() {
       </section>
 
       {/* 5. INVESTOR'S CORNER (5 Configurable Interactive Tiles) */}
-      <section className="py-20 bg-[#10243A] text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C7A76C]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl pointer-events-none" />
+      <section className="py-20 bg-[#0f2b44] text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#2376b8]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#f87b1f]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/15 px-3.5 py-1 rounded-full border border-[#f87b1f]/30 inline-block mb-3">
               Investor Empowerment
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -492,35 +501,35 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {investorTools.map((tool) => (
+            {investorTools.map((tool, idx) => (
               <div
-                key={tool.key}
-                className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-[#C7A76C]/60 transition-all duration-300 flex flex-col justify-between group backdrop-blur-sm"
+                key={tool.key || tool.slug || tool._id || tool.url || tool.href || `tool-${idx}`}
+                className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-[#2376b8]/60 transition-all duration-300 flex flex-col justify-between group backdrop-blur-sm"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
                       {getToolIcon(tool.iconName)}
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#dfc593] bg-[#C7A76C]/15 px-2.5 py-1 rounded-full border border-[#C7A76C]/30">
-                      {tool.badge}
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/15 px-2.5 py-1 rounded-full border border-[#f87b1f]/30">
+                      {tool.badge || tool.badgeText || 'Interactive Tool'}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#C7A76C] transition-colors">
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#f87b1f] transition-colors">
                     {tool.title}
                   </h3>
 
                   <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                    {tool.shortDescription}
+                    {tool.shortDescription || tool.description}
                   </p>
                 </div>
 
                 <Link
-                  href={tool.url}
-                  className="bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 group-hover:shadow-md"
+                  href={tool.url || tool.href || '#'}
+                  className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-md group-hover:shadow-[#f87b1f]/20"
                 >
-                  <span>{tool.actionText}</span>
+                  <span>{tool.actionText || 'Launch Tool'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -534,22 +543,22 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2">
                 Market Intelligence
               </span>
-              <h2 className="text-3xl font-extrabold text-[#10243A] tracking-tight">
+              <h2 className="text-3xl font-extrabold text-[#0f2b44] tracking-tight">
                 Latest Financial Insights & Market News
               </h2>
             </div>
 
             {/* Tab Buttons */}
-            <div className="flex items-center bg-[#F8F7F3] p-1.5 rounded-xl border border-slate-200">
+            <div className="flex items-center bg-[#f8fafc] p-1.5 rounded-xl border border-slate-200">
               <button
                 onClick={() => setNewsTab('popular')}
                 className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
                   newsTab === 'popular'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#10243A]'
+                    ? 'bg-[#2376b8] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-[#2376b8]'
                 }`}
               >
                 Popular
@@ -558,8 +567,8 @@ export default function HomePage() {
                 onClick={() => setNewsTab('ipo')}
                 className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
                   newsTab === 'ipo'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#10243A]'
+                    ? 'bg-[#2376b8] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-[#2376b8]'
                 }`}
               >
                 IPO Watch
@@ -568,8 +577,8 @@ export default function HomePage() {
                 onClick={() => setNewsTab('market')}
                 className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
                   newsTab === 'market'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#10243A]'
+                    ? 'bg-[#2376b8] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-[#2376b8]'
                 }`}
               >
                 Market Desk
@@ -581,17 +590,17 @@ export default function HomePage() {
             {filteredNews.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-[#F8F7F3] rounded-2xl p-6 border border-slate-200/80 hover:shadow-md transition-shadow flex flex-col justify-between"
+                className="bg-[#f8fafc] rounded-2xl p-6 border border-slate-200/80 hover:border-[#2376b8]/50 hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
-                    <span className="font-semibold text-[#10243A] bg-white px-2.5 py-1 rounded border border-slate-200">
+                    <span className="font-semibold text-[#0f2b44] bg-white px-2.5 py-1 rounded-lg border border-slate-200">
                       {item.badge}
                     </span>
                     <span>{item.source}</span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-[#10243A] mb-3 leading-snug hover:text-[#C7A76C] transition-colors">
+                  <h3 className="text-lg font-bold text-[#0f2b44] mb-3 leading-snug hover:text-[#2376b8] transition-colors">
                     {item.title}
                   </h3>
 
@@ -602,7 +611,7 @@ export default function HomePage() {
 
                 <Link
                   href={item.url || '/market-update'}
-                  className="text-xs font-bold text-[#C7A76C] hover:text-[#a88547] flex items-center gap-1.5"
+                  className="text-xs font-bold text-[#f87b1f] hover:text-[#d9620b] flex items-center gap-1.5 transition-colors"
                 >
                   <span>Read Full Market Brief</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -614,12 +623,12 @@ export default function HomePage() {
       </section>
 
       {/* 7. FINANCIAL VIDEO SECTION */}
-      <section className="py-20 bg-[#F8F7F3] border-y border-slate-200/80">
+      <section className="py-20 bg-[#f8fafc] border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#10243A] rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-12 text-white">
+          <div className="bg-gradient-to-br from-[#0f2b44] via-[#0f2b44] to-[#164366] rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-12 text-white">
             <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4 w-fit">
-                <Play className="w-3 h-3 text-[#C7A76C]" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/40 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4 w-fit">
+                <Play className="w-3 h-3 text-[#f87b1f]" />
                 <span>Financial Literacy Desk</span>
               </div>
 
@@ -633,22 +642,22 @@ export default function HomePage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-center gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0" />
                   <span>Historical rolling returns of Nifty 50 over 15 years</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0" />
                   <span>The psychological trap of waiting for market corrections</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441] shrink-0" />
                   <span>Step-up SIP strategies for salaried and business clients</span>
                 </div>
               </div>
 
               <Link
                 href="/investor/financial-calculator"
-                className="bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-sm px-6 py-3 rounded-lg w-fit transition-all flex items-center gap-2"
+                className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm px-6 py-3.5 rounded-xl w-fit shadow-md hover:shadow-lg transition-all flex items-center gap-2"
               >
                 <span>Simulate Your Compounding</span>
                 <ArrowRight className="w-4 h-4" />
@@ -664,11 +673,11 @@ export default function HomePage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-[#C7A76C] text-[#10243A] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 rounded-full bg-[#f87b1f] text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
                     <Play className="w-7 h-7 fill-current ml-1" />
                   </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm p-3 rounded-lg text-xs text-white">
+                <div className="absolute bottom-4 left-4 right-4 bg-black/70 backdrop-blur-sm p-3 rounded-lg text-xs text-white">
                   Finasset Wealth Masterclass: Disciplined Rupee Compounding (Odisha Edition)
                 </div>
               </div>
@@ -680,10 +689,10 @@ export default function HomePage() {
       {/* 8. MOBILE APP PROMO SECTION */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-[#10243A] to-[#1b3858] rounded-3xl p-8 sm:p-14 text-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center shadow-xl">
+          <div className="bg-gradient-to-r from-[#0f2b44] to-[#164366] rounded-3xl p-8 sm:p-14 text-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center shadow-xl">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#dfc593] text-xs font-bold uppercase tracking-wider">
-                <Smartphone className="w-3.5 h-3.5 text-[#C7A76C]" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#89b441] text-xs font-bold uppercase tracking-wider">
+                <Smartphone className="w-3.5 h-3.5 text-[#89b441]" />
                 <span>Wealth Anywhere</span>
               </div>
 
@@ -697,19 +706,19 @@ export default function HomePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-200">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C]" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441]" />
                   <span>Consolidated Multi-AMC Tracking</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C]" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441]" />
                   <span>One-Click Capital Gains (Tax) Reports</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C]" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441]" />
                   <span>Bank-Grade 256-Bit Security</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#C7A76C]" />
+                  <CheckCircle2 className="w-4 h-4 text-[#89b441]" />
                   <span>Family Portfolio Aggregation</span>
                 </div>
               </div>
@@ -717,7 +726,7 @@ export default function HomePage() {
               <div className="pt-4 flex flex-wrap items-center gap-4">
                 <Link
                   href="/portfolio-login"
-                  className="bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg transition-all flex items-center gap-2"
+                  className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-[#f87b1f]/20 transition-all flex items-center gap-2"
                 >
                   <span>Launch Investor Web App</span>
                   <ExternalLink className="w-4 h-4" />
@@ -735,29 +744,29 @@ export default function HomePage() {
                   <div>
                     <div className="flex items-center justify-between text-[10px] text-slate-400 mb-4">
                       <span>Finasset Wealth</span>
-                      <span className="text-emerald-400">● LIVE</span>
+                      <span className="text-[#89b441]">● LIVE</span>
                     </div>
                     <div className="text-xs text-slate-400 font-medium">Total Family Portfolio</div>
                     <div className="text-2xl font-extrabold text-white mt-1">₹1,42,85,920</div>
-                    <div className="text-xs text-emerald-400 font-semibold mt-1">▲ +14.8% Annualized CAGR</div>
+                    <div className="text-xs text-[#89b441] font-semibold mt-1">▲ +14.8% Annualized CAGR</div>
 
                     <div className="mt-6 space-y-2">
                       <div className="bg-slate-900 p-2.5 rounded-xl flex justify-between items-center text-xs">
                         <span className="text-slate-300">Equity Funds</span>
-                        <span className="font-bold text-[#C7A76C]">65%</span>
+                        <span className="font-bold text-[#f87b1f]">65%</span>
                       </div>
                       <div className="bg-slate-900 p-2.5 rounded-xl flex justify-between items-center text-xs">
                         <span className="text-slate-300">Debt & FDs</span>
-                        <span className="font-bold text-slate-300">25%</span>
+                        <span className="font-bold text-[#2376b8]">25%</span>
                       </div>
                       <div className="bg-slate-900 p-2.5 rounded-xl flex justify-between items-center text-xs">
                         <span className="text-slate-300">Gold & Sovereign</span>
-                        <span className="font-bold text-amber-400">10%</span>
+                        <span className="font-bold text-[#89b441]">10%</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-[#10243A] p-3 rounded-xl text-center text-[11px] font-bold text-[#C7A76C]">
+                  <div className="bg-[#0f2b44] p-3 rounded-xl text-center text-[11px] font-bold text-[#89b441] border border-[#2376b8]/30">
                     Next SIP Scheduled: 5th of Month
                   </div>
                 </div>
@@ -768,13 +777,13 @@ export default function HomePage() {
       </section>
 
       {/* 9. TESTIMONIALS */}
-      <section className="py-20 bg-[#F8F7F3]">
+      <section className="py-20 bg-[#f8fafc]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
               Client Trust & Voices
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10243A] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44] tracking-tight">
               Trusted by Discerning Families Across Odisha
             </h2>
             <p className="text-slate-600 mt-4 leading-relaxed">
@@ -786,27 +795,27 @@ export default function HomePage() {
             {testimonials.map((t, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-2xl p-7 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+                className="bg-white rounded-2xl p-7 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center gap-1 text-amber-400 mb-4">
+                  <div className="flex items-center gap-1 text-[#f87b1f] mb-4">
                     {[...Array(t.rating || 5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
 
                   <p className="text-slate-700 text-sm leading-relaxed mb-6 italic">
-                    &quot;{t.reviewText}&quot;
+                    &quot;{t.reviewText || t.quote || ''}&quot;
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                  <div className="w-10 h-10 rounded-full bg-[#10243A] text-[#C7A76C] flex items-center justify-center font-bold text-sm">
-                    {t.clientName.charAt(0)}
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2376b8] to-[#0f2b44] text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                    {t.clientName ? t.clientName.charAt(0) : 'C'}
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-[#10243A]">{t.clientName}</h3>
-                    <p className="text-xs text-slate-500">{t.designation}</p>
+                    <h3 className="font-bold text-sm text-[#0f2b44]">{t.clientName || 'Client'}</h3>
+                    <p className="text-xs text-slate-500">{t.designation || 'Investor'}</p>
                   </div>
                 </div>
               </div>
@@ -819,7 +828,7 @@ export default function HomePage() {
       <section className="py-16 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
               Partnering with India&apos;s Leading Asset Management Companies & Insurers
             </span>
           </div>
@@ -828,9 +837,9 @@ export default function HomePage() {
             {partners.map((p, idx) => (
               <div
                 key={idx}
-                className="bg-[#F8F7F3] p-4 rounded-xl border border-slate-200/60 text-center hover:border-[#C7A76C] transition-colors"
+                className="bg-[#f8fafc] p-4 rounded-xl border border-slate-200/80 text-center hover:border-[#2376b8] hover:shadow-sm transition-all"
               >
-                <span className="text-xs font-bold text-[#10243A] block">{p.name}</span>
+                <span className="text-xs font-bold text-[#0f2b44] block">{p.name}</span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">{p.category}</span>
               </div>
             ))}
@@ -839,11 +848,11 @@ export default function HomePage() {
       </section>
 
       {/* 11. REQUEST A CALL BACK FORM (Working End-to-End) */}
-      <section id="callback" className="py-20 bg-[#10243A] text-white">
+      <section id="callback" className="py-20 bg-[#0f2b44] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto bg-slate-900 rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-2xl">
+          <div className="max-w-4xl mx-auto bg-slate-900/90 rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-2xl backdrop-blur-sm">
             <div className="text-center max-w-2xl mx-auto mb-10">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/15 px-3 py-1 rounded-full border border-[#f87b1f]/30 inline-block mb-3">
                 Personalized Consultation
               </span>
               <h2 className="text-3xl font-extrabold text-white tracking-tight">
@@ -856,14 +865,14 @@ export default function HomePage() {
 
             {submitSuccess ? (
               <div className="bg-emerald-950/60 border border-emerald-500/50 p-6 rounded-2xl text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                <CheckCircle2 className="w-12 h-12 text-[#89b441] mx-auto" />
                 <h3 className="text-lg font-bold text-white">Request Received Successfully</h3>
                 <p className="text-sm text-slate-300">
                   Thank you! Our advisory team at Saheed Nagar / Jaydev Vihar will contact you at your preferred time.
                 </p>
                 <button
                   onClick={() => setSubmitSuccess(false)}
-                  className="mt-2 text-xs font-semibold text-[#C7A76C] underline"
+                  className="mt-2 text-xs font-semibold text-[#f87b1f] underline"
                 >
                   Submit another consultation request
                 </button>
@@ -887,7 +896,7 @@ export default function HomePage() {
                       placeholder="e.g. Ramesh Mohanty"
                       value={callbackForm.name}
                       onChange={(e) => setCallbackForm({ ...callbackForm, name: e.target.value })}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#2376b8]"
                     />
                   </div>
 
@@ -901,7 +910,7 @@ export default function HomePage() {
                       placeholder="e.g. +91 94370 12345"
                       value={callbackForm.phone}
                       onChange={(e) => setCallbackForm({ ...callbackForm, phone: e.target.value })}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#2376b8]"
                     />
                   </div>
                 </div>
@@ -914,7 +923,7 @@ export default function HomePage() {
                     <select
                       value={callbackForm.serviceOfInterest}
                       onChange={(e) => setCallbackForm({ ...callbackForm, serviceOfInterest: e.target.value })}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#2376b8]"
                     >
                       <option value="Mutual Funds & SIP">Mutual Funds & Systematic Investment Plan (SIP)</option>
                       <option value="Comprehensive Financial Planning">Comprehensive Financial Planning</option>
@@ -933,7 +942,7 @@ export default function HomePage() {
                     <select
                       value={callbackForm.preferredTime}
                       onChange={(e) => setCallbackForm({ ...callbackForm, preferredTime: e.target.value })}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#2376b8]"
                     >
                       <option value="Anytime">Anytime during business hours</option>
                       <option value="Morning (10:00 AM - 1:00 PM)">Morning (10:00 AM - 1:00 PM)</option>
@@ -952,7 +961,7 @@ export default function HomePage() {
                     placeholder="Tell us about your investment horizon or specific financial question..."
                     value={callbackForm.message}
                     onChange={(e) => setCallbackForm({ ...callbackForm, message: e.target.value })}
-                    className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#C7A76C]"
+                    className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#2376b8]"
                   />
                 </div>
 
@@ -960,11 +969,11 @@ export default function HomePage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full sm:w-auto bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 text-[#10243A] font-extrabold text-sm sm:text-base px-8 py-4 rounded-xl shadow-lg transition-all"
+                    className="w-full sm:w-auto bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-extrabold text-sm sm:text-base px-8 py-4 rounded-xl shadow-lg shadow-[#f87b1f]/25 transition-all"
                   >
                     {submitting ? 'Submitting Request...' : 'Schedule Confidential Call Back'}
                   </button>
-                  <p className="text-xs text-slate-500 mt-3">
+                  <p className="text-xs text-slate-400 mt-3">
                     We maintain strict confidentiality. Your details will never be shared with third parties.
                   </p>
                 </div>

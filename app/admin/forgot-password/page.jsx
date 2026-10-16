@@ -226,7 +226,7 @@ export default function AdminForgotPasswordPage() {
                     placeholder="admin@finassetwealth.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#2376b8]"
                   />
                 </div>
               </div>

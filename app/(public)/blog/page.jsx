@@ -39,12 +39,12 @@ export default function BlogListingPage() {
   }, [selectedCategory, search]);
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 text-center">
+      <section className="bg-[#0f2b44] text-white py-16 text-center">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <FileText className="w-3.5 h-3.5 text-[#C7A76C]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/30 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4">
+            <FileText className="w-3.5 h-3.5 text-[#f87b1f]" />
             <span>Research & Financial Wisdom</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
@@ -60,15 +60,15 @@ export default function BlogListingPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           {/* Controls: Categories & Search */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Category Pills */}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setSelectedCategory('All')}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                   selectedCategory === 'All'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'bg-[#F8F7F3] text-slate-600 hover:text-[#10243A]'
+                    ? 'bg-[#2376b8] text-white shadow-sm'
+                    : 'bg-[#f8fafc] text-slate-600 hover:text-[#2376b8]'
                 }`}
               >
                 All Articles
@@ -79,8 +79,8 @@ export default function BlogListingPage() {
                   onClick={() => setSelectedCategory(c.name)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     selectedCategory === c.name
-                      ? 'bg-[#10243A] text-white shadow-sm'
-                      : 'bg-[#F8F7F3] text-slate-600 hover:text-[#10243A]'
+                      ? 'bg-[#2376b8] text-white shadow-sm'
+                      : 'bg-[#f8fafc] text-slate-600 hover:text-[#2376b8]'
                   }`}
                 >
                   {c.name} ({c.count})
@@ -96,7 +96,7 @@ export default function BlogListingPage() {
                 placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-[#F8F7F3] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                className="w-full pl-10 pr-4 py-2 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
               />
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function BlogListingPage() {
             </div>
           ) : posts.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
-              <h3 className="text-lg font-bold text-[#10243A]">No articles found</h3>
+              <h3 className="text-lg font-bold text-[#0f2b44]">No articles found</h3>
               <p className="text-xs text-slate-500 mt-1">Try another category or search query.</p>
             </div>
           ) : (
@@ -116,7 +116,7 @@ export default function BlogListingPage() {
               {posts.map((post) => (
                 <article
                   key={post.slug}
-                  className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm hover:border-[#2376b8]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     {post.featuredImage && (
@@ -126,7 +126,7 @@ export default function BlogListingPage() {
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <span className="absolute top-3 left-3 bg-[#10243A] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow">
+                        <span className="absolute top-3 left-3 bg-[#0f2b44] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow">
                           {post.category}
                         </span>
                       </div>
@@ -145,7 +145,7 @@ export default function BlogListingPage() {
                         </span>
                       </div>
 
-                      <h2 className="text-xl font-bold text-[#10243A] mb-3 leading-snug group-hover:text-[#C7A76C] transition-colors">
+                      <h2 className="text-xl font-bold text-[#0f2b44] mb-3 leading-snug group-hover:text-[#2376b8] transition-colors">
                         <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                       </h2>
 
@@ -159,7 +159,7 @@ export default function BlogListingPage() {
                     <span className="text-xs text-slate-500 font-semibold">{post.author}</span>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="text-xs font-bold text-[#C7A76C] group-hover:text-[#a88547] flex items-center gap-1"
+                      className="text-xs font-bold text-[#f87b1f] group-hover:text-[#d9620b] flex items-center gap-1 transition-colors"
                     >
                       <span>Read Article</span>
                       <ArrowRight className="w-3.5 h-3.5" />

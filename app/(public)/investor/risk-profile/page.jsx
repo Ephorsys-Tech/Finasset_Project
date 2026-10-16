@@ -69,7 +69,7 @@ export default function RiskProfilePage() {
   if (loading) {
     return (
       <div className="py-24 text-center text-slate-500">
-        <div className="animate-spin w-8 h-8 border-4 border-[#10243A] border-t-transparent rounded-full mx-auto mb-4" />
+        <div className="animate-spin w-8 h-8 border-4 border-[#2376b8] border-t-transparent rounded-full mx-auto mb-4" />
         <p className="text-sm font-semibold">Loading psychometric risk profiler...</p>
       </div>
     );
@@ -78,12 +78,12 @@ export default function RiskProfilePage() {
   const questions = questionnaire?.questions || [];
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 text-center">
+      <section className="bg-[#0f2b44] text-white py-16 text-center">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <Target className="w-3.5 h-3.5 text-[#C7A76C]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/30 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
+            <Target className="w-3.5 h-3.5 text-[#2376b8]" />
             <span>Psychometric Asset Profiler</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
@@ -102,30 +102,30 @@ export default function RiskProfilePage() {
             /* Result View */
             <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-xl space-y-8 animate-in fade-in duration-300">
               <div className="text-center space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f]">
                   Assessment Complete
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10243A]">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44]">
                   {result.band?.title || 'Moderate Growth Investor'}
                 </h2>
-                <div className="inline-block bg-[#10243A] text-white px-4 py-1.5 rounded-full text-xs font-bold">
+                <div className="inline-block bg-[#0f2b44] text-white px-4 py-1.5 rounded-full text-xs font-bold">
                   Score: {result.score} / {result.maxPossibleScore} Points • Category: {result.band?.category}
                 </div>
               </div>
 
               {/* Description & Recommendation */}
-              <div className="bg-[#F8F7F3] rounded-2xl p-6 border border-slate-200/80 space-y-4">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#10243A]">
+              <div className="bg-[#f8fafc] rounded-2xl p-6 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-[#0f2b44]">
                   Profile Analysis
                 </h3>
                 <p className="text-sm text-slate-700 leading-relaxed">
                   {result.band?.description}
                 </p>
                 <div className="pt-3 border-t border-slate-200">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] mb-1">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#2376b8] mb-1">
                     Finasset Strategic Recommendation:
                   </h4>
-                  <p className="text-sm font-semibold text-[#10243A] leading-relaxed">
+                  <p className="text-sm font-semibold text-[#0f2b44] leading-relaxed">
                     {result.band?.recommendation}
                   </p>
                 </div>
@@ -134,12 +134,12 @@ export default function RiskProfilePage() {
               {/* Suggested Asset Allocation */}
               {result.band?.assetAllocation && (
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-[#10243A]">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-[#0f2b44]">
                     Recommended Target Asset Mix
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl text-center">
-                      <div className="text-3xl font-extrabold text-[#10243A]">
+                      <div className="text-3xl font-extrabold text-[#2376b8]">
                         {result.band.assetAllocation.equity}%
                       </div>
                       <div className="text-xs font-bold text-slate-600 mt-1 uppercase">Equity Funds & Stocks</div>
@@ -147,7 +147,7 @@ export default function RiskProfilePage() {
                     </div>
 
                     <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl text-center">
-                      <div className="text-3xl font-extrabold text-slate-700">
+                      <div className="text-3xl font-extrabold text-[#89b441]">
                         {result.band.assetAllocation.debt}%
                       </div>
                       <div className="text-xs font-bold text-slate-600 mt-1 uppercase">Debt, Bonds & FDs</div>
@@ -155,7 +155,7 @@ export default function RiskProfilePage() {
                     </div>
 
                     <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl text-center">
-                      <div className="text-3xl font-extrabold text-[#C7A76C]">
+                      <div className="text-3xl font-extrabold text-[#f87b1f]">
                         {result.band.assetAllocation.goldRealEstate}%
                       </div>
                       <div className="text-xs font-bold text-slate-600 mt-1 uppercase">Gold & Real Estate</div>
@@ -169,7 +169,7 @@ export default function RiskProfilePage() {
               <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#10243A] transition-colors"
+                  className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#0f2b44] transition-colors"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Retake Questionnaire</span>
@@ -177,7 +177,7 @@ export default function RiskProfilePage() {
 
                 <Link
                   href="/contact-us#callback"
-                  className="bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-sm px-6 py-3.5 rounded-xl shadow transition-all flex items-center gap-2"
+                  className="bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-[#f87b1f]/20 transition-all flex items-center gap-2"
                 >
                   <span>Build This Custom Portfolio with Us</span>
                   <ArrowRight className="w-4 h-4" />
@@ -188,10 +188,10 @@ export default function RiskProfilePage() {
             /* Questions View */
             <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-sm space-y-10">
               <div className="border-b border-slate-100 pb-6">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8]">
                   Step-by-Step Diagnostic
                 </span>
-                <h2 className="text-2xl font-bold text-[#10243A] mt-1">
+                <h2 className="text-2xl font-bold text-[#0f2b44] mt-1">
                   Answer the Following 5 Questions
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
@@ -203,14 +203,14 @@ export default function RiskProfilePage() {
                 {questions.map((q, idx) => (
                   <div key={q.id} className="space-y-3">
                     <div className="flex items-start gap-3">
-                      <span className="w-7 h-7 rounded-full bg-[#10243A] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                      <span className="w-7 h-7 rounded-full bg-[#0f2b44] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <div>
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
                           {q.category}
                         </span>
-                        <h3 className="text-base font-bold text-[#10243A] mt-0.5">
+                        <h3 className="text-base font-bold text-[#0f2b44] mt-0.5">
                           {q.title}
                         </h3>
                       </div>
@@ -226,17 +226,17 @@ export default function RiskProfilePage() {
                             onClick={() => handleSelectOption(q.id, opt.score)}
                             className={`text-left p-3.5 rounded-xl border text-xs sm:text-sm font-medium transition-all ${
                               isSelected
-                                ? 'bg-[#10243A] text-white border-[#10243A] shadow-md font-semibold'
-                                : 'bg-[#F8F7F3] text-slate-700 border-slate-200/80 hover:bg-slate-100'
+                                ? 'bg-[#0f2b44] text-white border-[#0f2b44] shadow-md font-semibold'
+                                : 'bg-[#f8fafc] text-slate-700 border-slate-200/80 hover:bg-slate-100'
                             }`}
                           >
                             <div className="flex items-start gap-2">
                               <span
                                 className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
-                                  isSelected ? 'border-[#C7A76C] bg-[#C7A76C]' : 'border-slate-400'
+                                  isSelected ? 'border-[#f87b1f] bg-[#f87b1f]' : 'border-slate-400'
                                 }`}
                               >
-                                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#10243A]" />}
+                                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#0f2b44]" />}
                               </span>
                               <span>{opt.text}</span>
                             </div>
@@ -256,10 +256,10 @@ export default function RiskProfilePage() {
                 <button
                   type="button"
                   onClick={handleCalculateScore}
-                  className="w-full sm:w-auto bg-[#10243A] hover:bg-[#1b3858] text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-[#f87b1f]/20 transition-all flex items-center justify-center gap-2"
                 >
                   <span>Compute My Risk Profile</span>
-                  <ArrowRight className="w-4 h-4 text-[#C7A76C]" />
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>
