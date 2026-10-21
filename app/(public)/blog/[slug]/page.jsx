@@ -39,7 +39,7 @@ export default function BlogDetailPage({ params }) {
     );
   }
 
-  const post = blogData?.post;
+  const post = blogData?.post || (blogData?._id ? blogData : null);
   const relatedPosts = blogData?.relatedPosts || [];
 
   if (!post) {
@@ -109,7 +109,7 @@ export default function BlogDetailPage({ params }) {
 
           {/* Body Content */}
           <div className="prose prose-slate max-w-none text-sm sm:text-base leading-relaxed text-slate-700 whitespace-pre-line space-y-4">
-            {post.content}
+            {post.content || post.description}
           </div>
 
           {/* Tags */}

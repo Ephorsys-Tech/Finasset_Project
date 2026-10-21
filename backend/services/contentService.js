@@ -14,6 +14,30 @@ import {
   fallbackMarketIndices,
   fallbackNewsItems,
 } from '@/lib/fallbackData';
+import { cloudinary } from '@/backend/config/cloudinary';
+
+const extractCloudinaryPublicId = (url) => {
+  if (!url || typeof url !== 'string' || !url.includes('cloudinary.com')) return null;
+  try {
+    const parts = url.split('/upload/');
+    if (parts.length < 2) return null;
+    const afterUpload = parts[1];
+    const withoutVersion = afterUpload.replace(/^v\d+\//, '');
+    const publicId = withoutVersion.substring(0, withoutVersion.lastIndexOf('.'));
+    return publicId || null;
+  } catch {
+    return null;
+  }
+};
+
+const deleteCloudinaryAsset = async (publicId) => {
+  if (!publicId) return;
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (err) {
+    console.warn('Failed to delete asset from Cloudinary:', err?.message || err);
+  }
+};
 
 export const contentService = {
   // Settings
@@ -98,6 +122,16 @@ export const contentService = {
 
   async createBlogPost(data, adminEmail, req) {
     await connectToDatabase();
+    if (data.description && !data.content) {
+      data.content = data.description;
+    } else if (data.content && !data.description) {
+      data.description = data.content;
+    }
+    if (!data.excerpt && (data.description || data.content)) {
+      const plain = (data.description || data.content).replace(/[#*`_\[\]]/g, '').trim();
+      data.excerpt = plain.length > 160 ? plain.substring(0, 157) + '...' : plain;
+    }
+
     const post = await BlogPost.create(data);
     await logAdminActivity({
       adminEmail,
@@ -112,8 +146,37 @@ export const contentService = {
 
   async updateBlogPost(id, data, adminEmail, req) {
     await connectToDatabase();
+    const existing = await BlogPost.findById(id);
+    if (!existing) throw new Error('Post not found');
+
+    if (data.description && !data.content) {
+      data.content = data.description;
+    } else if (data.content && !data.description) {
+      data.description = data.content;
+    }
+    if (!data.excerpt && (data.description || data.content)) {
+      const plain = (data.description || data.content).replace(/[#*`_\[\]]/g, '').trim();
+      data.excerpt = plain.length > 160 ? plain.substring(0, 157) + '...' : plain;
+    }
+
+    // Clean up previous image on Cloudinary if replaced or removed
+    if (
+      existing.featuredImagePublicId &&
+      data.featuredImagePublicId !== undefined &&
+      existing.featuredImagePublicId !== data.featuredImagePublicId
+    ) {
+      await deleteCloudinaryAsset(existing.featuredImagePublicId);
+    } else if (
+      !existing.featuredImagePublicId &&
+      existing.featuredImage &&
+      data.featuredImage !== undefined &&
+      existing.featuredImage !== data.featuredImage
+    ) {
+      const oldPublicId = extractCloudinaryPublicId(existing.featuredImage);
+      if (oldPublicId) await deleteCloudinaryAsset(oldPublicId);
+    }
+
     const post = await BlogPost.findByIdAndUpdate(id, { $set: data }, { new: true });
-    if (!post) throw new Error('Post not found');
     await logAdminActivity({
       adminEmail,
       action: 'UPDATE_BLOG_POST',
@@ -127,8 +190,18 @@ export const contentService = {
 
   async deleteBlogPost(id, adminEmail, req) {
     await connectToDatabase();
-    const post = await BlogPost.findByIdAndDelete(id);
+    const post = await BlogPost.findById(id);
     if (!post) throw new Error('Post not found');
+
+    // Clean up image from Cloudinary when blog post is deleted
+    if (post.featuredImagePublicId) {
+      await deleteCloudinaryAsset(post.featuredImagePublicId);
+    } else if (post.featuredImage) {
+      const publicId = extractCloudinaryPublicId(post.featuredImage);
+      if (publicId) await deleteCloudinaryAsset(publicId);
+    }
+
+    await BlogPost.findByIdAndDelete(id);
     await logAdminActivity({
       adminEmail,
       action: 'DELETE_BLOG_POST',
