@@ -28,9 +28,19 @@ export default function BlogListingPage() {
       .then((res) => res.json())
       .then((json) => {
         if (json.success) {
-          setPosts(json.data.posts || []);
-          if (json.data.categories?.length) {
+          const list = Array.isArray(json.data) ? json.data : (json.data?.posts || []);
+          setPosts(list);
+
+          if (json.data?.categories?.length) {
             setCategories(json.data.categories);
+          } else {
+            const catMap = {};
+            list.forEach((p) => {
+              if (p.category) {
+                catMap[p.category] = (catMap[p.category] || 0) + 1;
+              }
+            });
+            setCategories(Object.entries(catMap).map(([name, count]) => ({ name, count })));
           }
         }
       })
@@ -150,7 +160,7 @@ export default function BlogListingPage() {
                       </h2>
 
                       <p className="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
-                        {post.excerpt}
+                        {post.excerpt || post.description || post.content}
                       </p>
                     </div>
                   </div>

@@ -57,9 +57,23 @@ export const contentController = {
       const url = new URL(req.url);
       const category = url.searchParams.get('category') || '';
       const search = url.searchParams.get('search') || '';
-      const limit = url.searchParams.get('limit') || 10;
+      const limit = url.searchParams.get('limit') || 50;
       const posts = await contentService.getBlogPosts({ category, search, limit });
-      return sendSuccess(posts);
+
+      // Aggregate categories from published posts
+      const allPosts = await contentService.getBlogPosts({ limit: 100 });
+      const categoryCounts = {};
+      allPosts.forEach((p) => {
+        if (p.category) {
+          categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
+        }
+      });
+      const categories = Object.entries(categoryCounts).map(([name, count]) => ({
+        name,
+        count,
+      }));
+
+      return sendSuccess({ posts, categories });
     } catch (err) {
       return sendError(err.message, 500, err);
     }
@@ -68,7 +82,14 @@ export const contentController = {
   async getBlogPostBySlug(slug) {
     try {
       const post = await contentService.getBlogPostBySlug(slug);
-      return sendSuccess(post);
+      let relatedPosts = [];
+      try {
+        const related = await contentService.getBlogPosts({ category: post.category, limit: 4 });
+        relatedPosts = related.filter((r) => r.slug !== post.slug).slice(0, 3);
+      } catch {
+        relatedPosts = [];
+      }
+      return sendSuccess({ post, relatedPosts });
     } catch {
       return sendNotFound('Blog post not found');
     }
@@ -106,10 +127,10 @@ export const contentController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
+      const body = await req.json().catch(() => ({}));
+      const id = url.searchParams.get('id') || body.id || body._id;
       if (!id) return sendBadRequest('Post ID required');
 
-      const body = await req.json().catch(() => ({}));
       const post = await contentService.updateBlogPost(id, body, auth.admin.email, req);
       return sendSuccess(post, 'Article updated successfully');
     } catch (err) {
@@ -123,7 +144,11 @@ export const contentController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
+      let id = url.searchParams.get('id');
+      if (!id) {
+        const body = await req.json().catch(() => ({}));
+        id = body.id || body._id;
+      }
       if (!id) return sendBadRequest('Post ID required');
 
       await contentService.deleteBlogPost(id, auth.admin.email, req);

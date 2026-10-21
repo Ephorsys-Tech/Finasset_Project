@@ -101,18 +101,18 @@ export default function AdminProtectedLayout({ children }) {
 
   const navItems = [
     { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Services', href: '/admin/services', icon: Briefcase },
+    { label: 'Enquiries', href: '/admin/enquiries', icon: Inbox },
+    { label: 'Blog Manager', href: '/admin/blog', icon: BookOpen },
     { label: 'Site Settings', href: '/admin/site-settings', icon: Settings },
     { label: 'Menu Manager', href: '/admin/menus', icon: MenuIcon },
     { label: 'Home Page', href: '/admin/home-page', icon: Home },
-    { label: 'Services', href: '/admin/services', icon: Briefcase },
     { label: "Investor's Corner", href: '/admin/investor-corner', icon: Calculator },
     { label: 'Pay Premium', href: '/admin/pay-premium', icon: CreditCard },
     { label: 'News & Market', href: '/admin/news-market', icon: TrendingUp },
     { label: 'Testimonials', href: '/admin/testimonials', icon: MessageSquareQuote },
     { label: 'Partners', href: '/admin/partners', icon: Handshake },
     { label: 'Pages Content', href: '/admin/pages', icon: FileText },
-    { label: 'Blog Manager', href: '/admin/blog', icon: BookOpen },
-    { label: 'Enquiries', href: '/admin/enquiries', icon: Inbox },
     { label: 'Media Library', href: '/admin/media', icon: Image },
     { label: 'Activity Log', href: '/admin/activity-log', icon: History },
   ];
