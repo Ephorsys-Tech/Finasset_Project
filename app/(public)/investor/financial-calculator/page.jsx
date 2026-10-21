@@ -1,382 +1,352 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import {
   Calculator,
-  TrendingUp,
-  ArrowRight,
+  Coins,
+  ArrowRightLeft,
+  ArrowDownCircle,
+  Umbrella,
+  Clock,
   ShieldCheck,
-  CheckCircle2,
-  Info,
-  Calendar,
+  Percent,
+  Receipt,
+  Heart,
+  GraduationCap,
+  Home,
+  Car,
+  Plane,
+  TrendingUp,
+  BarChart3,
+  LineChart,
+  Search,
+  ArrowRight,
   Sparkles,
 } from 'lucide-react';
-import { formatINR, calculateSipProjection, calculateLumpsumProjection } from '@/lib/utils';
+
+export const metadata = {
+  title: 'Financial Calculators & MF Tools | Finasset Wealth',
+  description: 'Explore our comprehensive suite of financial planning calculators and mutual fund analytical tools to plan, calculate, and achieve your financial goals.',
+};
+
+// ==========================================
+// 1. FINANCIAL CALCULATORS (14 Tools)
+// ==========================================
+const FINANCIAL_CALCULATORS = [
+  {
+    title: 'SIP Calculator',
+    slug: 'sip-calculator',
+    desc: 'Calculate the future wealth generated through disciplined monthly systematic investments.',
+    icon: Calculator,
+    tag: 'Popular',
+    color: 'text-[#2376b8] bg-[#2376b8]/10',
+  },
+  {
+    title: 'Lumpsum Calculator',
+    slug: 'lumpsum-calculator',
+    desc: 'Project compound returns on one-time surplus capital investments over your chosen horizon.',
+    icon: Coins,
+    tag: 'One-Time',
+    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+  },
+  {
+    title: 'STP Calculator',
+    slug: 'stp-calculator',
+    desc: 'Simulate systematic transfers from liquid/debt funds to equity funds for rupee cost averaging.',
+    icon: ArrowRightLeft,
+    tag: 'Transfer',
+    color: 'text-[#89b441] bg-[#89b441]/10',
+  },
+  {
+    title: 'SWP Calculator',
+    slug: 'swp-calculator',
+    desc: 'Plan regular monthly income cashflows from your accumulated mutual fund corpus.',
+    icon: ArrowDownCircle,
+    tag: 'Income',
+    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+  },
+  {
+    title: 'Retirement Corpus Calculator',
+    slug: 'retirement-corpus-calculator',
+    desc: 'Determine your required retirement nest egg adjusted for post-retirement living costs and inflation.',
+    icon: Umbrella,
+    tag: 'Milestone',
+    color: 'text-[#2376b8] bg-[#2376b8]/10',
+  },
+  {
+    title: 'Investment Delay Calculator',
+    slug: 'investment-delay-calculator',
+    desc: 'Measure the staggering cost and opportunity loss of postponing your investments by a few years.',
+    icon: Clock,
+    tag: 'Opportunity',
+    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+  },
+  {
+    title: 'Life Insurance Calculator',
+    slug: 'life-insurance-calculator',
+    desc: 'Calculate the optimal term insurance coverage required to safeguard your family dependents.',
+    icon: ShieldCheck,
+    tag: 'Protection',
+    color: 'text-[#89b441] bg-[#89b441]/10',
+  },
+  {
+    title: 'EMI Calculator',
+    slug: 'emi-calculator',
+    desc: 'Calculate accurate monthly EMIs, principal breakup, and total interest across any loan amount.',
+    icon: Percent,
+    tag: 'Debt',
+    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+  },
+  {
+    title: 'TAX Calculator',
+    slug: 'tax-calculator',
+    desc: 'Estimate tax liability under Old vs New Income Tax regimes and optimize deductions.',
+    icon: Receipt,
+    tag: 'Tax Planning',
+    color: 'text-[#2376b8] bg-[#2376b8]/10',
+  },
+  {
+    title: 'Marriage Expense Calculator',
+    slug: 'marriage-expense-calculator',
+    desc: 'Estimate future wedding costs accounting for inflation and calculate monthly savings required.',
+    icon: Heart,
+    tag: 'Life Goal',
+    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+  },
+  {
+    title: 'Education Cost Calculator',
+    slug: 'education-cost-calculator',
+    desc: 'Forecast higher education tuition costs adjusted for education inflation to build a child fund.',
+    icon: GraduationCap,
+    tag: 'Education',
+    color: 'text-[#89b441] bg-[#89b441]/10',
+  },
+  {
+    title: 'Home Loan Calculator',
+    slug: 'home-loan-calculator',
+    desc: 'Evaluate home loan eligibility, monthly repayments, and total interest outgo over loan tenure.',
+    icon: Home,
+    tag: 'Property',
+    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+  },
+  {
+    title: 'Car Purchase Calculator',
+    slug: 'car-purchase-calculator',
+    desc: 'Plan auto loan financing, down payment amounts, and monthly auto EMI affordability.',
+    icon: Car,
+    tag: 'Auto',
+    color: 'text-[#2376b8] bg-[#2376b8]/10',
+  },
+  {
+    title: 'Vacation Budget Calculator',
+    slug: 'vacation-budget-calculator',
+    desc: 'Set travel targets and compute monthly savings needed to fund your dream family vacation.',
+    icon: Plane,
+    tag: 'Lifestyle',
+    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+  },
+];
+
+// ==========================================
+// 2. MF TOOLS CALCULATORS (6 Tools)
+// ==========================================
+const MF_TOOLS_CALCULATORS = [
+  {
+    title: 'SIP Performance',
+    slug: 'sip-performance',
+    desc: 'Analyze historical returns and point-to-point compounding delivered by systematic investment plans.',
+    icon: TrendingUp,
+    tag: 'SIP Track',
+    color: 'text-[#2376b8] bg-[#2376b8]/10',
+  },
+  {
+    title: 'STP Performance',
+    slug: 'stp-performance',
+    desc: 'Track historical performance and capital gains yield across debt-to-equity systematic transfer routes.',
+    icon: ArrowRightLeft,
+    tag: 'STP Track',
+    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+  },
+  {
+    title: 'SWP Performance',
+    slug: 'swp-performance',
+    desc: 'Evaluate past cashflow consistency and residual capital sustainability under systematic withdrawal plans.',
+    icon: ArrowDownCircle,
+    tag: 'SWP Track',
+    color: 'text-[#89b441] bg-[#89b441]/10',
+  },
+  {
+    title: 'Scheme Performance',
+    slug: 'scheme-performance',
+    desc: 'Review scheme returns, benchmark alpha, rolling yields, and risk ratios across mutual fund schemes.',
+    icon: BarChart3,
+    tag: 'Analytics',
+    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+  },
+  {
+    title: 'Fund Performance',
+    slug: 'fund-performance',
+    desc: 'Deep-dive into mutual fund house track records, fund manager performance, and AUM growth metrics.',
+    icon: LineChart,
+    tag: 'AMC Audit',
+    color: 'text-[#2376b8] bg-[#2376b8]/10',
+  },
+  {
+    title: 'NAV Finder Calculator',
+    slug: 'nav-finder-calculator',
+    desc: 'Lookup historical and latest Net Asset Values (NAV) across all mutual fund schemes and dividend histories.',
+    icon: Search,
+    tag: 'NAV Lookup',
+    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+  },
+];
 
 export default function FinancialCalculatorPage() {
-  const [mode, setMode] = useState('sip'); // 'sip' | 'lumpsum'
-
-  // SIP states
-  const [sipMonthly, setSipMonthly] = useState(15000);
-  const [sipRate, setSipRate] = useState(12.5);
-  const [sipYears, setSipYears] = useState(15);
-
-  // Lumpsum states
-  const [lumpsumPrincipal, setLumpsumPrincipal] = useState(500000);
-  const [lumpsumRate, setLumpsumRate] = useState(12.0);
-  const [lumpsumYears, setLumpsumYears] = useState(10);
-
-  const sipResult = calculateSipProjection(sipMonthly, sipRate, sipYears);
-  const lumpsumResult = calculateLumpsumProjection(lumpsumPrincipal, lumpsumRate, lumpsumYears);
-
-  const activeResult = mode === 'sip' ? sipResult : lumpsumResult;
-  const investedPct = activeResult.totalValue > 0
-    ? Math.round((activeResult.investedAmount / activeResult.totalValue) * 100)
-    : 50;
-  const returnsPct = 100 - investedPct;
-
-  // Generate Year-by-Year Table Preview (for up to active years)
-  const yearsArray = [];
-  const activeYears = mode === 'sip' ? sipYears : lumpsumYears;
-  const step = activeYears <= 10 ? 1 : activeYears <= 20 ? 2 : 5;
-
-  for (let y = 1; y <= activeYears; y += step) {
-    const res = mode === 'sip'
-      ? calculateSipProjection(sipMonthly, sipRate, y)
-      : calculateLumpsumProjection(lumpsumPrincipal, lumpsumRate, y);
-    yearsArray.push({ year: y, ...res });
-  }
-  // Ensure final year is included
-  if (yearsArray[yearsArray.length - 1]?.year !== activeYears) {
-    const finalRes = mode === 'sip'
-      ? calculateSipProjection(sipMonthly, sipRate, activeYears)
-      : calculateLumpsumProjection(lumpsumPrincipal, lumpsumRate, activeYears);
-    yearsArray.push({ year: activeYears, ...finalRes });
-  }
-
   return (
-    <div className="w-full bg-[#f8fafc]">
-      {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/30 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
-            <Calculator className="w-3.5 h-3.5 text-[#2376b8]" />
-            <span>Interactive Compounding Engine</span>
+    <div className="w-full bg-[#f8fafc] min-h-screen">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-b from-[#0a1e30] via-[#0f2b44] to-[#123657] text-white py-14 sm:py-18 relative">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/40 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-[#f87b1f]" />
+            <span>Financial Planning & MF Analytics</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Financial Wealth Calculator
+            Financial & MF Tools Calculators
           </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Experience the exponential compounding power of disciplined investing. Simulate Systematic Investment Plans (SIP) or lump sum wealth creation over your chosen horizon.
+          <p className="text-slate-300 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            Select any financial calculator or mutual fund tool below to simulate outcomes, evaluate historical returns, and plan your life goals.
           </p>
         </div>
       </section>
 
-      {/* Main Calculator */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mode Switcher */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm flex items-center">
-              <button
-                onClick={() => setMode('sip')}
-                className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
-                  mode === 'sip'
-                    ? 'bg-[#0f2b44] text-white shadow-md'
-                    : 'text-slate-600 hover:text-[#2376b8]'
-                }`}
-              >
-                SIP (Monthly Investment)
-              </button>
-              <button
-                onClick={() => setMode('lumpsum')}
-                className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
-                  mode === 'lumpsum'
-                    ? 'bg-[#0f2b44] text-white shadow-md'
-                    : 'text-slate-600 hover:text-[#2376b8]'
-                }`}
-              >
-                Lumpsum (One-Time Investment)
-              </button>
+      {/* Main Content Area: 2 Distinct Sections */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+        {/* ========================================================= */}
+        {/* SECTION 1: FINANCIAL CALCULATORS                          */}
+        {/* ========================================================= */}
+        <section id="financial-calculators">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 pb-5 mb-8">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[#2376b8] block mb-1">
+                Category 01
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44]">
+                Financial Calculators
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Comprehensive calculators for goal planning, wealth accumulation, and debt management.
+              </p>
             </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 self-start sm:self-auto">
+              {FINANCIAL_CALCULATORS.length} Calculators
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            {/* Left Inputs (7 cols) */}
-            <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-sm space-y-8">
-              {mode === 'sip' ? (
-                <>
-                  {/* Monthly Investment */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {FINANCIAL_CALCULATORS.map((calc) => {
+              const Icon = calc.icon;
+              return (
+                <Link
+                  key={calc.slug}
+                  href={`/investor/financial-calculator/${calc.slug}`}
+                  className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-lg hover:border-[#2376b8] hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group"
+                >
                   <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#0f2b44]">
-                        Monthly Investment Amount
-                      </label>
-                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
-                        {formatINR(sipMonthly)}
+                    {/* Top Row: Icon & Tag */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold ${calc.color}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-[#2376b8]/10 group-hover:text-[#2376b8] transition-colors">
+                        {calc.tag}
                       </span>
                     </div>
-                    <input
-                      type="range"
-                      min={1000}
-                      max={200000}
-                      step={1000}
-                      value={sipMonthly}
-                      onChange={(e) => setSipMonthly(Number(e.target.value))}
-                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
-                      <span>₹1,000</span>
-                      <span>₹1,00,000</span>
-                      <span>₹2,00,000</span>
-                    </div>
+
+                    {/* Title & Description */}
+                    <h3 className="text-base font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors">
+                      {calc.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
+                      {calc.desc}
+                    </p>
                   </div>
 
-                  {/* Return Rate */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#0f2b44]">
-                        Expected Annual Return Rate (% p.a.)
-                      </label>
-                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
-                        {sipRate}%
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={6}
-                      max={24}
-                      step={0.5}
-                      value={sipRate}
-                      onChange={(e) => setSipRate(Number(e.target.value))}
-                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
-                      <span>6% (Conservative Debt)</span>
-                      <span>12-14% (Equity Historical)</span>
-                      <span>24% (Aggressive)</span>
-                    </div>
+                  {/* Card Bottom CTA */}
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#2376b8]">
+                    <span>Open Calculator</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
 
-                  {/* Time Horizon */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#0f2b44]">
-                        Investment Time Period
-                      </label>
-                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
-                        {sipYears} {sipYears === 1 ? 'Year' : 'Years'}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={1}
-                      max={35}
-                      step={1}
-                      value={sipYears}
-                      onChange={(e) => setSipYears(Number(e.target.value))}
-                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
-                      <span>1 Year</span>
-                      <span>15 Years</span>
-                      <span>35 Years</span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Lumpsum Amount */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#0f2b44]">
-                        Total Lumpsum Investment
-                      </label>
-                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
-                        {formatINR(lumpsumPrincipal)}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={25000}
-                      max={5000000}
-                      step={25000}
-                      value={lumpsumPrincipal}
-                      onChange={(e) => setLumpsumPrincipal(Number(e.target.value))}
-                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
-                      <span>₹25,000</span>
-                      <span>₹25,00,000</span>
-                      <span>₹50,00,000</span>
-                    </div>
-                  </div>
-
-                  {/* Return Rate */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#0f2b44]">
-                        Expected Annual Return Rate (% p.a.)
-                      </label>
-                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
-                        {lumpsumRate}%
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={6}
-                      max={24}
-                      step={0.5}
-                      value={lumpsumRate}
-                      onChange={(e) => setLumpsumRate(Number(e.target.value))}
-                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
-                      <span>6% (Debt/FD)</span>
-                      <span>12% (Equity)</span>
-                      <span>24% (PMS Alpha)</span>
-                    </div>
-                  </div>
-
-                  {/* Time Horizon */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-bold text-sm text-[#0f2b44]">
-                        Investment Time Period
-                      </label>
-                      <span className="text-lg font-extrabold text-[#0f2b44] bg-[#f8fafc] px-4 py-1.5 rounded-lg border border-slate-200">
-                        {lumpsumYears} {lumpsumYears === 1 ? 'Year' : 'Years'}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={1}
-                      max={30}
-                      step={1}
-                      value={lumpsumYears}
-                      onChange={(e) => setLumpsumYears(Number(e.target.value))}
-                      className="w-full accent-[#f87b1f] h-2 bg-slate-200 rounded-lg cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1.5 font-medium">
-                      <span>1 Year</span>
-                      <span>15 Years</span>
-                      <span>30 Years</span>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Explanatory Note */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 flex items-start gap-2.5">
-                <Info className="w-4 h-4 text-[#2376b8] shrink-0 mt-0.5" />
-                <span>
-                  <strong>Did you know?</strong> An investment of ₹15,000/month compounding at 12.5% for 20 years yields approximately ₹1.48 Crore against an actual out-of-pocket investment of just ₹36 Lakhs. Time is your greatest wealth creator.
-                </span>
-              </div>
+        {/* ========================================================= */}
+        {/* SECTION 2: MF TOOLS CALCULATORS                           */}
+        {/* ========================================================= */}
+        <section id="mf-tools-calculators">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 pb-5 mb-8">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[#89b441] block mb-1">
+                Category 02
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44]">
+                MF Tools Calculators
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Specialized analytical engines to evaluate mutual fund returns, performance consistency, and NAV trends.
+              </p>
             </div>
-
-            {/* Right Results & Visuals (5 cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="bg-[#0f2b44] text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-800">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] block mb-1">
-                  Projected Wealth Outcome
-                </span>
-                <div className="text-4xl sm:text-5xl font-extrabold text-white mt-2 tracking-tight">
-                  {formatINR(activeResult.totalValue)}
-                </div>
-                <div className="text-xs text-slate-300 mt-1">
-                  Expected value after {mode === 'sip' ? sipYears : lumpsumYears} years
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-slate-800 space-y-4">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Total Invested Capital:</span>
-                    <span className="font-bold text-white">{formatINR(activeResult.investedAmount)}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Estimated Wealth Gain:</span>
-                    <span className="font-bold text-[#89b441]">
-                      +{formatINR(activeResult.estimatedReturns)}
-                    </span>
-                  </div>
-
-                  {/* Proportion Bar */}
-                  <div className="pt-2">
-                    <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden flex">
-                      <div
-                        style={{ width: `${investedPct}%` }}
-                        className="bg-[#2376b8] transition-all duration-500"
-                        title={`Invested: ${investedPct}%`}
-                      />
-                      <div
-                        style={{ width: `${returnsPct}%` }}
-                        className="bg-[#89b441] transition-all duration-500"
-                        title={`Returns: ${returnsPct}%`}
-                      />
-                    </div>
-                    <div className="flex justify-between text-[11px] text-slate-400 mt-2">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#2376b8]" />
-                        Invested ({investedPct}%)
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#89b441]" />
-                        Gains ({returnsPct}%)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-slate-800">
-                  <Link
-                    href="/contact-us#callback"
-                    className="w-full bg-[#f87b1f] hover:bg-[#d9620b] text-white font-bold text-sm py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#f87b1f]/20"
-                  >
-                    <span>Start This Investment Journey</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Regulatory Disclaimer */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200/80 text-xs text-slate-500 leading-relaxed">
-                <strong className="text-slate-700">Important Assumption Disclaimer:</strong> Calculations are based on assumed rates of return compounded periodically and are meant strictly for illustrative purposes. Mutual Fund investments are subject to market risks; past performance does not assure or guarantee future returns.
-              </div>
-            </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 self-start sm:self-auto">
+              {MF_TOOLS_CALCULATORS.length} Tools
+            </span>
           </div>
 
-          {/* Year-by-Year Growth Table */}
-          <div className="mt-16 bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm">
-            <h2 className="text-xl font-bold text-[#0f2b44] mb-4">
-              Year-by-Year Compounding Progression
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 text-xs font-bold uppercase text-slate-400">
-                    <th className="py-3 px-4">Year</th>
-                    <th className="py-3 px-4">Invested Capital</th>
-                    <th className="py-3 px-4">Compounded Growth</th>
-                    <th className="py-3 px-4">Total Portfolio Corpus</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {yearsArray.map((row) => (
-                    <tr key={row.year} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-4 font-bold text-[#0f2b44]">End of Year {row.year}</td>
-                      <td className="py-3 px-4 text-slate-600">{formatINR(row.investedAmount)}</td>
-                      <td className="py-3 px-4 text-[#89b441] font-semibold">+{formatINR(row.estimatedReturns)}</td>
-                      <td className="py-3 px-4 font-bold text-[#0f2b44]">{formatINR(row.totalValue)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {MF_TOOLS_CALCULATORS.map((tool) => {
+              const Icon = tool.icon;
+              return (
+                <Link
+                  key={tool.slug}
+                  href={`/investor/financial-calculator/${tool.slug}`}
+                  className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-lg hover:border-[#89b441] hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Top Row: Icon & Tag */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold ${tool.color}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-[#89b441]/10 group-hover:text-[#89b441] transition-colors">
+                        {tool.tag}
+                      </span>
+                    </div>
+
+                    {/* Title & Description */}
+                    <h3 className="text-base font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors">
+                      {tool.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
+                      {tool.desc}
+                    </p>
+                  </div>
+
+                  {/* Card Bottom CTA */}
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#89b441] group-hover:text-[#0f2b44] transition-colors">
+                    <span>Open Tool</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+        </section>
+
+        {/* Regulatory Disclaimer */}
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 text-xs text-slate-500 leading-relaxed shadow-sm">
+          <strong className="text-slate-700">Regulatory Disclaimer:</strong> Financial calculators and analytical tools provided on this platform are for educational and illustrative purposes only. Calculations are based on mathematical formulas and user assumptions and do not guarantee future returns. Mutual Fund investments are subject to market risks; please read all scheme-related documents carefully.
         </div>
-      </section>
+      </div>
     </div>
   );
 }
