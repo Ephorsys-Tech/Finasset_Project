@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MapPin,
   Phone,
@@ -12,16 +12,44 @@ import {
 } from 'lucide-react';
 
 export default function ContactUsPage() {
+  const [services, setServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
-    serviceOfInterest: 'General Financial Advisory',
+    serviceOfInterest: '',
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Fetch dynamic published services created by admin (matches navbar services section)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const serviceParam = params.get('service');
+      if (serviceParam) {
+        setForm((prev) => ({ ...prev, serviceOfInterest: serviceParam }));
+      }
+    }
+
+    fetch('/api/v1/public/services')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data)) {
+          setServices(json.data);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load services for contact form:', err);
+      })
+      .finally(() => {
+        setLoadingServices(false);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +72,7 @@ export default function ContactUsPage() {
           name: '',
           phone: '',
           email: '',
-          serviceOfInterest: 'General Financial Advisory',
+          serviceOfInterest: '',
           message: '',
         });
       } else {
@@ -160,7 +188,7 @@ export default function ContactUsPage() {
             </div>
 
             {/* Interactive Contact Form (7 cols) */}
-            <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-sm space-y-8">
+            <div id="callback" className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-sm space-y-8">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2">
                   Online Inquiry
@@ -246,13 +274,14 @@ export default function ContactUsPage() {
                         onChange={(e) => setForm({ ...form, serviceOfInterest: e.target.value })}
                         className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                       >
-                        <option value="General Financial Advisory">General Financial Advisory</option>
-                        <option value="Mutual Funds & SIP">Mutual Funds & SIP</option>
-                        <option value="Insurance Planning">Insurance Planning</option>
-                        <option value="NRI Wealth Advisory">NRI Wealth Advisory</option>
-                        <option value="Real Estate Advisory">Real Estate Advisory</option>
-                        <option value="Fixed Deposits & Bonds">Fixed Deposits & Bonds</option>
-                        <option value="Portfolio Management (PMS)">Portfolio Management (PMS)</option>
+                        <option value="">
+                          {loadingServices ? 'Loading services...' : 'Select Advisory Area'}
+                        </option>
+                        {services.map((service) => (
+                          <option key={service._id || service.slug || service.name} value={service.name}>
+                            {service.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
