@@ -9,6 +9,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        card: {
+          DEFAULT: '#FFFFFF',
+          foreground: '#0f2b44',
+        },
+        primary: {
+          DEFAULT: '#2376b8',
+          foreground: '#FFFFFF',
+        },
+        secondary: {
+          DEFAULT: '#f1f5f9',
+          foreground: '#0f2b44',
+        },
         brand: {
           blue: {
             DEFAULT: '#2376b8',

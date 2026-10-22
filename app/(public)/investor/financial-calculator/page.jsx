@@ -1,26 +1,8 @@
 import Link from 'next/link';
 import {
-  Calculator,
-  Coins,
-  ArrowRightLeft,
-  ArrowDownCircle,
-  Umbrella,
-  Clock,
-  ShieldCheck,
-  Percent,
-  Receipt,
-  Heart,
-  GraduationCap,
-  Home,
-  Car,
-  Plane,
-  TrendingUp,
-  BarChart3,
-  LineChart,
-  Search,
-  ArrowRight,
   Sparkles,
 } from 'lucide-react';
+import { ServiceCard } from '@/components/ui/service-card';
 
 export const metadata = {
   title: 'Financial Calculators & MF Tools | Finasset Wealth',
@@ -34,114 +16,128 @@ const FINANCIAL_CALCULATORS = [
   {
     title: 'SIP Calculator',
     slug: 'sip-calculator',
-    desc: 'Calculate the future wealth generated through disciplined monthly systematic investments.',
-    icon: Calculator,
+    desc: 'Calculate future wealth generated through disciplined monthly systematic investments.',
     tag: 'Popular',
-    color: 'text-[#2376b8] bg-[#2376b8]/10',
+    variant: 'blue',
+    imgSrc: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'SIP systematic investment illustration',
   },
   {
     title: 'Lumpsum Calculator',
     slug: 'lumpsum-calculator',
     desc: 'Project compound returns on one-time surplus capital investments over your chosen horizon.',
-    icon: Coins,
     tag: 'One-Time',
-    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+    variant: 'orange',
+    imgSrc: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Lumpsum investment growth illustration',
   },
   {
     title: 'STP Calculator',
     slug: 'stp-calculator',
-    desc: 'Simulate systematic transfers from liquid/debt funds to equity funds for rupee cost averaging.',
-    icon: ArrowRightLeft,
+    desc: 'Simulate systematic transfers from debt to equity funds for rupee cost averaging.',
     tag: 'Transfer',
-    color: 'text-[#89b441] bg-[#89b441]/10',
+    variant: 'green',
+    imgSrc: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'STP systematic transfer illustration',
   },
   {
     title: 'SWP Calculator',
     slug: 'swp-calculator',
     desc: 'Plan regular monthly income cashflows from your accumulated mutual fund corpus.',
-    icon: ArrowDownCircle,
     tag: 'Income',
-    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+    variant: 'navy',
+    imgSrc: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'SWP regular income illustration',
   },
   {
     title: 'Retirement Corpus Calculator',
     slug: 'retirement-corpus-calculator',
-    desc: 'Determine your required retirement nest egg adjusted for post-retirement living costs and inflation.',
-    icon: Umbrella,
+    desc: 'Determine your required retirement nest egg adjusted for post-retirement inflation.',
     tag: 'Milestone',
-    color: 'text-[#2376b8] bg-[#2376b8]/10',
+    variant: 'blue',
+    imgSrc: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Retirement nest egg planning',
   },
   {
     title: 'Investment Delay Calculator',
     slug: 'investment-delay-calculator',
-    desc: 'Measure the staggering cost and opportunity loss of postponing your investments by a few years.',
-    icon: Clock,
+    desc: 'Measure the staggering cost and opportunity loss of postponing investments.',
     tag: 'Opportunity',
-    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+    variant: 'red',
+    imgSrc: 'https://images.unsplash.com/photo-1501139083538-0139583c060f?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Cost of investment delay illustration',
   },
   {
     title: 'Life Insurance Calculator',
     slug: 'life-insurance-calculator',
-    desc: 'Calculate the optimal term insurance coverage required to safeguard your family dependents.',
-    icon: ShieldCheck,
+    desc: 'Calculate optimal term insurance coverage required to safeguard your dependents.',
     tag: 'Protection',
-    color: 'text-[#89b441] bg-[#89b441]/10',
+    variant: 'green',
+    imgSrc: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Family life insurance protection',
   },
   {
     title: 'EMI Calculator',
     slug: 'emi-calculator',
-    desc: 'Calculate accurate monthly EMIs, principal breakup, and total interest across any loan amount.',
-    icon: Percent,
+    desc: 'Calculate monthly EMIs, principal breakup, and total interest across any loan.',
     tag: 'Debt',
-    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+    variant: 'gray',
+    imgSrc: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Loan EMI calculation and figures',
   },
   {
     title: 'TAX Calculator',
     slug: 'tax-calculator',
     desc: 'Estimate tax liability under Old vs New Income Tax regimes and optimize deductions.',
-    icon: Receipt,
     tag: 'Tax Planning',
-    color: 'text-[#2376b8] bg-[#2376b8]/10',
+    variant: 'default',
+    imgSrc: 'https://images.unsplash.com/photo-1586486855514-8c633cc6fd38?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Tax planning and calculations',
   },
   {
     title: 'Marriage Expense Calculator',
     slug: 'marriage-expense-calculator',
-    desc: 'Estimate future wedding costs accounting for inflation and calculate monthly savings required.',
-    icon: Heart,
+    desc: 'Estimate wedding costs accounting for inflation and calculate monthly savings required.',
     tag: 'Life Goal',
-    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+    variant: 'red',
+    imgSrc: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Marriage expense planning',
   },
   {
     title: 'Education Cost Calculator',
     slug: 'education-cost-calculator',
-    desc: 'Forecast higher education tuition costs adjusted for education inflation to build a child fund.',
-    icon: GraduationCap,
+    desc: 'Forecast higher education tuition costs adjusted for education inflation.',
     tag: 'Education',
-    color: 'text-[#89b441] bg-[#89b441]/10',
+    variant: 'blue',
+    imgSrc: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Higher education tuition planning',
   },
   {
     title: 'Home Loan Calculator',
     slug: 'home-loan-calculator',
-    desc: 'Evaluate home loan eligibility, monthly repayments, and total interest outgo over loan tenure.',
-    icon: Home,
+    desc: 'Evaluate home loan eligibility, monthly repayments, and total interest outgo.',
     tag: 'Property',
-    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+    variant: 'navy',
+    imgSrc: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Home loan property financing',
   },
   {
     title: 'Car Purchase Calculator',
     slug: 'car-purchase-calculator',
     desc: 'Plan auto loan financing, down payment amounts, and monthly auto EMI affordability.',
-    icon: Car,
     tag: 'Auto',
-    color: 'text-[#2376b8] bg-[#2376b8]/10',
+    variant: 'orange',
+    imgSrc: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Automobile vehicle purchase financing',
   },
   {
     title: 'Vacation Budget Calculator',
     slug: 'vacation-budget-calculator',
-    desc: 'Set travel targets and compute monthly savings needed to fund your dream family vacation.',
-    icon: Plane,
+    desc: 'Set travel targets and compute monthly savings needed for your dream family vacation.',
     tag: 'Lifestyle',
-    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+    variant: 'green',
+    imgSrc: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Vacation holiday budget planner',
   },
 ];
 
@@ -152,50 +148,56 @@ const MF_TOOLS_CALCULATORS = [
   {
     title: 'SIP Performance',
     slug: 'sip-performance',
-    desc: 'Analyze historical returns and point-to-point compounding delivered by systematic investment plans.',
-    icon: TrendingUp,
+    desc: 'Analyze historical returns and point-to-point compounding delivered by SIPs.',
     tag: 'SIP Track',
-    color: 'text-[#2376b8] bg-[#2376b8]/10',
+    variant: 'blue',
+    imgSrc: 'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'SIP performance analytics',
   },
   {
     title: 'STP Performance',
     slug: 'stp-performance',
-    desc: 'Track historical performance and capital gains yield across debt-to-equity systematic transfer routes.',
-    icon: ArrowRightLeft,
+    desc: 'Track historical performance and capital gains yield across STP routes.',
     tag: 'STP Track',
-    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+    variant: 'orange',
+    imgSrc: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'STP transfer performance analytics',
   },
   {
     title: 'SWP Performance',
     slug: 'swp-performance',
-    desc: 'Evaluate past cashflow consistency and residual capital sustainability under systematic withdrawal plans.',
-    icon: ArrowDownCircle,
+    desc: 'Evaluate past cashflow consistency and residual capital sustainability.',
     tag: 'SWP Track',
-    color: 'text-[#89b441] bg-[#89b441]/10',
+    variant: 'green',
+    imgSrc: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'SWP cashflow sustainability',
   },
   {
     title: 'Scheme Performance',
     slug: 'scheme-performance',
-    desc: 'Review scheme returns, benchmark alpha, rolling yields, and risk ratios across mutual fund schemes.',
-    icon: BarChart3,
+    desc: 'Review scheme returns, benchmark alpha, rolling yields, and risk ratios.',
     tag: 'Analytics',
-    color: 'text-[#0f2b44] bg-[#0f2b44]/10',
+    variant: 'navy',
+    imgSrc: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Scheme performance evaluation',
   },
   {
     title: 'Fund Performance',
     slug: 'fund-performance',
-    desc: 'Deep-dive into mutual fund house track records, fund manager performance, and AUM growth metrics.',
-    icon: LineChart,
+    desc: 'Deep-dive into mutual fund house track records and fund manager performance.',
     tag: 'AMC Audit',
-    color: 'text-[#2376b8] bg-[#2376b8]/10',
+    variant: 'default',
+    imgSrc: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'AMC fund house performance',
   },
   {
     title: 'NAV Finder Calculator',
     slug: 'nav-finder-calculator',
-    desc: 'Lookup historical and latest Net Asset Values (NAV) across all mutual fund schemes and dividend histories.',
-    icon: Search,
+    desc: 'Lookup historical and latest Net Asset Values (NAV) across all mutual fund schemes.',
     tag: 'NAV Lookup',
-    color: 'text-[#f87b1f] bg-[#f87b1f]/10',
+    variant: 'gray',
+    imgSrc: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=500&auto=format&fit=crop&q=80',
+    imgAlt: 'Historical mutual fund NAV lookup',
   },
 ];
 
@@ -203,16 +205,17 @@ export default function FinancialCalculatorPage() {
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#0a1e30] via-[#0f2b44] to-[#123657] text-white py-14 sm:py-18 relative">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/40 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
+      <section className="bg-gradient-to-b from-[#0a1e30] via-[#0f2b44] to-[#123657] text-white py-14 sm:py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#2376b8]/20 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/40 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4 backdrop-blur-sm">
             <Sparkles className="w-3.5 h-3.5 text-[#f87b1f]" />
-            <span>Financial Planning & MF Analytics</span>
+            <span>Financial Planning &amp; MF Analytics</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Financial & MF Tools Calculators
+            Financial &amp; MF Tools Calculators
           </h1>
-          <p className="text-slate-300 mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-300 mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
             Select any financial calculator or mutual fund tool below to simulate outcomes, evaluate historical returns, and plan your life goals.
           </p>
         </div>
@@ -236,48 +239,26 @@ export default function FinancialCalculatorPage() {
                 Comprehensive calculators for goal planning, wealth accumulation, and debt management.
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 self-start sm:self-auto">
+            <span className="text-xs font-bold text-slate-600 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm self-start sm:self-auto">
               {FINANCIAL_CALCULATORS.length} Calculators
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {FINANCIAL_CALCULATORS.map((calc) => {
-              const Icon = calc.icon;
-              return (
-                <Link
-                  key={calc.slug}
-                  href={`/investor/financial-calculator/${calc.slug}`}
-                  className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-lg hover:border-[#2376b8] hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group"
-                >
-                  <div>
-                    {/* Top Row: Icon & Tag */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold ${calc.color}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-[#2376b8]/10 group-hover:text-[#2376b8] transition-colors">
-                        {calc.tag}
-                      </span>
-                    </div>
-
-                    {/* Title & Description */}
-                    <h3 className="text-base font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors">
-                      {calc.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
-                      {calc.desc}
-                    </p>
-                  </div>
-
-                  {/* Card Bottom CTA */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#2376b8]">
-                    <span>Open Calculator</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {FINANCIAL_CALCULATORS.map((calc) => (
+              <ServiceCard
+                key={calc.slug}
+                title={calc.title}
+                href={`/investor/financial-calculator/${calc.slug}`}
+                tag={calc.tag}
+                description={calc.desc}
+                imgSrc={calc.imgSrc}
+                imgAlt={calc.imgAlt}
+                variant={calc.variant}
+                ctaText="CALCULATE NOW"
+                className="min-h-[200px]"
+              />
+            ))}
           </div>
         </section>
 
@@ -297,53 +278,31 @@ export default function FinancialCalculatorPage() {
                 Specialized analytical engines to evaluate mutual fund returns, performance consistency, and NAV trends.
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 self-start sm:self-auto">
+            <span className="text-xs font-bold text-slate-600 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm self-start sm:self-auto">
               {MF_TOOLS_CALCULATORS.length} Tools
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {MF_TOOLS_CALCULATORS.map((tool) => {
-              const Icon = tool.icon;
-              return (
-                <Link
-                  key={tool.slug}
-                  href={`/investor/financial-calculator/${tool.slug}`}
-                  className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-lg hover:border-[#89b441] hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between group"
-                >
-                  <div>
-                    {/* Top Row: Icon & Tag */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold ${tool.color}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-[#89b441]/10 group-hover:text-[#89b441] transition-colors">
-                        {tool.tag}
-                      </span>
-                    </div>
-
-                    {/* Title & Description */}
-                    <h3 className="text-base font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors">
-                      {tool.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
-                      {tool.desc}
-                    </p>
-                  </div>
-
-                  {/* Card Bottom CTA */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#89b441] group-hover:text-[#0f2b44] transition-colors">
-                    <span>Open Tool</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {MF_TOOLS_CALCULATORS.map((tool) => (
+              <ServiceCard
+                key={tool.slug}
+                title={tool.title}
+                href={`/investor/financial-calculator/${tool.slug}`}
+                tag={tool.tag}
+                description={tool.desc}
+                imgSrc={tool.imgSrc}
+                imgAlt={tool.imgAlt}
+                variant={tool.variant}
+                ctaText="OPEN ANALYTICS"
+                className="min-h-[200px]"
+              />
+            ))}
           </div>
         </section>
 
         {/* Regulatory Disclaimer */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 text-xs text-slate-500 leading-relaxed shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 text-xs text-slate-500 leading-relaxed shadow-sm">
           <strong className="text-slate-700">Regulatory Disclaimer:</strong> Financial calculators and analytical tools provided on this platform are for educational and illustrative purposes only. Calculations are based on mathematical formulas and user assumptions and do not guarantee future returns. Mutual Fund investments are subject to market risks; please read all scheme-related documents carefully.
         </div>
       </div>
