@@ -131,6 +131,7 @@ export default function AdminEnquiriesPage() {
 
   const getTypeBadgeClass = (type) => {
     const t = (type || '').toLowerCase();
+    if (t.includes('nri')) return 'bg-cyan-100 text-cyan-800 border-cyan-300 font-extrabold';
     if (t.includes('consult')) return 'bg-indigo-100 text-indigo-800 border-indigo-200';
     if (t.includes('callback')) return 'bg-amber-100 text-amber-800 border-amber-200';
     if (t.includes('contact')) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -159,7 +160,7 @@ export default function AdminEnquiriesPage() {
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Status Pills */}
+          {/* Status Pills */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {['ALL', 'NEW', 'CONTACTED', 'CLOSED'].map((st) => (
             <button
@@ -174,6 +175,17 @@ export default function AdminEnquiriesPage() {
               {st}
             </button>
           ))}
+          <span className="text-slate-300 mx-1 hidden sm:inline">|</span>
+          <button
+            onClick={() => setTypeFilter(typeFilter === 'nri' ? 'ALL' : 'nri')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              typeFilter === 'nri'
+                ? 'bg-cyan-700 text-white shadow-xs'
+                : 'bg-cyan-50 text-cyan-800 border border-cyan-200 hover:bg-cyan-100'
+            }`}
+          >
+            <span>NRI Corner Enquiries</span>
+          </button>
         </div>
 
         {/* Type & Search */}
@@ -184,6 +196,7 @@ export default function AdminEnquiriesPage() {
             className="bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none"
           >
             <option value="ALL">All Sources & Types</option>
+            <option value="nri">NRI Consultations</option>
             <option value="consultation">Consultation Requests</option>
             <option value="callback">Callback Requests</option>
             <option value="contact">Contact Messages</option>
@@ -259,8 +272,11 @@ export default function AdminEnquiriesPage() {
                       )}
                     </td>
                     <td className="py-4 px-4 max-w-[170px] truncate text-slate-600">
-                      <div className="font-semibold text-slate-800">{e.serviceOfInterest}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{e.sourcePage}</div>
+                      <div className="font-semibold text-slate-800 truncate">{e.serviceOfInterest}</div>
+                      <div className="text-[10px] text-slate-400 truncate flex items-center gap-1 mt-0.5">
+                        {e.country && <span className="font-bold text-cyan-700 bg-cyan-50 px-1.5 py-0.2 rounded border border-cyan-200">[{e.country}]</span>}
+                        <span>{e.sourcePage}</span>
+                      </div>
                     </td>
                     <td className="py-4 px-4">
                       <select
@@ -393,6 +409,16 @@ export default function AdminEnquiriesPage() {
                   {selectedDetailsEnquiry.type}
                 </span>
               </div>
+              {selectedDetailsEnquiry.country && (
+                <div className="bg-cyan-50/70 p-3 rounded-xl border border-cyan-200/80 col-span-2">
+                  <span className="text-cyan-800 block text-[10px] uppercase font-bold tracking-wider">
+                    Country of Residence
+                  </span>
+                  <span className="font-extrabold text-cyan-950 block mt-0.5 text-sm">
+                    {selectedDetailsEnquiry.country}
+                  </span>
+                </div>
+              )}
             </div>
 
             {selectedDetailsEnquiry.message && (

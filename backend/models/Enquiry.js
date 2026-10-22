@@ -20,10 +20,13 @@ const EnquirySchema = new mongoose.Schema(
         'contact',
         'career',
         'consultation',
+        'nri',
         'CALLBACK',
         'CONTACT',
         'CAREER',
         'CONSULTATION',
+        'NRI',
+        'NRI_CONSULTATION',
         'SERVICE_CONSULTATION',
       ],
       default: 'consultation',
@@ -43,6 +46,11 @@ const EnquirySchema = new mongoose.Schema(
       default: '',
       trim: true,
       lowercase: true,
+    },
+    country: {
+      type: String,
+      default: '',
+      trim: true,
     },
     serviceOfInterest: {
       type: String,
@@ -74,4 +82,8 @@ const EnquirySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Enquiry || mongoose.model('Enquiry', EnquirySchema);
+if (mongoose.models.Enquiry) {
+  delete mongoose.models.Enquiry;
+}
+
+export default mongoose.model('Enquiry', EnquirySchema);
