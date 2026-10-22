@@ -18,6 +18,7 @@ import {
   BookOpen,
   Inbox,
   Image,
+  Globe,
   History,
   LogOut,
   ExternalLink,
@@ -108,13 +109,14 @@ export default function AdminProtectedLayout({ children }) {
     { label: 'Menu Manager', href: '/admin/menus', icon: MenuIcon },
     { label: 'Home Page', href: '/admin/home-page', icon: Home },
     { label: "Investor's Corner", href: '/admin/investor-corner', icon: Calculator },
-    { label: 'Pay Premium', href: '/admin/pay-premium', icon: CreditCard },
+    // { label: 'Pay Premium', href: '/admin/pay-premium', icon: CreditCard },
     { label: 'News & Market', href: '/admin/news-market', icon: TrendingUp },
     { label: 'Testimonials', href: '/admin/testimonials', icon: MessageSquareQuote },
     { label: 'Partners', href: '/admin/partners', icon: Handshake },
-    { label: 'Pages Content', href: '/admin/pages', icon: FileText },
+    // { label: 'Pages Content', href: '/admin/pages', icon: FileText },
     { label: 'Media Library', href: '/admin/media', icon: Image },
-    { label: 'Activity Log', href: '/admin/activity-log', icon: History },
+    { label: 'NRI Corner', href: '/admin/nri-corner', icon: Globe },
+    // { label: 'Activity Log', href: '/admin/activity-log', icon: History },
   ];
 
   if (loading) {
