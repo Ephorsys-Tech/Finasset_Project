@@ -1,5 +1,13 @@
+import dns from 'dns';
 import mongoose from 'mongoose';
 import { config } from './env';
+
+// Ensure DNS SRV records for MongoDB Atlas resolve properly across Windows and ISP resolvers
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  // Ignore in environments where setting DNS servers is not permitted
+}
 
 /**
  * Global cached MongoDB Atlas connection pooling
