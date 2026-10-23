@@ -35,7 +35,8 @@ import { formatINR } from '@/lib/utils';
 import HeroSlider from '@/components/home/HeroSlider';
 import FeatureCarousel from '@/components/ui/feature-carousel';
 import { Marquee } from '@/components/ui/marquee';
-import { fallbackMarketIndices, fallbackServices, fallbackNewsItems, fallbackFinancialVideo, fallbackPartners } from '@/lib/fallbackData';
+import { fallbackMarketIndices, fallbackServices, fallbackFinancialVideo, fallbackPartners } from '@/lib/fallbackData';
+import { useNewsStore } from '@/store/useNewsStore';
 
 function getEmbedUrl(url) {
   if (!url) return 'https://www.youtube.com/embed/1-S_q_kUeYw';
@@ -51,7 +52,6 @@ export default function HomePage() {
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAllServices, setShowAllServices] = useState(false);
-  const [selectedNewsIndex, setSelectedNewsIndex] = useState(0);
   const [newsTab, setNewsTab] = useState('popular');
   const [callbackForm, setCallbackForm] = useState({
     name: '',
@@ -63,6 +63,20 @@ export default function HomePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
+  // Connect to Zustand News Store (powered by Axios instance)
+  const {
+    newsItems: zustandNews,
+    activeNews: zustandActive,
+    selectedNewsIndex,
+    selectNews,
+    fetchNews,
+  } = useNewsStore();
+
+  useEffect(() => {
+    // Fetch latest news items via Zustand store using Axios
+    fetchNews(false);
+  }, [fetchNews]);
 
   useEffect(() => {
     async function fetchHomeData() {
@@ -89,15 +103,16 @@ export default function HomePage() {
   const marketIndices = homeData?.marketIndices || [];
   const displayIndices = (marketIndices && marketIndices.length > 0) ? marketIndices : fallbackMarketIndices;
   const tickerItems = [...displayIndices, ...displayIndices];
-  const newsItems = homeData?.newsItems || [];
-  const displayNews = (newsItems && newsItems.length > 0) ? newsItems : fallbackNewsItems;
-  const activeNews = displayNews[selectedNewsIndex] || displayNews[0];
+  const displayNews = (zustandNews && Array.isArray(zustandNews) && zustandNews.length > 0)
+    ? zustandNews
+    : (homeData?.newsItems && Array.isArray(homeData.newsItems) && homeData.newsItems.length > 0 ? homeData.newsItems : []);
+  const activeNews = zustandActive || (displayNews.length > 0 ? (displayNews[selectedNewsIndex] || displayNews[0]) : null);
   const testimonials = homeData?.testimonials || [];
   const partners = (homeData?.partners && homeData.partners.length > 0) ? homeData.partners : fallbackPartners;
   const financialVideo = homeData?.financialVideo || fallbackFinancialVideo;
 
   const handleSelectNews = (idx) => {
-    setSelectedNewsIndex(idx);
+    selectNews(idx);
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       const el = document.getElementById('featured-news-card');
       if (el) {
@@ -412,45 +427,74 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* News Feed Grid (Left: Active Featured Story, Right: Interactive List) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          {/* News Feed Grid or Empty State */}
+          {displayNews.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50/70 p-12 sm:p-16 text-center max-w-2xl mx-auto space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mx-auto text-[#2376b8]">
+                <FileText className="w-7 h-7 stroke-[1.8]" />
+              </div>
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-800 tracking-tight">
+                  No News Available
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-md mx-auto mt-1.5">
+                  There are currently no published market stories or editorial feeds available. Please check back soon for our latest financial insights and advisory commentary.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             {/* Left Side: Featured / Selected News in Detail */}
             <div id="featured-news-card" className="lg:col-span-7 xl:col-span-8 scroll-mt-24">
               <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 h-[440px] sm:h-[500px] lg:h-[540px] flex flex-col justify-between p-6 sm:p-10 group">
                 {/* Background Image with smooth transition */}
-                <div
-                  key={activeNews?._id || activeNews?.title || selectedNewsIndex}
-                  className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-105 animate-in fade-in duration-500"
-                  style={{
-                    backgroundImage: `url('${activeNews?.imageUrl || 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1200&q=80'}')`,
-                  }}
-                />
+                {activeNews?.imageUrl ? (
+                  <div
+                    key={activeNews?._id || activeNews?.title || selectedNewsIndex}
+                    className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-105 animate-in fade-in duration-500"
+                    style={{
+                      backgroundImage: `url('${activeNews.imageUrl}')`,
+                    }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#10243A] via-[#163352] to-[#0a1827] flex items-center justify-center">
+                    <div className="text-center p-6 opacity-25">
+                      <TrendingUp className="w-16 h-16 text-[#C7A76C] mx-auto mb-2" />
+                      <span className="text-xs font-extrabold uppercase tracking-widest text-slate-300">
+                        Finasset Market Intelligence
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-slate-950/20 z-10" />
 
-                {/* Top-Left Badge: Matching Screenshot "Featured Post" pill */}
+                {/* Top-Left Badge: Tag */}
                 <div className="relative z-20 self-start">
-                  <span className="px-4 py-1.5 rounded-full bg-white text-slate-900 font-bold text-xs shadow-lg tracking-wide border border-white/80">
-                    {activeNews?.badge || 'Featured Post'}
+                  <span className="px-4 py-1.5 rounded-full bg-white text-slate-900 font-extrabold text-xs shadow-lg tracking-wide border border-white/80">
+                    {activeNews?.tag || activeNews?.badge || 'Tax Alert'}
                   </span>
                 </div>
 
                 {/* Bottom News Details */}
                 <div className="relative z-20 flex flex-col justify-end text-left">
-                  {/* Publish Date & Meta */}
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-300 mb-2.5">
+                  {/* Publish Date & Meta: Date with Year • Mins of Read • Sub Tag */}
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-semibold text-slate-300 mb-2.5">
                     <span>
-                      {activeNews?.publishedAt
-                        ? (typeof activeNews.publishedAt === 'string'
-                            ? activeNews.publishedAt
-                            : new Date(activeNews.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))
-                        : 'Recent'}
+                      {activeNews?.date ||
+                        (activeNews?.publishedAt
+                          ? (typeof activeNews.publishedAt === 'string'
+                              ? activeNews.publishedAt
+                              : new Date(activeNews.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))
+                          : '11 Jan, 2025')}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-slate-400" />
-                    <span>{activeNews?.readTime || '5 min Read'}</span>
-                    {activeNews?.source && (
+                    <span>{activeNews?.readTime || '3 min Read'}</span>
+                    {(activeNews?.subTag || activeNews?.source) && (
                       <>
                         <span className="w-1 h-1 rounded-full bg-slate-400" />
-                        <span className="text-[#89b441]">{activeNews.source}</span>
+                        <span className="text-[#89b441] font-bold">
+                          {activeNews?.subTag || activeNews?.source}
+                        </span>
                       </>
                     )}
                   </div>
@@ -462,7 +506,7 @@ export default function HomePage() {
 
                   {/* Subtitle / Description */}
                   <p className="text-slate-200 text-xs sm:text-sm sm:leading-relaxed line-clamp-3 mb-5 max-w-2xl">
-                    {activeNews?.summary || activeNews?.description}
+                    {activeNews?.description || activeNews?.summary}
                   </p>
 
                   {/* Action Link */}
@@ -501,11 +545,13 @@ export default function HomePage() {
               <div className="flex-1 overflow-y-auto pr-1.5 sm:pr-2 space-y-3 sm:space-y-3.5 news-feed-scroll max-h-[440px] sm:max-h-[480px] lg:max-h-none overscroll-contain">
                 {displayNews.map((item, idx) => {
                   const isSelected = idx === selectedNewsIndex;
-                  const dateStr = item?.publishedAt
-                    ? (typeof item.publishedAt === 'string'
-                        ? item.publishedAt
-                        : new Date(item.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))
-                    : 'Recent';
+                  const dateStr = item?.date ||
+                    (item?.publishedAt
+                      ? (typeof item.publishedAt === 'string'
+                          ? item.publishedAt
+                          : new Date(item.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))
+                      : '11 Jan, 2025');
+                  const readTimeStr = item?.readTime || '3 min Read';
 
                   return (
                     <button
@@ -519,13 +565,19 @@ export default function HomePage() {
                       }`}
                     >
                       {/* Thumbnail Image */}
-                      <div className="w-20 sm:w-28 h-18 sm:h-20 rounded-xl overflow-hidden shrink-0 relative bg-slate-100 border border-slate-200/60">
-                        <img
-                          src={item?.imageUrl || 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=400&q=80'}
-                          alt={item?.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                        />
+                      <div className="w-20 sm:w-28 h-18 sm:h-20 rounded-xl overflow-hidden shrink-0 relative bg-slate-100 border border-slate-200/60 flex items-center justify-center">
+                        {item?.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item?.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <FileText className="w-6 h-6 stroke-[1.5]" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Content Area */}
@@ -537,7 +589,7 @@ export default function HomePage() {
                             {isSelected && (
                               <span className="w-1.5 h-1.5 rounded-full bg-[#2376b8]" />
                             )}
-                            {item?.readTime || '4 min Read'}
+                            {readTimeStr}
                           </span>
                         </div>
 
@@ -556,8 +608,9 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
+    </section>
  
       {/* 6. FINANCIAL VIDEO (Cinematic Full-Width Showcase with In-Video Bottom-Right Title) */}
       <section id="financial-video" className="py-12 sm:py-16 lg:py-20 bg-white scroll-mt-20 border-t border-slate-200/80">

@@ -400,7 +400,7 @@ export const contentService = {
       ]);
 
       const activeIndices = (indices && indices.length) ? indices : fallbackMarketIndices;
-      const activeNews = (newsItems && newsItems.length) ? newsItems : fallbackNewsItems;
+      const activeNews = (newsItems && newsItems.length) ? newsItems : [];
 
       return {
         indices: activeIndices,
@@ -415,9 +415,9 @@ export const contentService = {
       return {
         indices: fallbackMarketIndices,
         news: {
-          popular: fallbackNewsItems,
-          ipo: fallbackNewsItems,
-          market: fallbackNewsItems,
+          popular: [],
+          ipo: [],
+          market: [],
         },
         lastUpdated: new Date(),
       };

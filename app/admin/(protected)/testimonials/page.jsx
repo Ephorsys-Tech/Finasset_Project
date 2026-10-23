@@ -11,6 +11,7 @@ import {
   Star,
   CheckCircle2,
 } from 'lucide-react';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminTestimonialsPage() {
   const [testimonials, setTestimonials] = useState([]);
@@ -18,6 +19,8 @@ export default function AdminTestimonialsPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -73,10 +76,16 @@ export default function AdminTestimonialsPage() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Delete testimonial from ${name}?`)) return;
-    await fetch(`/api/v1/admin/testimonials?id=${id}`, { method: 'DELETE' });
-    fetchItems();
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/v1/admin/testimonials?id=${deleteTarget.id}`, { method: 'DELETE' });
+      fetchItems();
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -122,7 +131,11 @@ export default function AdminTestimonialsPage() {
               <button onClick={() => handleOpenEdit(t)} className="p-1.5 text-slate-600 hover:text-[#10243A]">
                 <Edit2 className="w-4 h-4" />
               </button>
-              <button onClick={() => handleDelete(t._id, t.clientName)} className="p-1.5 text-rose-500 hover:text-rose-700">
+              <button
+                onClick={() => setDeleteTarget({ id: t._id, name: t.clientName })}
+                className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                title="Delete Testimonial"
+              >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
@@ -223,6 +236,17 @@ export default function AdminTestimonialsPage() {
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Testimonial"
+        itemName={deleteTarget?.name}
+        message="Are you sure you want to delete this investor testimonial? This action cannot be undone."
+        confirmText="Yes, Delete Review"
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
