@@ -89,7 +89,7 @@ export default function RiskProfilePage() {
   // Keyboard navigation support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isCompleted) return;
+      if (isCompleted || !currentQuestion) return;
 
       // Enter to advance if selected
       if (e.key === 'Enter' && selectedOption) {
@@ -99,7 +99,7 @@ export default function RiskProfilePage() {
 
       // Number keys 1-5 to select options
       const num = parseInt(e.key, 10);
-      if (num >= 1 && num <= currentQuestion.options.length) {
+      if (num >= 1 && currentQuestion?.options && num <= currentQuestion.options.length) {
         e.preventDefault();
         handleSelectOption(currentQuestion.options[num - 1]);
       }

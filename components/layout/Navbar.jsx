@@ -81,49 +81,68 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white transition-all duration-300">
-      {/* Top Bar for Client & Employee Login (Left) & Quick Contacts (Right) */}
-      <div className="bg-[#0f2b44] text-slate-300 text-xs py-2 px-4 border-b border-[#1b5d92]/40">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          {/* Top Left: Client Login & Employee Login */}
-          <div className="flex items-center gap-3 sm:gap-4 justify-center sm:justify-start w-full sm:w-auto">
-            <Link
-              href="/portfolio-login"
-              className="inline-flex items-center gap-1.5 text-slate-200 hover:text-[#f87b1f] font-semibold transition-all duration-200 group px-2 py-0.5 rounded hover:bg-white/5"
-            >
-              <User className="w-3.5 h-3.5 text-[#f87b1f] group-hover:scale-110 transition-transform duration-200" />
-              <span>Client Login</span>
-            </Link>
-
-            <span className="text-slate-600 select-none">|</span>
-
-            <Link
-              href="/admin/login"
-              className="inline-flex items-center gap-1.5 text-slate-300 hover:text-[#89b441] font-semibold transition-all duration-200 group px-2 py-0.5 rounded hover:bg-white/5"
-            >
-              <Briefcase className="w-3.5 h-3.5 text-[#89b441] group-hover:scale-110 transition-transform duration-200" />
-              <span>Employee Login</span>
-            </Link>
-          </div>
-
-          {/* Top Right: Phone & Email Details */}
-          <div className="flex items-center gap-4 sm:gap-5 justify-center sm:justify-end w-full sm:w-auto border-t sm:border-t-0 border-slate-700/50 pt-1.5 sm:pt-0">
+      {/* Top Bar for Client & Employee Login & Contacts (Desktop Only, Right-aligned with Hover Slide-to-Left Reveal) */}
+      <div className="hidden sm:block bg-[#0f2b44] text-slate-300 text-xs py-1.5 px-4 sm:px-6 lg:px-8 border-b border-[#1b5d92]/40">
+        <div className="max-w-7xl mx-auto flex items-center justify-end">
+          {/* 4 Interactive Logo Icon Sections on the Right */}
+          <div className="flex items-center gap-2">
+            {/* 1. Phone / Call Icon */}
             <a
               href="tel:+919437012345"
-              className="flex items-center gap-1.5 text-slate-300 hover:text-[#f87b1f] transition-colors duration-200 whitespace-nowrap"
+              aria-label="Call +91 94370 12345"
+              className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#2376b8]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
             >
-              <Phone className="w-3.5 h-3.5 text-[#2376b8]" />
-              <span className="font-medium">+91 94370 12345</span>
+              <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                <Phone className="w-3.5 h-3.5 text-[#2376b8] group-hover:text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
+              </span>
+              <span className="max-w-0 opacity-0 group-hover:max-w-[200px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-medium text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+                +91 94370 12345
+              </span>
             </a>
 
-            <span className="text-slate-600 select-none">|</span>
-
+            {/* 2. Mail / Email Icon */}
             <a
               href="mailto:contact@finassetwealth.com"
-              className="flex items-center gap-1.5 text-slate-300 hover:text-[#f87b1f] transition-colors duration-200 whitespace-nowrap"
+              aria-label="Email contact@finassetwealth.com"
+              className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#2376b8]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
             >
-              <Mail className="w-3.5 h-3.5 text-[#2376b8]" />
-              <span className="font-medium">contact@finassetwealth.com</span>
+              <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                <Mail className="w-3.5 h-3.5 text-[#2376b8] group-hover:text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
+              </span>
+              <span className="max-w-0 opacity-0 group-hover:max-w-[220px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-medium text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+                contact@finassetwealth.com
+              </span>
             </a>
+
+            <span className="text-slate-700 select-none">|</span>
+
+            {/* 3. Client Login Icon */}
+            <Link
+              href="/portfolio-login"
+              aria-label="Client Login"
+              className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#f87b1f]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
+            >
+              <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                <User className="w-3.5 h-3.5 text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
+              </span>
+              <span className="max-w-0 opacity-0 group-hover:max-w-[160px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-semibold text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+                Client Login
+              </span>
+            </Link>
+
+            {/* 4. Employee Login Icon */}
+            <Link
+              href="/admin/login"
+              aria-label="Employee Login"
+              className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#89b441]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
+            >
+              <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                <Briefcase className="w-3.5 h-3.5 text-[#89b441] group-hover:scale-110 transition-all duration-200" />
+              </span>
+              <span className="max-w-0 opacity-0 group-hover:max-w-[160px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-semibold text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+                Employee Login
+              </span>
+            </Link>
           </div>
         </div>
       </div>
