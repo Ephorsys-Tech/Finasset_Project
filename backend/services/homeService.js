@@ -15,7 +15,6 @@ import {
   fallbackMarketIndices,
   fallbackNewsItems,
   fallbackTestimonials,
-  fallbackPartners,
   fallbackFinancialVideo,
 } from '@/lib/fallbackData';
 
@@ -80,7 +79,7 @@ export const homeService = {
         marketIndices: (marketIndices && marketIndices.length) ? marketIndices : fallbackMarketIndices,
         newsItems: normalizedNews,
         testimonials: (testimonials && testimonials.length) ? testimonials : fallbackTestimonials,
-        partners: (partners && partners.length) ? partners : fallbackPartners,
+        partners: (partners && partners.length) ? partners : [],
         financialVideo: settings?.financialVideo || fallbackFinancialVideo,
       };
     } catch (err) {
@@ -93,7 +92,7 @@ export const homeService = {
         marketIndices: fallbackMarketIndices,
         newsItems: [],
         testimonials: fallbackTestimonials,
-        partners: fallbackPartners,
+        partners: [],
         financialVideo: fallbackFinancialVideo,
         isFallback: true,
       };
