@@ -69,7 +69,7 @@ export default function FinancialFitnessPage() {
   // Keyboard navigation support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isCompleted) return;
+      if (isCompleted || !currentQuestion) return;
 
       // Enter to advance if selected
       if (e.key === 'Enter' && selectedOption) {
