@@ -14,16 +14,18 @@ import InvestorsCorner from '@/components/home/InvestorsCorner';
 import NewsFeed from '@/components/home/NewsFeed';
 import CallbackForm from '@/components/home/CallbackForm';
 import OurServices from '@/components/home/OurServices';
+import VideoShowcase from '@/components/home/VideoShowcase';
 
-function getEmbedUrl(url) {
-  if (!url) return 'https://www.youtube.com/embed/1-S_q_kUeYw';
-  if (url.includes('embed')) return url;
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
-  if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}?rel=0&modestbranding=1`;
-  }
-  return url;
-}
+
+// function getEmbedUrl(url) {
+//   if (!url) return 'https://www.youtube.com/embed/1-S_q_kUeYw';
+//   if (url.includes('embed')) return url;
+//   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+//   if (match && match[1]) {
+//     return `https://www.youtube.com/embed/${match[1]}?rel=0&modestbranding=1`;
+//   }
+//   return url;
+// }
 
 
 export default function HomePage() {
@@ -62,7 +64,10 @@ export default function HomePage() {
   const tickerItems = [...displayIndices, ...displayIndices];
   const testimonials = homeData?.testimonials || [];
   const partners = homeData?.partners || [];
-  const financialVideo = homeData?.financialVideo || fallbackFinancialVideo;
+  // const financialVideo = homeData?.financialVideo || fallbackFinancialVideo;
+
+  const financialVideos =
+  homeData?.financialVideos || (homeData?.financialVideo ? [homeData.financialVideo] : []);
 
 
   const homeNews = homeData?.newsItems || [];
@@ -156,32 +161,8 @@ export default function HomePage() {
       {/* 5. NEWS FEED */}
       <NewsFeed initialNews={homeNews} />
 
-      {/* 6. FINANCIAL VIDEO */}
-      <section
-        id="financial-video"
-        className="py-12 sm:py-16 lg:py-20 bg-white scroll-mt-20 border-t border-slate-200/80"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative w-full aspect-video rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border border-slate-200/80">
-            <iframe
-              src={getEmbedUrl(
-                financialVideo?.embedUrl || financialVideo?.videoUrl || 'https://www.youtube.com/embed/1-S_q_kUeYw'
-              )}
-              title={financialVideo?.title || 'Financial Video'}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              loading="lazy"
-            />
-
-            <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-20 pointer-events-none text-right max-w-[85%] sm:max-w-md lg:max-w-xl">
-              <h2 className="text-sm sm:text-base lg:text-xl font-extrabold text-white tracking-tight leading-snug drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] text-right">
-                {financialVideo?.title || 'The Power of Compounding & Wealth Creation: Practical Advisory Guide'}
-              </h2>
-            </div>
-          </div>
-        </div>
-      </section>
+     {/* 6. FINANCIAL VIDEOS */}
+<VideoShowcase initialVideos={financialVideos} />
 
       {/* 7. MOBILE APP PROMO SECTION */}
       <section className="py-20 bg-white border-t border-slate-200/80">
@@ -278,7 +259,7 @@ export default function HomePage() {
       <ClientPartners initialPartners={partners} />
 
       {/* 11. REQUEST A CALL BACK FORM */}
-      <CallbackForm />
+      <CallbackForm initialServices={services} />
     </div>
   );
 }

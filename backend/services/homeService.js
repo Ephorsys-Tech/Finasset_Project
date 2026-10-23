@@ -7,6 +7,7 @@ import MarketIndex from '@/backend/models/MarketIndex';
 import NewsItem from '@/backend/models/NewsItem';
 import Testimonial from '@/backend/models/Testimonial';
 import Partner from '@/backend/models/Partner';
+import Video from '@/backend/models/Video';
 import { logAdminActivity } from '@/backend/lib/auth';
 import {
   fallbackHeroSlides,
@@ -32,6 +33,7 @@ export const homeService = {
         newsItems,
         testimonials,
         partners,
+        videos,
       ] = await Promise.all([
         SiteSettings.findOne({}).lean().catch(() => null),
         HeroSlide.find({ isActive: true }).sort({ order: 1 }).lean().catch(() => []),
@@ -41,6 +43,7 @@ export const homeService = {
         NewsItem.find({ isPublished: true }).sort({ order: 1, publishedAt: -1 }).lean().catch(() => []),
         Testimonial.find({ isPublished: true }).sort({ order: 1 }).lean().catch(() => []),
         Partner.find({ isPublished: true }).sort({ order: 1 }).lean().catch(() => []),
+        Video.find({ isPublished: true }).sort({ displayOrder: 1, createdAt: -1 }).limit(4).lean().catch(() => []),
       ]);
 
       const rawNews = (newsItems && newsItems.length) ? newsItems : [];
@@ -80,7 +83,8 @@ export const homeService = {
         newsItems: normalizedNews,
         testimonials: (testimonials && testimonials.length) ? testimonials : fallbackTestimonials,
         partners: (partners && partners.length) ? partners : [],
-        financialVideo: settings?.financialVideo || fallbackFinancialVideo,
+        financialVideos: (videos && videos.length) ? videos : (settings?.financialVideo ? [settings.financialVideo] : [fallbackFinancialVideo]),
+        financialVideo: (videos && videos.length) ? videos[0] : (settings?.financialVideo || fallbackFinancialVideo),
       };
     } catch (err) {
       console.warn('⚠️ Serving cached fallback home data:', err.message);
@@ -93,6 +97,7 @@ export const homeService = {
         newsItems: [],
         testimonials: fallbackTestimonials,
         partners: [],
+        financialVideos: [fallbackFinancialVideo],
         financialVideo: fallbackFinancialVideo,
         isFallback: true,
       };

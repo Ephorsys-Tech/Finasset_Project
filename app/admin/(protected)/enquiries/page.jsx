@@ -409,6 +409,17 @@ export default function AdminEnquiriesPage() {
                   {selectedDetailsEnquiry.type}
                 </span>
               </div>
+              {selectedDetailsEnquiry.preferredTime && (
+                <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200/70 col-span-2">
+                  <span className="text-amber-800 block text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-amber-600" />
+                    Preferred Callback Time
+                  </span>
+                  <span className="font-bold text-amber-950 block mt-0.5 text-xs">
+                    {selectedDetailsEnquiry.preferredTime}
+                  </span>
+                </div>
+              )}
               {selectedDetailsEnquiry.country && (
                 <div className="bg-cyan-50/70 p-3 rounded-xl border border-cyan-200/80 col-span-2">
                   <span className="text-cyan-800 block text-[10px] uppercase font-bold tracking-wider">
