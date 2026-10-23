@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { formatINR, calculateSipProjection, calculateLumpsumProjection } from '@/lib/utils';
 import { ALL_CALCULATORS } from '@/lib/calculatorsData';
-import { ServiceCard } from '@/components/ui/service-card';
+import MinimalCalculatorCard from '@/components/calculators/MinimalCalculatorCard';
 import CalculatorPieChart from '@/components/calculators/CalculatorPieChart';
 import CalculatorComparisonChart from '@/components/calculators/CalculatorComparisonChart';
 import { exportCalculatorToPdf } from '@/components/calculators/pdfExport';
@@ -1666,17 +1666,13 @@ export default function CalculatorDetailClient({ slug, tool }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {otherCalculators.map((other) => (
-              <ServiceCard
+              <MinimalCalculatorCard
                 key={other.slug}
                 title={other.title}
                 href={`/investor/financial-calculator/${other.slug}`}
                 tag={other.badge}
                 description={other.desc}
-                imgSrc={other.imgSrc}
-                imgAlt={other.imgAlt || other.title}
-                variant={other.variant || 'default'}
-                ctaText="CALCULATE"
-                className="min-h-[175px] p-5"
+                icon={other.iconName}
               />
             ))}
           </div>

@@ -8,7 +8,7 @@ export const config = {
   isProd: process.env.NODE_ENV === 'production',
 
   // Database
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/finasset_wealth',
+  MONGODB_URI: (process.env.MONGODB_URI || process.env['MONGODB_URI '])?.trim() || 'mongodb://127.0.0.1:27017/finasset_wealth',
 
   // Security & JWT Secrets
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'finasset_access_secret_super_secure_key_change_in_prod',
