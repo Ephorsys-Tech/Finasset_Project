@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Info,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function PayPremiumPage() {
   const [insurers, setInsurers] = useState([]);
@@ -38,20 +39,12 @@ export default function PayPremiumPage() {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/30 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
-            <CreditCard className="w-3.5 h-3.5 text-[#2376b8]" />
-            <span>Direct Insurer Payment Portals</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Pay Insurance Premium Online
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Direct, verified one-click payment gateways for your ongoing policy renewals across leading life, health, and general insurance companies in India.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Pay Insurance Premium Online"
+        description="Direct, verified one-click payment gateways for your ongoing policy renewals across leading life, health, and general insurance companies in India."
+        imageSrc="https://images.unsplash.com/photo-1556742049-0a67c5574f73?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Pay Insurance Premium Online"
+      />
 
       {/* Insurers List & Filters */}
       <section className="py-16">

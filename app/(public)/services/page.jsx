@@ -12,6 +12,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function ServicesPage() {
   const [services, setServices] = useState([]);
@@ -49,20 +50,12 @@ export default function ServicesPage() {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Header Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/15 px-3.5 py-1 rounded-full border border-[#f87b1f]/30 inline-block mb-3">
-            Advisory Disciplines
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Comprehensive Wealth &amp; Financial Solutions
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base">
-            From strategic goal planning and multi-AMC mutual funds to high-yield bonds, insurance
-            protection, and NRI advisory in Bhubaneswar, Odisha.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Comprehensive Wealth & Financial Solutions"
+        description="From strategic goal planning and multi-AMC mutual funds to high-yield bonds, insurance protection, and NRI advisory in Bhubaneswar, Odisha."
+        imageSrc="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Comprehensive Wealth & Financial Solutions"
+      />
 
       {/* Services Grid */}
       <section className="py-20">

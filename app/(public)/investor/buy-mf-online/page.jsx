@@ -13,6 +13,7 @@ import {
   CreditCard,
   Lock,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function BuyMfOnlinePage() {
   const [settings, setSettings] = useState(null);
@@ -31,20 +32,12 @@ export default function BuyMfOnlinePage() {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/30 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4">
-            <Zap className="w-3.5 h-3.5 text-[#2376b8]" />
-            <span>Direct Digital Execution</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Buy Mutual Funds Online
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Execute fresh SIPs, switch funds, invest lumpsum, or automate withdrawals directly through our secure AMFI-registered mutual fund transacting portal.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Buy Mutual Funds Online"
+        description="Execute fresh SIPs, switch funds, invest lumpsum, or automate withdrawals directly through our secure AMFI-registered mutual fund transacting portal."
+        imageSrc="https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Buy Mutual Funds Online"
+      />
 
       {/* Main Guidance & Portal Card */}
       <section className="py-16">

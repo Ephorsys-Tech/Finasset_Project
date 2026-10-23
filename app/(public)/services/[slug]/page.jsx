@@ -18,6 +18,7 @@ import {
   Calendar,
   Lock,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function ServiceDetailPage({ params }) {
   const unwrappedParams = use(params);
@@ -171,39 +172,17 @@ export default function ServiceDetailPage({ params }) {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 sm:py-20 relative overflow-hidden">
-        {(service.bannerImage || service.image) && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-15"
-            style={{ backgroundImage: `url(${service.bannerImage || service.image})` }}
-          />
-        )}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-xs text-blue-200 uppercase tracking-wider mb-4 font-semibold">
-            <Link href="/" className="hover:underline">Home</Link>
-            <span>/</span>
-            <Link href="/services" className="hover:underline">Services</Link>
-            <span>/</span>
-            <span className="text-white">{service.name}</span>
-          </div>
-
-          <div className="flex items-start gap-6">
-            {service.image && (
-              <div className="hidden sm:block w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/20 shadow-xl shrink-0">
-                <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
-              </div>
-            )}
-            <div>
-              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-                {service.name}
-              </h1>
-              <p className="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
-                {service.shortDescription}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Services', href: '/services' },
+          { label: service.name },
+        ]}
+        title={service.name}
+        description={service.shortDescription}
+        imageSrc={service.image || service.bannerImage || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop'}
+        imageAlt={service.name}
+      />
 
       {/* Main Content Area */}
       <section className="py-16">
