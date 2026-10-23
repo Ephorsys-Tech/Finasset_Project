@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, Loader2, Lock, RefreshCw, ShieldCheck } from 'lucide-react';
+import { useEnquiryStore } from '@/store/useEnquiryStore';
+import { useServiceStore } from '@/store/useServiceStore';
 
-const SERVICE_OPTIONS = [
+const DEFAULT_SERVICE_OPTIONS = [
   { value: 'Mutual Funds & SIP', label: 'Mutual Funds & SIP' },
   { value: 'Comprehensive Financial Planning', label: 'Comprehensive Financial Planning' },
   { value: 'Life & Health Insurance', label: 'Life & Health Insurance' },
@@ -23,7 +25,7 @@ const TIME_OPTIONS = [
 const INITIAL_FORM = {
   name: '',
   phone: '',
-  serviceOfInterest: SERVICE_OPTIONS[0].value,
+  serviceOfInterest: '',
   preferredTime: TIME_OPTIONS[0].value,
   message: '',
 };
@@ -215,15 +217,70 @@ function Field({ label, required, optional, children }) {
 /**
  * Callback Form Component
  * Self-contained "Request a Call Back" section with captcha.
- * Usage: <CallbackForm />
+ * Connects Area of interest directly with services managed by the Admin.
+ * Usage: <CallbackForm initialServices={services} />
  */
-export default function CallbackForm() {
+export default function CallbackForm({ initialServices = [] }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [captchaOk, setCaptchaOk] = useState(false);
   const [captchaKey, setCaptchaKey] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+
+  const {
+    isSubmitting,
+    submitSuccess,
+    submitError,
+    trackingNumber,
+    submitCallback,
+    setSubmitError,
+    resetStatus,
+  } = useEnquiryStore();
+
+  const { services: storeServices, fetchServices, setServices } = useServiceStore();
+
+  // Load published services configured by the Admin via Axios
+  useEffect(() => {
+    if (Array.isArray(initialServices) && initialServices.length > 0) {
+      setServices(initialServices);
+    } else {
+      fetchServices();
+    }
+  }, [initialServices, setServices, fetchServices]);
+
+  const currentServices =
+    storeServices && storeServices.length > 0
+      ? storeServices
+      : Array.isArray(initialServices) && initialServices.length > 0
+      ? initialServices
+      : [];
+
+  // Map admin services to dropdown options with graceful fallback
+  const serviceOptions = useMemo(() => {
+    if (currentServices.length > 0) {
+      return currentServices.map((s) => ({
+        value: s.name || s.title,
+        label: s.name || s.title,
+      }));
+    }
+    return DEFAULT_SERVICE_OPTIONS;
+  }, [currentServices]);
+
+  // Keep form.serviceOfInterest in sync with available options
+  useEffect(() => {
+    if (serviceOptions.length > 0) {
+      setForm((prev) => {
+        const exists = serviceOptions.some((o) => o.value === prev.serviceOfInterest);
+        if (!exists || !prev.serviceOfInterest) {
+          return { ...prev, serviceOfInterest: serviceOptions[0].value };
+        }
+        return prev;
+      });
+    }
+  }, [serviceOptions]);
+
+  // Reset status on unmount so form starts clean
+  useEffect(() => {
+    return () => resetStatus();
+  }, [resetStatus]);
 
   const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
@@ -236,36 +293,50 @@ export default function CallbackForm() {
       return;
     }
 
-    const digits = form.phone.replace(/\D/g, '');
-    if (digits.length < 10 || digits.length > 13) {
-      setSubmitError('Please enter a valid phone number (10 digits).');
+    if (!form.name || form.name.trim().length < 2) {
+      setSubmitError('Please enter your full name (at least 2 characters).');
       return;
     }
 
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/v1/public/enquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          type: 'callback',
-          sourcePage: 'Homepage Call Back Form',
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSubmitSuccess(true);
-        setForm(INITIAL_FORM);
-      } else {
-        setSubmitError(data.message || 'Failed to submit request');
-      }
-    } catch {
-      setSubmitError('Network error. Please try again or call our office directly.');
-    } finally {
-      setSubmitting(false);
-      setCaptchaKey((k) => k + 1); // new captcha after every attempt
+    if (/\d/.test(form.name)) {
+      setSubmitError('Full name cannot contain numbers.');
+      return;
     }
+
+    const digits = form.phone.replace(/\D/g, '');
+    if (digits.length < 10 || digits.length > 15) {
+      setSubmitError('Please enter a valid phone number (at least 10 digits).');
+      return;
+    }
+
+    try {
+      const res = await submitCallback({
+        name: form.name,
+        phone: form.phone,
+        serviceOfInterest: form.serviceOfInterest || serviceOptions[0]?.value || 'General Wealth Advisory',
+        preferredTime: form.preferredTime,
+        message: form.message,
+        sourcePage: 'Homepage Call Back Form',
+      });
+
+      if (res.success) {
+        setForm({
+          ...INITIAL_FORM,
+          serviceOfInterest: serviceOptions[0]?.value || '',
+        });
+      }
+    } finally {
+      setCaptchaKey((k) => k + 1); // refresh captcha after submission attempt
+    }
+  };
+
+  const handleReset = () => {
+    resetStatus();
+    setForm({
+      ...INITIAL_FORM,
+      serviceOfInterest: serviceOptions[0]?.value || '',
+    });
+    setCaptchaKey((k) => k + 1);
   };
 
   return (
@@ -291,12 +362,18 @@ export default function CallbackForm() {
                 <CheckCircle2 className="h-9 w-9 text-[#89b441]" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Request received</h3>
+              {trackingNumber && (
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#2376b8]/20 bg-[#2376b8]/5 px-3 py-1 text-xs font-semibold text-[#2376b8]">
+                  <span>Reference ID:</span>
+                  <span className="font-mono">{trackingNumber}</span>
+                </div>
+              )}
               <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
                 Thank you! Our advisory team will contact you at your preferred time.
               </p>
               <button
                 type="button"
-                onClick={() => setSubmitSuccess(false)}
+                onClick={handleReset}
                 className="mt-6 rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-[#2376b8] transition hover:bg-[#2376b8]/5"
               >
                 Submit another request
@@ -351,11 +428,11 @@ export default function CallbackForm() {
                   {(id) => (
                     <select
                       id={id}
-                      value={form.serviceOfInterest}
+                      value={form.serviceOfInterest || (serviceOptions[0]?.value ?? '')}
                       onChange={update('serviceOfInterest')}
                       className={`${inputClass} cursor-pointer`}
                     >
-                      {SERVICE_OPTIONS.map((o) => (
+                      {serviceOptions.map((o) => (
                         <option key={o.value} value={o.value}>
                           {o.label}
                         </option>
@@ -399,10 +476,10 @@ export default function CallbackForm() {
 
               <button
                 type="submit"
-                disabled={submitting || !captchaOk}
+                disabled={isSubmitting || !captchaOk}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#f87b1f] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#d9620b] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none sm:text-base"
               >
-                {submitting ? (
+                {isSubmitting ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
                     <span>Submitting...</span>
