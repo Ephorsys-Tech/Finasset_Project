@@ -10,6 +10,7 @@ import {
   ArrowRight,
   TrendingUp,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 import { formatDate } from '@/lib/utils';
 
 export default function BlogListingPage() {
@@ -51,20 +52,12 @@ export default function BlogListingPage() {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/30 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4">
-            <FileText className="w-3.5 h-3.5 text-[#f87b1f]" />
-            <span>Research & Financial Wisdom</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Financial Insights & Market Notes
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Practical investment perspectives, capital gains strategies, compounding breakdowns, and NRI guidance written by Finasset Wealth researchers.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Financial Insights & Market Notes"
+        description="Practical investment perspectives, capital gains strategies, compounding breakdowns, and NRI guidance written by Finasset Wealth researchers."
+        imageSrc="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Financial Insights & Market Notes"
+      />
 
       {/* Main Content */}
       <section className="py-16">

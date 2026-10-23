@@ -19,6 +19,7 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function NriCornerPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', country: '', message: '' });
@@ -143,36 +144,12 @@ export default function NriCornerPage() {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 sm:py-20 text-center relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/30 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4">
-            <Globe className="w-3.5 h-3.5 text-[#f87b1f]" />
-            <span>Cross-Border Wealth Desk</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            NRI Wealth &amp; Investment Advisory
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Harness the explosive growth of the Indian economy from wherever you live. 100% compliant investment avenues, FEMA guidance, and seamless repatriation back home to Odisha.
-          </p>
-
-          {/* <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#knowledge-base"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/20 transition-all backdrop-blur-sm"
-            >
-              <span>Explore NRI Guidelines &amp; FAQs</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#f87b1f]" />
-            </a>
-            <a
-              href="#consultation"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#f87b1f] hover:bg-[#e66a10] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#f87b1f]/25 transition-all"
-            >
-              <span>Schedule NRI Consultation</span>
-            </a>
-          </div> */}
-        </div>
-      </section>
+      <PageHero
+        title="NRI Wealth & Investment Advisory"
+        description="Harness the explosive growth of the Indian economy from wherever you live. 100% compliant investment avenues, FEMA guidance, and seamless repatriation back home to Odisha."
+        imageSrc="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="NRI Wealth & Investment Advisory"
+      />
 
       {/* Main Content */}
       <section className="py-20">

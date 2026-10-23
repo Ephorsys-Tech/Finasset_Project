@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import MinimalCalculatorCard from '@/components/calculators/MinimalCalculatorCard';
+import PageHero from '@/components/common/PageHero';
 
 export const metadata = {
   title: 'Financial Calculators & MF Tools | Finasset Wealth',
@@ -163,21 +164,12 @@ export default function FinancialCalculatorPage() {
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#0a1e30] via-[#0f2b44] to-[#123657] text-white py-14 sm:py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#2376b8]/20 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2376b8]/20 border border-[#2376b8]/40 text-blue-200 text-xs font-bold uppercase tracking-wider mb-4 backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5 text-[#f87b1f]" />
-            <span>Financial Planning &amp; MF Analytics</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Financial &amp; MF Tools Calculators
-          </h1>
-          <p className="text-slate-300 mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-            Select any financial calculator or mutual fund tool below to simulate outcomes, evaluate historical returns, and plan your life goals.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Financial & MF Tools Calculators"
+        description="Select any financial calculator or mutual fund tool below to simulate outcomes, evaluate historical returns, and plan your life goals."
+        imageSrc="https://images.unsplash.com/photo-1554224154-26032ffc0d07?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Financial & Mutual Fund Tools Calculators"
+      />
 
       {/* Main Content Area: 2 Distinct Sections */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">

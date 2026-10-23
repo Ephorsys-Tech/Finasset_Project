@@ -224,26 +224,12 @@ export default function Navbar() {
 
               {/* Dropdown Menu */}
               <div
-                className={`absolute top-full left-0 w-96 bg-white/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-100 py-3.5 px-3 z-50 transition-all duration-300 transform origin-top ${
+                className={`absolute top-full left-0 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 px-2.5 z-50 transition-all duration-300 transform origin-top ${
                   servicesDropdown
                     ? 'opacity-100 translate-y-2 scale-100 pointer-events-auto visible'
                     : 'opacity-0 translate-y-4 scale-95 pointer-events-none invisible'
                 }`}
               >
-                <div className="px-3 pb-2.5 mb-2 border-b border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#2376b8] flex items-center gap-1.5 bg-[#f0f6fb] px-2.5 py-1 rounded-full">
-                    <Sparkles className="w-3 h-3 text-[#f87b1f]" />
-                    <span>Wealth Disciplines</span>
-                  </span>
-                  <Link
-                    href="/services"
-                    className="text-xs text-[#2376b8] hover:text-[#f87b1f] font-semibold flex items-center gap-1 transition-colors"
-                  >
-                    <span>View All</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-
                 <div className="grid grid-cols-1 gap-1">
                   {servicesList.length > 0 ? (
                     servicesList.map((s) => (

@@ -11,6 +11,7 @@ import {
   MapPin,
   Send,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function CareerPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', role: 'Senior Wealth Manager', message: '' });
@@ -70,20 +71,12 @@ export default function CareerPage() {
   return (
     <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#0f2b44] text-white py-16 sm:py-20 text-center relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f87b1f]/20 border border-[#f87b1f]/30 text-[#f87b1f] text-xs font-bold uppercase tracking-wider mb-4">
-            <Briefcase className="w-3.5 h-3.5 text-[#f87b1f]" />
-            <span>Join Our Team</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Careers at Finasset Wealth
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Build a rewarding career in ethical wealth management, research, and client relationship advisory at our Bhubaneswar headquarters.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Careers at Finasset Wealth"
+        description="Build a rewarding career in ethical wealth management, research, and client relationship advisory at our Bhubaneswar headquarters."
+        imageSrc="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Careers at Finasset Wealth"
+      />
 
       {/* Main Content */}
       <section className="py-20">
