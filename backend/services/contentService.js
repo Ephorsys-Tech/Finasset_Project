@@ -10,7 +10,6 @@ import NewsItem from '@/backend/models/NewsItem';
 import { logAdminActivity } from '@/backend/lib/auth';
 import {
   fallbackTestimonials,
-  fallbackPartners,
   fallbackMarketIndices,
   fallbackNewsItems,
 } from '@/lib/fallbackData';
@@ -335,9 +334,9 @@ export const contentService = {
     try {
       await connectToDatabase();
       const list = await Partner.find({ isPublished: true }).sort({ order: 1 }).lean();
-      return (list && list.length) ? list : fallbackPartners;
+      return list || [];
     } catch {
-      return fallbackPartners;
+      return [];
     }
   },
 
@@ -348,13 +347,18 @@ export const contentService = {
 
   async createPartner(data, adminEmail, req) {
     await connectToDatabase();
+    if (data.imageUrl && !data.logoUrl) data.logoUrl = data.imageUrl;
+    if (data.logoUrl && !data.imageUrl) data.imageUrl = data.logoUrl;
+    if (data.imagePublicId && !data.logoPublicId) data.logoPublicId = data.imagePublicId;
+    if (data.logoPublicId && !data.imagePublicId) data.imagePublicId = data.logoPublicId;
+
     const p = await Partner.create(data);
     await logAdminActivity({
       adminEmail,
       action: 'CREATE_PARTNER',
       entity: 'Partner',
       entityId: p._id,
-      summary: `Added partner: ${p.name}`,
+      summary: `Added partner: ${p.name || 'Client Partner'}`,
       req,
     });
     return p;
@@ -362,8 +366,30 @@ export const contentService = {
 
   async updatePartner(id, data, adminEmail, req) {
     await connectToDatabase();
+    const existing = await Partner.findById(id);
+    if (!existing) throw new Error('Partner not found');
+
+    const newPublicId = data.imagePublicId || data.logoPublicId;
+    const oldPublicId = existing.imagePublicId || existing.logoPublicId || extractCloudinaryPublicId(existing.imageUrl || existing.logoUrl);
+
+    // If new image uploaded and replacing old one, destroy previous asset from Cloudinary
+    if (newPublicId && oldPublicId && newPublicId !== oldPublicId) {
+      await deleteCloudinaryAsset(oldPublicId);
+    } else if (
+      (data.imageUrl || data.logoUrl) &&
+      (data.imageUrl !== existing.imageUrl || data.logoUrl !== existing.logoUrl) &&
+      oldPublicId &&
+      !newPublicId
+    ) {
+      await deleteCloudinaryAsset(oldPublicId);
+    }
+
+    if (data.imageUrl && !data.logoUrl) data.logoUrl = data.imageUrl;
+    if (data.logoUrl && !data.imageUrl) data.imageUrl = data.logoUrl;
+    if (data.imagePublicId && !data.logoPublicId) data.logoPublicId = data.imagePublicId;
+    if (data.logoPublicId && !data.imagePublicId) data.imagePublicId = data.logoPublicId;
+
     const p = await Partner.findByIdAndUpdate(id, { $set: data }, { new: true });
-    if (!p) throw new Error('Partner not found');
     await logAdminActivity({
       adminEmail,
       action: 'UPDATE_PARTNER',
@@ -377,8 +403,16 @@ export const contentService = {
 
   async deletePartner(id, adminEmail, req) {
     await connectToDatabase();
-    const p = await Partner.findByIdAndDelete(id);
+    const p = await Partner.findById(id);
     if (!p) throw new Error('Partner not found');
+
+    // Clean up remote asset on Cloudinary if publicId exists or can be extracted
+    const publicId = p.imagePublicId || p.logoPublicId || extractCloudinaryPublicId(p.imageUrl || p.logoUrl);
+    if (publicId) {
+      await deleteCloudinaryAsset(publicId);
+    }
+
+    await Partner.findByIdAndDelete(id);
     await logAdminActivity({
       adminEmail,
       action: 'DELETE_PARTNER',
