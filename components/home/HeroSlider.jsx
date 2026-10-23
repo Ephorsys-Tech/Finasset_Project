@@ -3,33 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-
-// Exact default fallback slide matching screenshot
-const DEFAULT_SLIDES = [
-  {
-    id: 1,
-    title: 'Grow Your Wealth With Smart Financial Planning',
-    subtitle:
-      'Personalized portfolio management and mutual fund strategies designed to secure your long-term goals.',
-    bgImage:
-      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1920&q=80',
-    order: 1,
-    isActive: true,
-  },
-  {
-    id: 2,
-    title: 'Retirement Planning Made Simple & Secure',
-    subtitle:
-      'Calculate your corpus and build sustainable passive income for your post-work life.',
-    bgImage:
-      'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1920&q=80',
-    order: 2,
-    isActive: true,
-  },
-];
+import { useHeroStore } from '@/store/useHeroStore';
+import { fallbackHeroSlides } from '@/lib/fallbackData';
 
 /**
- * Parses dynamic title and highlights brand colors matching the exact design:
+ * Parses dynamic title and highlights brand colors:
  * - "Grow Your Wealth" / "Retirement Planning" in #f87b1f (Orange)
  * - "Smart" in #2376b8 (Blue)
  * - "Secure" in #89b441 (Green)
@@ -124,31 +102,62 @@ function renderHighlightedTitle(title = '') {
   return <span className="text-[#f87b1f]">{title}</span>;
 }
 
-export default function HeroSlider({ slides = [] }) {
+/** Normalize a raw slide object into the shape the slider needs */
+function normalizeSlide(s, idx) {
+  return {
+    id: s._id || s.id || `slide-${idx}`,
+    title: s.title || 'Grow Your Wealth With Smart Financial Planning',
+    subtitle:
+      s.subtitle ||
+      s.description ||
+      'Personalized portfolio management and mutual fund strategies designed to secure your long-term goals.',
+    bgImage:
+      s.bgImageUrl ||
+      s.imageUrl ||
+      s.bgImage ||
+      'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1920&q=80',
+    cta1Text: s.cta1Text || 'Our Services',
+    cta1Url: s.cta1Url || '#services',
+    cta2Text: s.cta2Text || 'Contact Us',
+    cta2Url: s.cta2Url || '#contact',
+  };
+}
+
+export default function HeroSlider({ slides: initialSlides = [] }) {
+  // Pull store state but never block render on it
+  const { slides: storeSlides, fetchPublicSlides } = useHeroStore();
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(null);
-  const [direction, setDirection] = useState('bottom-to-top'); // 'bottom-to-top' | 'top-to-bottom'
+  const [direction, setDirection] = useState('bottom-to-top');
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Normalize data coming from backend
-  const activeSlides = (slides && slides.length > 0 ? slides : DEFAULT_SLIDES)
+  // Kick off background fetch; never awaited — store updates reactively
+  useEffect(() => {
+    fetchPublicSlides();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Priority: 1) initialSlides from SSR/parent, 2) live store slides, 3) fallback
+  const rawSource =
+    initialSlides && initialSlides.length > 0
+      ? initialSlides
+      : storeSlides && storeSlides.length > 0
+      ? storeSlides
+      : fallbackHeroSlides;
+
+  const activeSlides = (rawSource || fallbackHeroSlides)
     .filter((s) => s.isActive !== false)
     .sort((a, b) => (a.order || 0) - (b.order || 0))
-    .map((s, idx) => ({
-      id: s._id || s.id || idx,
-      title: s.title || 'Grow Your Wealth With Smart Financial Planning',
-      subtitle:
-        s.subtitle ||
-        s.description ||
-        'Personalized portfolio management and mutual fund strategies designed to secure your long-term goals.',
-      bgImage:
-        s.bgImageUrl ||
-        s.imageUrl ||
-        s.bgImage ||
-        'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1920&q=80',
-    }));
+    .map(normalizeSlide);
 
-  const slideCount = activeSlides.length;
+  const slideCount = activeSlides.length > 0 ? activeSlides.length : fallbackHeroSlides.length;
+  const safeSlides = activeSlides.length > 0 ? activeSlides : fallbackHeroSlides.map(normalizeSlide);
+
+  // Reset index when slide count changes (e.g. after real data loads)
+  useEffect(() => {
+    setCurrentIdx((prev) => (prev >= slideCount ? 0 : prev));
+  }, [slideCount]);
 
   // Bottom-to-Top vertical navigation
   const handleNavigate = (dir = 'next', targetIdx = null) => {
@@ -184,6 +193,7 @@ export default function HeroSlider({ slides = [] }) {
       handleNavigate('next');
     }, 6000);
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slideCount, currentIdx, isAnimating]);
 
   const safeCurrentIdx = currentIdx >= slideCount ? 0 : currentIdx;
@@ -266,7 +276,7 @@ export default function HeroSlider({ slides = [] }) {
         {/* RIGHT EDGE VERTICAL DOT INDICATORS */}
         {slideCount > 1 && (
           <div className="absolute right-5 sm:right-8 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-3">
-            {activeSlides.map((_, idx) => (
+            {safeSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => handleNavigate('next', idx)}
@@ -283,7 +293,7 @@ export default function HeroSlider({ slides = [] }) {
         )}
 
         {/* SLIDE CONTENT & BACKGROUND */}
-        {activeSlides.map((slide, idx) => {
+        {safeSlides.map((slide, idx) => {
           const isCurrent = idx === safeCurrentIdx;
           const isPrev = idx === prevIdx;
 
@@ -330,7 +340,7 @@ export default function HeroSlider({ slides = [] }) {
                 style={{ backgroundImage: `url(${slide.bgImage})` }}
               />
 
-              {/* Dark Gradient Overlay for Pristine Readability (Matching Screenshot) */}
+              {/* Dark Gradient Overlay for Pristine Readability */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#080c10] via-[#080c10]/85 to-transparent z-10" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#080c10]/90 via-transparent to-[#080c10]/40 z-10" />
 
@@ -342,27 +352,25 @@ export default function HeroSlider({ slides = [] }) {
                     {renderHighlightedTitle(slide.title)}
                   </h1>
 
-                  {/* Subtitle in text-slate-200 */}
+                  {/* Subtitle */}
                   <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-8 max-w-xl font-normal">
                     {slide.subtitle}
                   </p>
 
-                  {/* Fixed CTA Buttons: "Our Services" & "Contact Us" */}
+                  {/* CTA Buttons */}
                   <div className="flex flex-wrap items-center gap-4 pt-2">
-                    {/* Fixed Primary Button: Our Services */}
                     <Link
-                      href="#services"
+                      href={slide.cta1Url || '#services'}
                       className="inline-flex items-center justify-center bg-[#2376b8] hover:bg-[#1b5b8f] text-white font-semibold text-sm sm:text-base px-7 py-3 rounded-xl shadow-lg shadow-[#2376b8]/25 hover:shadow-xl hover:shadow-[#2376b8]/40 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
                     >
-                      Our Services
+                      {slide.cta1Text || 'Our Services'}
                     </Link>
 
-                    {/* Fixed Secondary Button: Contact Us */}
                     <Link
-                      href="#contact"
+                      href={slide.cta2Url || '#contact'}
                       className="inline-flex items-center justify-center bg-slate-900/40 hover:bg-[#89b441]/20 text-[#89b441] border border-[#89b441] backdrop-blur-md font-semibold text-sm sm:text-base px-7 py-3 rounded-xl shadow-md shadow-[#89b441]/10 hover:shadow-lg hover:shadow-[#89b441]/25 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
                     >
-                      Contact Us
+                      {slide.cta2Text || 'Contact Us'}
                     </Link>
                   </div>
                 </div>
