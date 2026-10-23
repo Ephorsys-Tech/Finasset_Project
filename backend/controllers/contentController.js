@@ -255,8 +255,17 @@ export const contentController = {
 
     try {
       const body = await req.json().catch(() => ({}));
-      if (!body.clientName || !body.quote) return sendBadRequest('Client name and quote required');
-      const t = await contentService.createTestimonial(body, auth.admin.email, req);
+      const text = body.reviewText || body.quote;
+      if (!body.clientName?.trim() || !text?.trim()) {
+        return sendBadRequest('Client name and review text required');
+      }
+      const payload = {
+        ...body,
+        clientName: body.clientName.trim(),
+        reviewText: text.trim(),
+        quote: text.trim(),
+      };
+      const t = await contentService.createTestimonial(payload, auth.admin.email, req);
       return sendSuccess(t, 'Testimonial added successfully', 201);
     } catch (err) {
       return sendError(err.message, 500, err);
@@ -269,11 +278,20 @@ export const contentController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
-      if (!id) return sendBadRequest('ID required');
-
+      let id = url.searchParams.get('id');
       const body = await req.json().catch(() => ({}));
-      const t = await contentService.updateTestimonial(id, body, auth.admin.email, req);
+      if (!id) id = body.id || body._id;
+      if (!id) return sendBadRequest('Testimonial ID required');
+
+      const text = body.reviewText !== undefined ? body.reviewText : body.quote;
+      const payload = {
+        ...body,
+        ...(text !== undefined ? { reviewText: text.trim(), quote: text.trim() } : {}),
+      };
+      delete payload.id;
+      delete payload._id;
+
+      const t = await contentService.updateTestimonial(id, payload, auth.admin.email, req);
       return sendSuccess(t, 'Testimonial updated successfully');
     } catch (err) {
       return sendError(err.message, 500, err);
@@ -286,8 +304,12 @@ export const contentController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
-      if (!id) return sendBadRequest('ID required');
+      let id = url.searchParams.get('id');
+      if (!id) {
+        const body = await req.json().catch(() => ({}));
+        id = body.id || body._id;
+      }
+      if (!id) return sendBadRequest('Testimonial ID required');
 
       await contentService.deleteTestimonial(id, auth.admin.email, req);
       return sendSuccess(null, 'Testimonial deleted successfully');
@@ -324,7 +346,12 @@ export const contentController = {
 
     try {
       const body = await req.json().catch(() => ({}));
-      if (!body.name) return sendBadRequest('Partner name required');
+      if (!body.name && !body.imageUrl && !body.logoUrl) {
+        return sendBadRequest('Partner image or name is required');
+      }
+      if (!body.name || !body.name.trim()) {
+        body.name = 'Client Partner';
+      }
       const p = await contentService.createPartner(body, auth.admin.email, req);
       return sendSuccess(p, 'Partner added successfully', 201);
     } catch (err) {
@@ -338,10 +365,15 @@ export const contentController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
-      if (!id) return sendBadRequest('ID required');
-
+      const queryId = url.searchParams.get('id');
       const body = await req.json().catch(() => ({}));
+      const id = queryId || body.id || body._id;
+      if (!id) return sendBadRequest('Partner ID is required');
+
+      if (!body.name || !body.name.trim()) {
+        body.name = 'Client Partner';
+      }
+
       const p = await contentService.updatePartner(id, body, auth.admin.email, req);
       return sendSuccess(p, 'Partner updated successfully');
     } catch (err) {
@@ -355,8 +387,14 @@ export const contentController = {
 
     try {
       const url = new URL(req.url);
-      const id = url.searchParams.get('id');
-      if (!id) return sendBadRequest('ID required');
+      const queryId = url.searchParams.get('id');
+      let bodyId = null;
+      if (!queryId) {
+        const body = await req.json().catch(() => ({}));
+        bodyId = body.id || body._id;
+      }
+      const id = queryId || bodyId;
+      if (!id) return sendBadRequest('Partner ID is required');
 
       await contentService.deletePartner(id, auth.admin.email, req);
       return sendSuccess(null, 'Partner deleted successfully');

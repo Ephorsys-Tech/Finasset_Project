@@ -1036,15 +1036,7 @@ async function seed() {
   ]);
 
   const PartnerColl = db.collection('partners');
-  await PartnerColl.deleteMany({});
-  await PartnerColl.insertMany([
-    { name: 'HDFC Mutual Fund', category: 'Mutual Fund AMC', logoUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=300&auto=format&fit=crop', websiteUrl: 'https://www.hdfcfund.com', order: 0, isPublished: true, createdAt: new Date(), updatedAt: new Date() },
-    { name: 'ICICI Prudential Mutual Fund', category: 'Mutual Fund AMC', logoUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=300&auto=format&fit=crop', websiteUrl: 'https://www.icicipruamc.com', order: 1, isPublished: true, createdAt: new Date(), updatedAt: new Date() },
-    { name: 'SBI Mutual Fund', category: 'Mutual Fund AMC', logoUrl: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=300&auto=format&fit=crop', websiteUrl: 'https://www.sbimf.com', order: 2, isPublished: true, createdAt: new Date(), updatedAt: new Date() },
-    { name: 'Nippon India Mutual Fund', category: 'Mutual Fund AMC', logoUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=300&auto=format&fit=crop', websiteUrl: 'https://mf.nipponindiaim.com', order: 3, isPublished: true, createdAt: new Date(), updatedAt: new Date() },
-    { name: 'Mirae Asset Mutual Fund', category: 'Mutual Fund AMC', logoUrl: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=300&auto=format&fit=crop', websiteUrl: 'https://www.miraeassetmf.co.in', order: 4, isPublished: true, createdAt: new Date(), updatedAt: new Date() },
-    { name: 'Kotak Mahindra Mutual Fund', category: 'Mutual Fund AMC', logoUrl: 'https://images.unsplash.com/photo-1565372195458-9de0b320ef04?q=80&w=300&auto=format&fit=crop', websiteUrl: 'https://www.kotakmf.com', order: 5, isPublished: true, createdAt: new Date(), updatedAt: new Date() },
-  ]);
+  console.log('ℹ️ Partners managed dynamically by Admin via admin portal.');
   console.log('✅ Testimonials and partners seeded.');
 
   // 11. Blog Posts

@@ -17,7 +17,13 @@ const TestimonialSchema = new mongoose.Schema(
     },
     reviewText: {
       type: String,
-      required: true,
+      default: '',
+      trim: true,
+    },
+    quote: {
+      type: String,
+      default: '',
+      trim: true,
     },
     rating: {
       type: Number,
@@ -28,6 +34,12 @@ const TestimonialSchema = new mongoose.Schema(
     avatarUrl: {
       type: String,
       default: '',
+      trim: true,
+    },
+    avatarPublicId: {
+      type: String,
+      default: '',
+      trim: true,
     },
     serviceUsed: {
       type: String,
@@ -45,4 +57,15 @@ const TestimonialSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Testimonial || mongoose.model('Testimonial', TestimonialSchema);
+// Pre-validate synchronization hook
+TestimonialSchema.pre('validate', function (next) {
+  if (this.reviewText && !this.quote) this.quote = this.reviewText;
+  if (this.quote && !this.reviewText) this.reviewText = this.quote;
+  next();
+});
+
+if (mongoose.models.Testimonial) {
+  delete mongoose.models.Testimonial;
+}
+
+export default mongoose.model('Testimonial', TestimonialSchema);

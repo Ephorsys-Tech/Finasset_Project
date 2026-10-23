@@ -34,9 +34,10 @@ import {
 import { formatINR } from '@/lib/utils';
 import HeroSlider from '@/components/home/HeroSlider';
 import FeatureCarousel from '@/components/ui/feature-carousel';
-import { Marquee } from '@/components/ui/marquee';
-import { fallbackMarketIndices, fallbackServices, fallbackFinancialVideo, fallbackPartners } from '@/lib/fallbackData';
+import { fallbackMarketIndices, fallbackServices, fallbackFinancialVideo } from '@/lib/fallbackData';
 import { useNewsStore } from '@/store/useNewsStore';
+import TestimonialSlider from '@/components/home/TestimonialSlider';
+import ClientPartners from '@/components/home/ClientPartners';
 
 function getEmbedUrl(url) {
   if (!url) return 'https://www.youtube.com/embed/1-S_q_kUeYw';
@@ -108,7 +109,7 @@ export default function HomePage() {
     : (homeData?.newsItems && Array.isArray(homeData.newsItems) && homeData.newsItems.length > 0 ? homeData.newsItems : []);
   const activeNews = zustandActive || (displayNews.length > 0 ? (displayNews[selectedNewsIndex] || displayNews[0]) : null);
   const testimonials = homeData?.testimonials || [];
-  const partners = (homeData?.partners && homeData.partners.length > 0) ? homeData.partners : fallbackPartners;
+  const partners = homeData?.partners || [];
   const financialVideo = homeData?.financialVideo || fallbackFinancialVideo;
 
   const handleSelectNews = (idx) => {
@@ -726,105 +727,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 9. TESTIMONIALS */}
-      <section className="py-20 bg-[#f8fafc]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
-              Client Trust & Voices
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f2b44] tracking-tight">
-              Trusted by Discerning Families Across Odisha
-            </h2>
-            <p className="text-slate-600 mt-4 leading-relaxed">
-              Real stories of financial discipline, goal achievement, and transparent fiduciary stewardship.
-            </p>
-          </div>
+      {/* 9. TESTIMONIALS (Interactive Auto-Moving Slider matching reference image) */}
+      <TestimonialSlider initialTestimonials={testimonials} />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl p-7 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center gap-1 text-[#f87b1f] mb-4">
-                    {[...Array(t.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
+      {/* 8. CLIENT PARTNERS (Matching reference design with crisp logos and infinite marquee) */}
+      <ClientPartners initialPartners={partners} />
 
-                  <p className="text-slate-700 text-sm leading-relaxed mb-6 italic">
-                    &quot;{t.reviewText || t.quote || ''}&quot;
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2376b8] to-[#0f2b44] text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                    {t.clientName ? t.clientName.charAt(0) : 'C'}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-sm text-[#0f2b44]">{t.clientName || 'Client'}</h3>
-                    <p className="text-xs text-slate-500">{t.designation || 'Investor'}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 8. PARTNERS LOGOS (Marquee Infinite Scroll) */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-200/80 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-6 sm:mb-8">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#2376b8]/10 px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-3">
-            Institutional Alliances
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44] tracking-tight">
-            Partnering with India's Leading Asset Management Companies &amp; Insurers
-          </h2>
-          <p className="text-slate-500 text-xs sm:text-sm mt-2 max-w-2xl mx-auto">
-            Direct fiduciary empanelment across India's foremost mutual fund houses, portfolio managers, and insurance underwriters.
-          </p>
-        </div>
-
-        {/* Marquee with Soft Edge Gradients */}
-        <div className="relative w-full overflow-hidden">
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-r from-white to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 z-20 bg-gradient-to-l from-white to-transparent" />
-
-          <Marquee pauseOnHover={true} speed={30} className="mt-0 sm:mt-0">
-            {partners.map((p, idx) => (
-              <div
-                key={idx}
-                className="mx-2 sm:mx-3 flex items-center gap-3.5 bg-[#f8fafc] hover:bg-white px-5 py-3 rounded-2xl border border-slate-200/80 hover:border-[#2376b8]/40 hover:shadow-lg transition-all duration-300 cursor-pointer group shrink-0"
-              >
-                {/* Brand Logo Symbol */}
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-xs shadow-xs border transition-transform duration-300 group-hover:scale-105 shrink-0"
-                  style={{
-                    backgroundColor: `${p.badgeColor || '#004c8f'}12`,
-                    borderColor: `${p.badgeColor || '#004c8f'}30`,
-                    color: p.badgeColor || '#004c8f',
-                  }}
-                >
-                  {p.shortName || (p.name ? p.name.substring(0, 3).toUpperCase() : 'AMC')}
-                </div>
-
-                {/* Brand Name & Category */}
-                <div className="text-left">
-                  <div className="text-xs sm:text-sm font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors whitespace-nowrap">
-                    {p.name}
-                  </div>
-                  <div className="text-[10px] sm:text-[11px] text-slate-400 font-medium">
-                    {p.category}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Marquee>
-        </div>
-      </section>
 
       {/* 11. REQUEST A CALL BACK FORM (Working End-to-End) */}
       <section id="contact" className="py-20 bg-[#0f2b44] text-white scroll-mt-20">
