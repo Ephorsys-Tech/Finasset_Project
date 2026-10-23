@@ -3,22 +3,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, Building } from 'lucide-react';
-import { fallbackServices } from '@/lib/fallbackData';
-import { fallbackMarketIndices, fallbackFinancialVideo } from '@/lib/fallbackData';
 
 const INITIAL_VISIBLE = 3;
 
-/**
- * Our Services Component
- * Uniform card grid with "Explore all / Show less" toggle.
- * Falls back to `fallbackServices` when no services are passed.
- * Usage: <OurServices initialServices={services} />
- */
+
 export default function OurServices({ initialServices = [] }) {
   const [showAll, setShowAll] = useState(false);
 
-  const services =
-    Array.isArray(initialServices) && initialServices.length > 0 ? initialServices : fallbackServices;
+  const services = Array.isArray(initialServices) ? initialServices : [];
+
+  // No services available -> hide the whole section
+  if (services.length === 0) return null;
+
   const visibleServices = showAll ? services : services.slice(0, INITIAL_VISIBLE);
 
   return (

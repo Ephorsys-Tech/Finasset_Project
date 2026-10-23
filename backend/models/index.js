@@ -18,6 +18,7 @@ import Page from './Page';
 import Enquiry from './Enquiry';
 import Media from './Media';
 import NriItem from './NriItem';
+import Video from './Video';
 
 export {
   Admin,
@@ -40,6 +41,7 @@ export {
   Enquiry,
   Media,
   NriItem,
+  Video,
 };
 
 export default {
@@ -63,4 +65,5 @@ export default {
   Enquiry,
   Media,
   NriItem,
+  Video,
 };
