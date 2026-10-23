@@ -97,7 +97,7 @@ export default function HomePage() {
       `}</style>
 
       {/* 2. MARKET WATCH STRIP */}
-      <section className="my-6 sm:my-8">
+      {/* <section className="my-6 sm:my-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow py-3 px-4 sm:px-6 flex items-center justify-between gap-4 overflow-hidden">
             <div className="flex items-center gap-2 shrink-0 z-10 bg-white pr-2">
@@ -150,7 +150,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 3. OUR SERVICES */}
       <OurServices initialServices={services} />

@@ -34,6 +34,10 @@ const HeroSlideSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    publicId: {
+      type: String,
+      default: '',
+    },
     statsHighlight: {
       label: { type: String, default: 'Client Trust' },
       value: { type: String, default: '15+ Years in Odisha' },
