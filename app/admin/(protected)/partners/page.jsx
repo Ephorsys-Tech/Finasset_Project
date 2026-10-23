@@ -10,6 +10,7 @@ import {
   Save,
   X,
 } from 'lucide-react';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminPartnersPage() {
   const [partners, setPartners] = useState([]);
@@ -17,6 +18,8 @@ export default function AdminPartnersPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -70,10 +73,16 @@ export default function AdminPartnersPage() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Delete partner ${name}?`)) return;
-    await fetch(`/api/v1/admin/partners?id=${id}`, { method: 'DELETE' });
-    fetchItems();
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/v1/admin/partners?id=${deleteTarget.id}`, { method: 'DELETE' });
+      fetchItems();
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -123,7 +132,11 @@ export default function AdminPartnersPage() {
                 <button onClick={() => handleOpenEdit(p)} className="p-1.5 text-slate-600 hover:text-[#10243A]">
                   <Edit2 className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(p._id, p.name)} className="p-1.5 text-rose-500 hover:text-rose-700">
+                <button
+                  onClick={() => setDeleteTarget({ id: p._id, name: p.name })}
+                  className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                  title="Delete Partner"
+                >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -216,6 +229,17 @@ export default function AdminPartnersPage() {
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Partner Institution"
+        itemName={deleteTarget?.name}
+        message="Are you sure you want to remove this partner tie-up? This action cannot be undone."
+        confirmText="Yes, Delete Partner"
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

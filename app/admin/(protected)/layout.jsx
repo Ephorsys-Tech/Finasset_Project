@@ -114,7 +114,7 @@ export default function AdminProtectedLayout({ children }) {
     { label: 'Testimonials', href: '/admin/testimonials', icon: MessageSquareQuote },
     { label: 'Partners', href: '/admin/partners', icon: Handshake },
     // { label: 'Pages Content', href: '/admin/pages', icon: FileText },
-    { label: 'Media Library', href: '/admin/media', icon: Image },
+    // { label: 'Media Library', href: '/admin/media', icon: Image },
     { label: 'NRI Corner', href: '/admin/nri-corner', icon: Globe },
     // { label: 'Activity Log', href: '/admin/activity-log', icon: History },
   ];
