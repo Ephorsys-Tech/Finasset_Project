@@ -20,6 +20,7 @@ import Media from './Media';
 import NriItem from './NriItem';
 import Video from './Video';
 import TaxationItem from './TaxationItem';
+import PayPremium from './PayPremium';
 
 export {
   Admin,
@@ -44,6 +45,7 @@ export {
   NriItem,
   Video,
   TaxationItem,
+  PayPremium,
 };
 
 export default {
@@ -69,4 +71,5 @@ export default {
   NriItem,
   Video,
   TaxationItem,
+  PayPremium,
 };

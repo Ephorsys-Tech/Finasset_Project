@@ -113,10 +113,10 @@ export default function AdminProtectedLayout({ children }) {
     { label: 'Media Library', href: '/admin/media', icon: Image },
     { label: 'NRI Corner', href: '/admin/nri-corner', icon: Globe },
     { label: 'Taxation', href: '/admin/taxation', icon: Receipt },
+    { label: 'Pay Premium', href: '/admin/pay-premium', icon: CreditCard },
     // { label: 'Menu Manager', href: '/admin/menus', icon: MenuIcon },
     // { label: 'Site Settings', href: '/admin/site-settings', icon: Settings },
     // { label: "Investor's Corner", href: '/admin/investor-corner', icon: Calculator },
-    // { label: 'Pay Premium', href: '/admin/pay-premium', icon: CreditCard },
     // { label: 'Pages Content', href: '/admin/pages', icon: FileText },
     // { label: 'Activity Log', href: '/admin/activity-log', icon: History },
   ];
