@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import { useServiceStore } from '@/store/useServiceStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 const ICON_OPTIONS = [
   { value: 'TrendingUp', label: 'TrendingUp (Growth)' },
@@ -72,6 +73,8 @@ export default function AdminServicesPage() {
   const [activeTab, setActiveTab] = useState('basic');
   const [imageUploading, setImageUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
   const imageInputRef = useRef(null);
   const bannerInputRef = useRef(null);
 
@@ -111,13 +114,21 @@ export default function AdminServicesPage() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  const handleDelete = (id, name) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeletingTarget(true);
     try {
-      await deleteService(id);
-      setMsg({ type: 'success', text: `Service "${name}" deleted.` });
+      await deleteService(deleteTarget.id);
+      setMsg({ type: 'success', text: `Service "${deleteTarget.name}" deleted successfully.` });
+      setDeleteTarget(null);
     } catch (err) {
       setMsg({ type: 'error', text: err.message || 'Delete failed' });
+    } finally {
+      setIsDeletingTarget(false);
     }
   };
 
@@ -876,6 +887,17 @@ export default function AdminServicesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Service"
+        itemName={deleteTarget?.name}
+        warningDetails="This will permanently delete this service discipline from the database and remove its public URL."
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }
