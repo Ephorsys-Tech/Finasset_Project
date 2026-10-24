@@ -18,34 +18,30 @@ import {
   Search,
   BookOpen,
 } from 'lucide-react';
+import { useNriStore } from '@/store/useNriStore';
 
 export default function AdminNriCornerPage() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    adminItems: items,
+    isLoading: loading,
+    isSaving: saving,
+    fetchItems,
+    createItem,
+    updateItem,
+    togglePublish,
+    swapOrder,
+    deleteItem,
+  } = useNriStore();
+
   const [editingItem, setEditingItem] = useState(null);
   const [isNew, setIsNew] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ type: '', text: '' });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const fetchItems = async () => {
-    try {
-      const res = await fetch('/api/v1/admin/nri-corner');
-      const json = await res.json();
-      if (json.success) {
-        setItems(json.data || []);
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Failed to fetch NRI Corner topics.' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchItems();
-  }, []);
+    fetchItems(true);
+  }, [fetchItems]);
 
   const handleOpenNew = () => {
     setIsNew(true);
@@ -76,34 +72,25 @@ export default function AdminNriCornerPage() {
       return;
     }
 
-    setSaving(true);
     setMsg({ type: '', text: '' });
 
     try {
-      const method = isNew ? 'POST' : 'PUT';
-      const payload = isNew ? editingItem : { id: editingItem._id, ...editingItem };
-
-      const res = await fetch('/api/v1/admin/nri-corner', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (data.success) {
+      if (isNew) {
+        await createItem(editingItem);
         setMsg({
           type: 'success',
-          text: isNew ? 'New NRI topic added successfully!' : 'NRI topic updated successfully!',
+          text: 'New NRI topic added successfully!',
         });
-        setEditingItem(null);
-        fetchItems();
       } else {
-        setMsg({ type: 'error', text: data.message || 'Operation failed' });
+        await updateItem(editingItem._id, editingItem);
+        setMsg({
+          type: 'success',
+          text: 'NRI topic updated successfully!',
+        });
       }
-    } catch {
-      setMsg({ type: 'error', text: 'Network error. Please try again.' });
-    } finally {
-      setSaving(false);
+      setEditingItem(null);
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Operation failed' });
     }
   };
 
@@ -111,32 +98,16 @@ export default function AdminNriCornerPage() {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
 
     try {
-      const res = await fetch(`/api/v1/admin/nri-corner?id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setMsg({ type: 'success', text: `Topic "${title}" deleted successfully.` });
-        fetchItems();
-      } else {
-        setMsg({ type: 'error', text: data.message || 'Failed to delete topic.' });
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Network error while deleting.' });
+      await deleteItem(id);
+      setMsg({ type: 'success', text: `Topic "${title}" deleted successfully.` });
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Failed to delete topic.' });
     }
   };
 
   const handleTogglePublish = async (item) => {
     try {
-      const res = await fetch('/api/v1/admin/nri-corner', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: item._id, isPublished: !item.isPublished }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setItems((prev) =>
-          prev.map((i) => (i._id === item._id ? { ...i, isPublished: !i.isPublished } : i))
-        );
-      }
+      await togglePublish(item);
     } catch {
       setMsg({ type: 'error', text: 'Failed to toggle status.' });
     }
@@ -152,19 +123,10 @@ export default function AdminNriCornerPage() {
     const targetOrder = targetItem.order || targetIndex + 1;
 
     try {
-      await Promise.all([
-        fetch('/api/v1/admin/nri-corner', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: item._id, order: targetOrder }),
-        }),
-        fetch('/api/v1/admin/nri-corner', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: targetItem._id, order: currentOrder }),
-        }),
-      ]);
-      fetchItems();
+      await swapOrder(
+        { _id: item._id, order: targetOrder },
+        { _id: targetItem._id, order: currentOrder }
+      );
     } catch {
       setMsg({ type: 'error', text: 'Failed to update topic order.' });
     }

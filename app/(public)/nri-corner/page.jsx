@@ -20,8 +20,13 @@ import {
   Loader2,
 } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
+import { useNriStore } from '@/store/useNriStore';
+import { useEnquiryStore } from '@/store/useEnquiryStore';
 
 export default function NriCornerPage() {
+  const { items: nriItems, isLoading: loadingItems, fetchItems } = useNriStore();
+  const { submitEnquiry } = useEnquiryStore();
+
   const [form, setForm] = useState({ name: '', email: '', phone: '', country: '', message: '' });
   const [formErrors, setFormErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
@@ -29,27 +34,13 @@ export default function NriCornerPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const [nriItems, setNriItems] = useState([]);
-  const [loadingItems, setLoadingItems] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState(null);
 
-  // Fetch dynamic NRI topics created by admin
+  // Fetch dynamic NRI topics created by admin via Zustand store and Axios
   useEffect(() => {
-    fetch('/api/v1/public/nri-corner')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success && Array.isArray(json.data)) {
-          setNriItems(json.data);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to load NRI Corner content:', err);
-      })
-      .finally(() => {
-        setLoadingItems(false);
-      });
-  }, []);
+    fetchItems(false);
+  }, [fetchItems]);
 
   const validate = () => {
     const errors = {};
@@ -101,32 +92,25 @@ export default function NriCornerPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch('/api/v1/public/enquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name.trim(),
-          email: form.email.trim().toLowerCase(),
-          phone: form.phone.trim(),
-          country: form.country.trim(),
-          message: form.message.trim(),
-          type: 'nri',
-          serviceOfInterest: `NRI Wealth Advisory (${form.country.trim() || 'Global'})`,
-          sourcePage: 'NRI Corner',
-        }),
+      const result = await submitEnquiry({
+        name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
+        country: form.country.trim(),
+        message: form.message.trim(),
+        type: 'nri',
+        serviceOfInterest: `NRI Wealth Advisory (${form.country.trim() || 'Global'})`,
+        sourcePage: 'NRI Corner',
       });
 
-      const data = await res.json();
-      if (data.success) {
+      if (result.success) {
         setSubmitted(true);
-        setSubmittedData(data.data || {});
+        setSubmittedData(result.data || {});
         setForm({ name: '', email: '', phone: '', country: '', message: '' });
         setFormErrors({});
-      } else {
-        setSubmitError(data.message || 'Failed to submit enquiry. Please check your inputs.');
       }
-    } catch {
-      setSubmitError('Network error. Please call our office directly or try again later.');
+    } catch (err) {
+      setSubmitError(err.message || 'Network error. Please call our office directly or try again later.');
     } finally {
       setSubmitting(false);
     }

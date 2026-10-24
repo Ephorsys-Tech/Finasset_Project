@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
@@ -13,20 +13,14 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
+import { useServiceStore } from '@/store/useServiceStore';
 
 export default function ServicesPage() {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { services, isLoading: loading, fetchServices } = useServiceStore();
 
   useEffect(() => {
-    fetch('/api/v1/public/services')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setServices(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    fetchServices(false);
+  }, [fetchServices]);
 
   const getServiceIcon = (iconName) => {
     switch (iconName) {

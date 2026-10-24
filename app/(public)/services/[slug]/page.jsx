@@ -19,13 +19,19 @@ import {
   Lock,
 } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
+import { useServiceStore } from '@/store/useServiceStore';
 
 export default function ServiceDetailPage({ params }) {
   const unwrappedParams = use(params);
   const slug = unwrappedParams.slug;
 
-  const [serviceData, setServiceData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    currentService: serviceData,
+    isDetailLoading: loading,
+    fetchServiceBySlug,
+    clearCurrentService,
+  } = useServiceStore();
+
   const [openFaq, setOpenFaq] = useState(null);
   const [inquiryName, setInquiryName] = useState('');
   const [inquiryEmail, setInquiryEmail] = useState('');
@@ -35,14 +41,13 @@ export default function ServiceDetailPage({ params }) {
   const [inquirySubmitting, setInquirySubmitting] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/v1/public/services/${slug}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setServiceData(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [slug]);
+    if (slug) {
+      fetchServiceBySlug(slug);
+    }
+    return () => {
+      clearCurrentService();
+    };
+  }, [slug, fetchServiceBySlug, clearCurrentService]);
 
   const handleNameChange = (e) => {
     // Strictly prevent numbers in the name
