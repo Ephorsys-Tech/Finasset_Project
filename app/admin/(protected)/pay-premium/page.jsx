@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Phone,
 } from 'lucide-react';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminPayPremiumPage() {
   const [insurers, setInsurers] = useState([]);
@@ -21,6 +22,8 @@ export default function AdminPayPremiumPage() {
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ type: '', text: '' });
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
 
   const fetchInsurers = async () => {
     try {
@@ -85,14 +88,26 @@ export default function AdminPayPremiumPage() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Delete insurer: "${name}"?`)) return;
+  const handleDelete = (id, name) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeletingTarget(true);
     try {
-      const res = await fetch(`/api/v1/admin/insurers?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/v1/admin/insurers?id=${deleteTarget.id}`, { method: 'DELETE' });
       const data = await res.json();
-      if (data.success) fetchInsurers();
+      if (data.success) {
+        fetchInsurers();
+        setDeleteTarget(null);
+      } else {
+        alert(data.message || 'Error deleting insurer');
+      }
     } catch {
       alert('Error deleting insurer');
+    } finally {
+      setIsDeletingTarget(false);
     }
   };
 
@@ -307,6 +322,17 @@ export default function AdminPayPremiumPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Insurer"
+        itemName={deleteTarget?.name}
+        warningDetails="This will permanently remove this insurance partner from the Pay Premium portal."
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }

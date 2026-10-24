@@ -19,6 +19,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { useNriStore } from '@/store/useNriStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminNriCornerPage() {
   const {
@@ -38,6 +39,8 @@ export default function AdminNriCornerPage() {
   const [msg, setMsg] = useState({ type: '', text: '' });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
 
   useEffect(() => {
     fetchItems(true);
@@ -94,14 +97,18 @@ export default function AdminNriCornerPage() {
     }
   };
 
-  const handleDelete = async (id, title) => {
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeletingTarget(true);
 
     try {
-      await deleteItem(id);
-      setMsg({ type: 'success', text: `Topic "${title}" deleted successfully.` });
+      await deleteItem(deleteTarget.id);
+      setMsg({ type: 'success', text: `Topic "${deleteTarget.title}" deleted successfully.` });
+      setDeleteTarget(null);
     } catch (err) {
       setMsg({ type: 'error', text: err.message || 'Failed to delete topic.' });
+    } finally {
+      setIsDeletingTarget(false);
     }
   };
 
@@ -352,7 +359,7 @@ export default function AdminNriCornerPage() {
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(item._id, item.title)}
+                    onClick={() => setDeleteTarget({ id: item._id, title: item.title })}
                     className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                     title="Delete Topic"
                   >
@@ -484,6 +491,18 @@ export default function AdminNriCornerPage() {
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete NRI Topic"
+        itemName={deleteTarget?.title}
+        message="Are you sure you want to delete this NRI Corner topic? This action cannot be undone."
+        warningDetails="This topic will be permanently removed from the public NRI Corner page."
+        confirmText="Yes, Delete Topic"
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }

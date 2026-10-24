@@ -17,6 +17,7 @@ import {
   Check,
 } from 'lucide-react';
 import { useHeroStore } from '@/store/useHeroStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 function renderLivePreview(title = '') {
   if (!title) return null;
@@ -88,6 +89,7 @@ export default function AdminHomePageManager() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [localMsg, setLocalMsg] = useState({ type: '', text: '' });
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -259,20 +261,21 @@ export default function AdminHomePageManager() {
     }
   };
 
-  // Delete hero slide by ID and destroy associated Cloudinary image
-  const handleDelete = async (slide) => {
-    const id = slide._id || slide.id;
-    const title = slide.title || 'Untitled Slide';
+  // Delete hero slide modal trigger and execution
+  const handleDelete = (slide) => {
+    setDeleteTarget(slide);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget._id || deleteTarget.id;
+    const title = deleteTarget.title || 'Untitled Slide';
 
     if (!id) {
       setLocalMsg({ type: 'error', text: 'Missing slide ID for deletion.' });
+      setDeleteTarget(null);
       return;
     }
-
-    const confirmDelete = confirm(
-      `Delete hero banner: "${title}"?\n\nThis will permanently delete this slide from the database and automatically remove its background image from Cloudinary.`
-    );
-    if (!confirmDelete) return;
 
     try {
       setDeletingId(id);
@@ -282,6 +285,7 @@ export default function AdminHomePageManager() {
         text: `Slide "${title}" and associated Cloudinary image deleted successfully.`,
       });
       await fetchSlides();
+      setDeleteTarget(null);
     } catch (err) {
       setLocalMsg({ type: 'error', text: err.message || 'Error deleting slide.' });
     } finally {
@@ -783,6 +787,17 @@ export default function AdminHomePageManager() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !(isDeleting || deletingId !== null) && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Hero Banner"
+        itemName={deleteTarget?.title}
+        warningDetails="This will permanently delete this slide from the database and automatically remove its background image from Cloudinary."
+        isDeleting={isDeleting || deletingId !== null}
+      />
     </div>
   );
 }

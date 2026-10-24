@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { formatDate, formatDateTime } from '@/lib/utils';
 import { useBlogStore } from '@/store/useBlogStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminBlogManagerPage() {
   const {
@@ -1122,77 +1123,22 @@ export default function AdminBlogManagerPage() {
         </div>
       )}
 
-      {/* Delete Article In-App Confirmation Modal */}
-      {deletingPost && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 text-center animate-in zoom-in-95 duration-200">
-            <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto border border-rose-100">
-              <Trash2 className="w-7 h-7" />
-            </div>
-
-            <div className="space-y-1.5">
-              <h3 className="text-base sm:text-lg font-black text-[#10243A]">
-                Delete Article?
-              </h3>
-              <p className="text-xs text-slate-500">
-                Are you sure you want to permanently delete:
-              </p>
-              <p className="text-xs font-bold text-[#10243A] bg-slate-50 p-2.5 rounded-xl border border-slate-200 break-words">
-                &ldquo;{deletingPost.title}&rdquo;
-              </p>
-            </div>
-
-            {deletingPost.featuredImagePublicId ? (
-              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-left flex items-start gap-2.5 text-[11px] text-amber-900">
-                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Cloudinary Asset Cleanup:</strong> The associated cover image (
-                  <code className="font-mono text-[10px] bg-amber-100/80 px-1 py-0.5 rounded">
-                    {deletingPost.featuredImagePublicId}
-                  </code>
-                  ) will also be permanently deleted from Cloudinary.
-                </span>
-              </div>
-            ) : deletingPost.featuredImage ? (
-              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-left flex items-start gap-2.5 text-[11px] text-amber-900">
-                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Note:</strong> Associated cloud image assets will also be wiped from Cloudinary.
-                </span>
-              </div>
-            ) : null}
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeletingPost(null)}
-                disabled={isDeletingPost}
-                className="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDeletePost}
-                disabled={isDeletingPost}
-                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-lg shadow-rose-600/20 transition-all disabled:opacity-50"
-              >
-                {isDeletingPost ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Deleting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Yes, Delete</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Article Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingPost)}
+        onClose={() => !isDeletingPost && setDeletingPost(null)}
+        onConfirm={handleConfirmDeletePost}
+        title="Delete Article"
+        itemName={deletingPost?.title}
+        warningDetails={
+          deletingPost?.featuredImagePublicId
+            ? `The associated cover image (${deletingPost.featuredImagePublicId}) will also be permanently deleted from Cloudinary.`
+            : deletingPost?.featuredImage
+            ? 'Associated cloud image assets will also be wiped from Cloudinary.'
+            : ''
+        }
+        isDeleting={isDeletingPost}
+      />
     </div>
   );
 }

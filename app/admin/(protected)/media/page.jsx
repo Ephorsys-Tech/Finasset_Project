@@ -22,6 +22,7 @@ import {
   X,
 } from 'lucide-react';
 import { useVideoStore } from '@/store/useVideoStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 function getYouTubeId(url = '') {
   const match = String(url).match(
@@ -74,6 +75,10 @@ export default function AdminMediaPage() {
     description: '',
     duration: '',
   });
+
+  // Delete Confirmation Modal State
+  const [deleteTarget, setDeleteTarget] = useState(null); // { id, name, type: 'video' | 'image' }
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
 
   // Fetch image media assets
   const fetchMedia = async () => {
@@ -139,15 +144,30 @@ export default function AdminMediaPage() {
     }
   };
 
-  const handleDeleteVideo = async (id, title) => {
-    if (!confirm(`Are you sure you want to remove the video "${title}"? This cannot be undone.`)) {
-      return;
-    }
+  const handleDeleteVideo = (id, title) => {
+    setDeleteTarget({ id, name: title, type: 'video' });
+  };
+
+  const handleDeleteImage = (id, filename) => {
+    setDeleteTarget({ id, name: filename || 'Media asset', type: 'image' });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeletingTarget(true);
     clearMessages();
     try {
-      await deleteVideo(id);
+      if (deleteTarget.type === 'video') {
+        await deleteVideo(deleteTarget.id);
+      } else {
+        await fetch(`/api/v1/admin/media?id=${deleteTarget.id}`, { method: 'DELETE' });
+        fetchMedia();
+      }
+      setDeleteTarget(null);
     } catch (err) {
-      alert(err.message || 'Error deleting video');
+      alert(err.message || 'Error deleting item');
+    } finally {
+      setIsDeletingTarget(false);
     }
   };
 
@@ -215,11 +235,6 @@ export default function AdminMediaPage() {
     }
   };
 
-  const handleDeleteImage = async (id) => {
-    if (!confirm('Delete this media asset? This will also remove it from Cloudinary if hosted there.')) return;
-    await fetch(`/api/v1/admin/media?id=${id}`, { method: 'DELETE' });
-    fetchMedia();
-  };
 
   const copyToClipboard = (url, id) => {
     navigator.clipboard.writeText(url);
@@ -643,6 +658,20 @@ export default function AdminMediaPage() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title={deleteTarget?.type === 'video' ? 'Delete Video' : 'Delete Media Asset'}
+        itemName={deleteTarget?.name}
+        warningDetails={
+          deleteTarget?.type === 'video'
+            ? 'This video slot will be freed up and removed from the homepage Video Showcase.'
+            : 'This will permanently remove the media asset and delete it from Cloudinary.'
+        }
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }
