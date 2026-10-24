@@ -343,9 +343,9 @@ export default function CallbackForm({ initialServices = [] }) {
     <section id="contact" className="scroll-mt-20 border-t border-slate-200/80 bg-slate-50 py-14 sm:py-20">
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         <div className="mb-8 text-center">
-          <span className="mb-3 inline-block rounded-full border border-[#2376b8]/20 bg-[#2376b8]/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#2376b8]">
-            Free Consultation
-          </span>
+            {/* <span className="mb-3 inline-block rounded-full border border-[#2376b8]/20 bg-[#2376b8]/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#2376b8]">
+              Free Consultation
+            </span> */}
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Request a Call Back
           </h2>

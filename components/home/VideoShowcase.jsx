@@ -410,9 +410,9 @@ export default function VideoShowcase({ initialVideos }) {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/10 px-3.5 py-1 rounded-full border border-[#f87b1f]/20 inline-block mb-2.5">
+            {/* <span className="text-xs font-bold uppercase tracking-wider text-[#f87b1f] bg-[#f87b1f]/10 px-3.5 py-1 rounded-full border border-[#f87b1f]/20 inline-block mb-2.5">
               Learn &amp; Grow
-            </span>
+            </span> */}
             <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 tracking-tight">
               Financial Videos
             </h2>

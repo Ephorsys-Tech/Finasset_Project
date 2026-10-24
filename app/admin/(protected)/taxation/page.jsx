@@ -17,7 +17,6 @@ import {
   EyeOff,
   Search,
   BookOpen,
-  Tag,
 } from 'lucide-react';
 import { useTaxationStore } from '@/store/useTaxationStore';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
@@ -52,7 +51,6 @@ export default function AdminTaxationPage() {
     setMsg({ type: '', text: '' });
     setEditingItem({
       title: '',
-      category: 'Tax Advisory',
       description: '',
       order: items.length + 1,
       isPublished: true,
@@ -144,8 +142,7 @@ export default function AdminTaxationPage() {
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.title?.toLowerCase().includes(search.toLowerCase()) ||
-      item.description?.toLowerCase().includes(search.toLowerCase()) ||
-      item.category?.toLowerCase().includes(search.toLowerCase());
+      item.description?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus =
       statusFilter === 'all'
         ? true
@@ -169,7 +166,7 @@ export default function AdminTaxationPage() {
           <div>
             <h1 className="text-2xl font-extrabold text-[#0f2b44]">Taxation Management</h1>
             <p className="text-xs text-slate-500 mt-1">
-              Create and manage capital gains rules, tax-saving pillars, Section 80C/80D advice, and strategies displayed on the public Taxation page.
+              Create and manage taxation topics, descriptions, and rules displayed on the public Taxation page.
             </p>
           </div>
         </div>
@@ -257,7 +254,7 @@ export default function AdminTaxationPage() {
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search topic title, description, category..."
+            placeholder="Search topic title or description..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#2376b8]"
@@ -308,12 +305,10 @@ export default function AdminTaxationPage() {
                     #{item.order ?? idx + 1}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      {item.category && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-2.5 py-0.5 rounded-full border border-[#2376b8]/20">
-                          {item.category}
-                        </span>
-                      )}
+                    <h3 className="text-base font-extrabold text-[#0f2b44] leading-snug">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1.5">
                       <button
                         onClick={() => handleTogglePublish(item)}
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors ${
@@ -335,10 +330,6 @@ export default function AdminTaxationPage() {
                         )}
                       </button>
                     </div>
-
-                    <h3 className="text-base font-extrabold text-[#0f2b44] leading-snug">
-                      {item.title}
-                    </h3>
                   </div>
                 </div>
 
@@ -386,7 +377,7 @@ export default function AdminTaxationPage() {
         )}
       </div>
 
-      {/* Add / Edit Modal */}
+      {/* Add / Edit Modal - ONLY Title and Description */}
       {editingItem && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6 my-8 animate-in fade-in zoom-in-95 duration-200">
@@ -400,7 +391,7 @@ export default function AdminTaxationPage() {
                     {isNew ? 'Add New Taxation Topic' : 'Edit Taxation Topic'}
                   </h2>
                   <p className="text-xs text-slate-400">
-                    Heading, category tag, and detailed content for the public Taxation page.
+                    Topic title and description for the public Taxation page.
                   </p>
                 </div>
               </div>
@@ -430,25 +421,12 @@ export default function AdminTaxationPage() {
 
               <div>
                 <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
-                  Category / Tag
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Equity Mutual Funds, Property & Bonds, Section 80D, Strategic Harvesting"
-                  value={editingItem.category || ''}
-                  onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                  className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#2376b8]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                   Detailed Description *
                 </label>
                 <textarea
                   required
                   rows={8}
-                  placeholder="Enter the detailed tax rules, percentages, exemption limits, legal conditions, or strategic points..."
+                  placeholder="Enter the detailed tax rules, guidelines, or points..."
                   value={editingItem.description}
                   onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                   className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#2376b8] leading-relaxed font-sans"

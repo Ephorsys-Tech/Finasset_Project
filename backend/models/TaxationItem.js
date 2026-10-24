@@ -12,11 +12,6 @@ const TaxationItemSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    category: {
-      type: String,
-      trim: true,
-      default: 'Tax Advisory',
-    },
     order: {
       type: Number,
       default: 0,

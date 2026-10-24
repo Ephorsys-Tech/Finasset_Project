@@ -62,9 +62,9 @@ export default function NewsFeed({ initialNews = [] }) {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#2376b8]/10 px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2.5">
+            {/* <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#2376b8]/10 px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2.5">
               Market Intelligence
-            </span>
+            </span> */}
             <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 tracking-tight">
               News Feed
             </h2>

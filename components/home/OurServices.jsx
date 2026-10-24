@@ -37,9 +37,9 @@ export default function OurServices({ initialServices = [] }) {
         {/* Section Header (same pattern as News Feed) */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#89b441] bg-[#89b441]/10 px-3.5 py-1 rounded-full border border-[#89b441]/25 inline-block mb-2.5">
+            {/* <span className="text-xs font-bold uppercase tracking-wider text-[#89b441] bg-[#89b441]/10 px-3.5 py-1 rounded-full border border-[#89b441]/25 inline-block mb-2.5">
               What We Offer
-            </span>
+            </span> */}
             <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 tracking-tight">
               Our Services
             </h2>
