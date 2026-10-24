@@ -11,10 +11,10 @@ import {
   Shield,
 } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
+import { useServiceStore } from '@/store/useServiceStore';
 
 export default function ContactUsPage() {
-  const [services, setServices] = useState([]);
-  const [loadingServices, setLoadingServices] = useState(true);
+  const { services, isLoading: loadingServices, fetchServices } = useServiceStore();
 
   const [form, setForm] = useState({
     name: '',
@@ -27,7 +27,7 @@ export default function ContactUsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch dynamic published services created by admin (matches navbar services section)
+  // Fetch dynamic published services created by admin via Zustand and Axios
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -37,20 +37,8 @@ export default function ContactUsPage() {
       }
     }
 
-    fetch('/api/v1/public/services')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success && Array.isArray(json.data)) {
-          setServices(json.data);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to load services for contact form:', err);
-      })
-      .finally(() => {
-        setLoadingServices(false);
-      });
-  }, []);
+    fetchServices(false);
+  }, [fetchServices]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

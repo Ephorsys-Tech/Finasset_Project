@@ -19,6 +19,16 @@ import {
   RESET_TOKEN_EXPIRY_MINUTES,
 } from '@/backend/utils/authHelpers';
 
+const parseRequestBody = async (req) => {
+  if (typeof req?.json === 'function') {
+    return await req.json().catch(() => ({}));
+  }
+  if (req?.body && typeof req.body === 'object' && typeof req.body.getReader !== 'function') {
+    return req.body;
+  }
+  return {};
+};
+
 //-------------------------------------------------------
 //@description - Forget Admin Password
 //@route - POST /api/v1/admin/forget-password
@@ -27,7 +37,7 @@ import {
 export const forgetPasswordAdmin = async (req, res) => {
   try {
     await connectToDatabase();
-    const body = req.body || (typeof req.json === 'function' ? await req.json().catch(() => ({})) : {});
+    const body = await parseRequestBody(req);
     const email = normalizeEmail(body?.email);
     if (!email) {
       return respond(res, 400, false, 'Email is Required');
@@ -35,8 +45,18 @@ export const forgetPasswordAdmin = async (req, res) => {
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      // Always return 200 to prevent email enumeration
-      return respond(res, 200, true, 'If an admin exists with this email, a reset OTP has been sent');
+      return respond(res, 404, false, 'No registered administrator account found with this email address');
+    }
+
+    // Check if SMTP_PASS is configured in environment
+    if (!process.env.SMTP_PASS || !process.env.SMTP_PASS.trim()) {
+      console.error('SMTP configuration error: SMTP_PASS is missing in environment variables.');
+      return respond(
+        res,
+        500,
+        false,
+        'Email delivery failed: SMTP_PASS is missing in server environment (.env.local). Please configure your Gmail App Password.'
+      );
     }
 
     const otp = crypto.randomInt(100000, 1000000).toString();
@@ -64,11 +84,16 @@ export const forgetPasswordAdmin = async (req, res) => {
       admin.passwordResetVerified = false;
       await admin.save({ validateBeforeSave: false });
 
-      console.error('Password Reset Mail Error:', mailError);
-      return respond(res, 500, false, 'Unable to send password reset email');
+      console.error('Password Reset Mail Error:', mailError.message || mailError);
+      return respond(
+        res,
+        500,
+        false,
+        `Email delivery failed: ${mailError.message || 'Unable to connect to SMTP server'}`
+      );
     }
 
-    return respond(res, 200, true, 'If an admin exists with this email, a reset OTP has been sent');
+    return respond(res, 200, true, `A 6-digit verification OTP has been sent to ${admin.email}`);
   } catch (error) {
     console.error('Forget Password Error:', error);
     return respond(res, 500, false, 'Internal Server Error', { error: error.message });
@@ -83,7 +108,7 @@ export const forgetPasswordAdmin = async (req, res) => {
 export const verifyResetOtpAdmin = async (req, res) => {
   try {
     await connectToDatabase();
-    const body = req.body || (typeof req.json === 'function' ? await req.json().catch(() => ({})) : {});
+    const body = await parseRequestBody(req);
     const email = normalizeEmail(body?.email);
     const otp = body?.otp?.toString().trim();
 
@@ -102,7 +127,7 @@ export const verifyResetOtpAdmin = async (req, res) => {
       admin.passwordResetOtpExpires < new Date() ||
       admin.passwordResetOtp !== hashValue(otp)
     ) {
-      return respond(res, 400, false, 'Invalid or expired OTP');
+      return respond(res, 400, false, 'Invalid or expired OTP code. Please verify the 6-digit code sent to your email.');
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
@@ -115,7 +140,7 @@ export const verifyResetOtpAdmin = async (req, res) => {
 
     await admin.save({ validateBeforeSave: false });
 
-    return respond(res, 200, true, 'OTP verified successfully', {
+    return respond(res, 200, true, 'OTP verified successfully! You may now set your new password.', {
       data: {
         resetToken,
         expiresInMinutes: RESET_TOKEN_EXPIRY_MINUTES,
@@ -135,7 +160,7 @@ export const verifyResetOtpAdmin = async (req, res) => {
 export const resetPasswordAdmin = async (req, res) => {
   try {
     await connectToDatabase();
-    const body = req.body || (typeof req.json === 'function' ? await req.json().catch(() => ({})) : {});
+    const body = await parseRequestBody(req);
     const email = normalizeEmail(body?.email);
     const resetToken = body?.resetToken?.trim();
     const { password, confirmPassword } = body || {};
@@ -149,7 +174,7 @@ export const resetPasswordAdmin = async (req, res) => {
     }
 
     if (password.length < 8) {
-      return respond(res, 400, false, 'Password must be at least 8 characters');
+      return respond(res, 400, false, 'Password must be at least 8 characters long');
     }
 
     const admin = await Admin.findOne({ email }).select(
@@ -164,7 +189,7 @@ export const resetPasswordAdmin = async (req, res) => {
       admin.passwordResetTokenExpires < new Date() ||
       admin.passwordResetToken !== hashValue(resetToken)
     ) {
-      return respond(res, 400, false, 'Invalid or expired reset token');
+      return respond(res, 400, false, 'Invalid or expired reset session. Please request a new OTP code.');
     }
 
     admin.password = password;
@@ -177,7 +202,7 @@ export const resetPasswordAdmin = async (req, res) => {
     // Revoke existing sessions upon password reset
     await RefreshToken.deleteMany({ adminId: admin._id }).catch(() => {});
 
-    return respond(res, 200, true, 'Password reset successfully');
+    return respond(res, 200, true, 'Password updated successfully! Please sign in with your new password.');
   } catch (error) {
     console.error('Reset Password Error:', error);
     return respond(res, 500, false, 'Internal Server Error', { error: error.message });

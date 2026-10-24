@@ -19,6 +19,7 @@ import {
   Compass,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState([]);
@@ -32,6 +33,8 @@ export default function AdminEnquiriesPage() {
   const [newNoteText, setNewNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
 
   const fetchEnquiries = async (page = 1) => {
     setLoading(true);
@@ -103,10 +106,14 @@ export default function AdminEnquiriesPage() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Are you sure you want to delete the enquiry request from "${name}"? This cannot be undone.`)) {
-      return;
-    }
+  const handleDelete = (id, name) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { id } = deleteTarget;
+    setIsDeletingTarget(true);
     setDeletingId(id);
     try {
       const res = await fetch(`/api/v1/admin/enquiries?id=${id}`, { method: 'DELETE' });
@@ -119,12 +126,14 @@ export default function AdminEnquiriesPage() {
           setActiveNotesEnquiry(null);
         }
         fetchEnquiries(pagination.page);
+        setDeleteTarget(null);
       } else {
         alert(data.message || 'Error deleting enquiry');
       }
     } catch {
       alert('Network error while deleting enquiry');
     } finally {
+      setIsDeletingTarget(false);
       setDeletingId(null);
     }
   };
@@ -538,6 +547,17 @@ export default function AdminEnquiriesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Enquiry Request"
+        itemName={deleteTarget?.name}
+        warningDetails="This will permanently delete this client enquiry and all its internal notes from the database."
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }

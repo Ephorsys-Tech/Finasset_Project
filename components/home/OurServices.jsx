@@ -1,16 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, Building } from 'lucide-react';
+import { useServiceStore } from '@/store/useServiceStore';
 
 const INITIAL_VISIBLE = 3;
 
-
 export default function OurServices({ initialServices = [] }) {
   const [showAll, setShowAll] = useState(false);
+  const { services: storeServices, fetchServices, setServices } = useServiceStore();
 
-  const services = Array.isArray(initialServices) ? initialServices : [];
+  useEffect(() => {
+    if (Array.isArray(initialServices) && initialServices.length > 0) {
+      setServices(initialServices);
+    } else {
+      fetchServices(false);
+    }
+  }, [initialServices, setServices, fetchServices]);
+
+  const services =
+    Array.isArray(storeServices) && storeServices.length > 0
+      ? storeServices
+      : Array.isArray(initialServices) && initialServices.length > 0
+      ? initialServices
+      : [];
 
   // No services available -> hide the whole section
   if (services.length === 0) return null;

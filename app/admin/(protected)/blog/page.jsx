@@ -27,19 +27,30 @@ import {
   Filter,
 } from 'lucide-react';
 import { formatDate, formatDateTime } from '@/lib/utils';
+import { useBlogStore } from '@/store/useBlogStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminBlogManagerPage() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    adminPosts: posts,
+    isLoading: loading,
+    isSaving: saving,
+    isUploading: uploadingImage,
+    fetchAdminPosts,
+    createPost,
+    updatePost,
+    deletePost,
+    uploadImage,
+    deleteImage,
+  } = useBlogStore();
+
   const [editingPost, setEditingPost] = useState(null);
   const [isNew, setIsNew] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
 
   // Cloudinary image upload states
-  const [uploadingImage, setUploadingImage] = useState(false);
   const [deletingImage, setDeletingImage] = useState(false);
   const [deletingPost, setDeletingPost] = useState(null);
   const [isDeletingPost, setIsDeletingPost] = useState(false);
@@ -57,25 +68,9 @@ export default function AdminBlogManagerPage() {
     }, 3500);
   };
 
-  const fetchPosts = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/v1/admin/blog');
-      const json = await res.json();
-      if (json.success) {
-        setPosts(json.data || []);
-      }
-    } catch (err) {
-      console.error('Failed to load posts:', err);
-      showToast('Failed to fetch articles', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchAdminPosts();
+  }, [fetchAdminPosts]);
 
   const generateSlug = (title) => {
     return title
@@ -161,7 +156,7 @@ export default function AdminBlogManagerPage() {
     });
   };
 
-  // Upload image to Cloudinary via backend endpoint
+  // Upload image to Cloudinary via Zustand store and Axios
   const handleImageFile = async (file) => {
     if (!file) return;
 
@@ -177,30 +172,15 @@ export default function AdminBlogManagerPage() {
     }
 
     setImageError('');
-    setUploadingImage(true);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch('/api/v1/admin/blog/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || 'Image upload failed');
-      }
-
-      const { imageUrl, publicId } = json.data;
+      const uploadData = await uploadImage(file);
+      const { imageUrl, publicId } = uploadData;
 
       // If there was an old image uploaded in this session that is different, delete old one
       if (editingPost.featuredImagePublicId && editingPost.featuredImagePublicId !== publicId) {
         try {
-          await fetch(`/api/v1/admin/blog/upload?publicId=${encodeURIComponent(editingPost.featuredImagePublicId)}`, {
-            method: 'DELETE',
-          });
+          await deleteImage(editingPost.featuredImagePublicId);
         } catch (cleanupErr) {
           console.warn('Failed to delete previous Cloudinary asset:', cleanupErr);
         }
@@ -217,7 +197,6 @@ export default function AdminBlogManagerPage() {
       console.error('Image upload failed:', err);
       setImageError(err.message || 'Could not upload image to Cloudinary. Please try again.');
     } finally {
-      setUploadingImage(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -229,14 +208,7 @@ export default function AdminBlogManagerPage() {
     setDeletingImage(true);
     try {
       if (editingPost.featuredImagePublicId) {
-        const res = await fetch(
-          `/api/v1/admin/blog/upload?publicId=${encodeURIComponent(editingPost.featuredImagePublicId)}`,
-          { method: 'DELETE' }
-        );
-        const data = await res.json();
-        if (!data.success) {
-          console.warn('Cloudinary delete notice:', data.message);
-        }
+        await deleteImage(editingPost.featuredImagePublicId);
       }
 
       setEditingPost((prev) => ({
@@ -296,9 +268,7 @@ export default function AdminBlogManagerPage() {
       return;
     }
 
-    setSaving(true);
     try {
-      const method = isNew ? 'POST' : 'PUT';
       const payload = {
         ...editingPost,
         publishedAt: editingPost.publishedAt
@@ -315,25 +285,18 @@ export default function AdminBlogManagerPage() {
         payload.id = editingPost._id;
       }
 
-      const res = await fetch('/api/v1/admin/blog', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        showToast(isNew ? 'Blog article published successfully!' : 'Blog article updated successfully!');
-        setEditingPost(null);
-        fetchPosts();
+      if (isNew) {
+        await createPost(payload);
+        showToast('Blog article published successfully!');
       } else {
-        throw new Error(data.message || 'Failed to save blog post');
+        await updatePost(editingPost._id, payload);
+        showToast('Blog article updated successfully!');
       }
+
+      setEditingPost(null);
     } catch (err) {
       console.error('Save error:', err);
       showToast(err.message || 'Error saving article', 'error');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -342,15 +305,9 @@ export default function AdminBlogManagerPage() {
     setIsDeletingPost(true);
 
     try {
-      const res = await fetch(`/api/v1/admin/blog?id=${deletingPost._id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        showToast('Article and associated Cloudinary image deleted successfully');
-        setDeletingPost(null);
-        fetchPosts();
-      } else {
-        throw new Error(data.message || 'Failed to delete');
-      }
+      await deletePost(deletingPost._id);
+      showToast('Article and associated Cloudinary image deleted successfully');
+      setDeletingPost(null);
     } catch (err) {
       console.error('Delete error:', err);
       showToast(err.message || 'Failed to delete article', 'error');
@@ -1166,77 +1123,22 @@ export default function AdminBlogManagerPage() {
         </div>
       )}
 
-      {/* Delete Article In-App Confirmation Modal */}
-      {deletingPost && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 text-center animate-in zoom-in-95 duration-200">
-            <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto border border-rose-100">
-              <Trash2 className="w-7 h-7" />
-            </div>
-
-            <div className="space-y-1.5">
-              <h3 className="text-base sm:text-lg font-black text-[#10243A]">
-                Delete Article?
-              </h3>
-              <p className="text-xs text-slate-500">
-                Are you sure you want to permanently delete:
-              </p>
-              <p className="text-xs font-bold text-[#10243A] bg-slate-50 p-2.5 rounded-xl border border-slate-200 break-words">
-                &ldquo;{deletingPost.title}&rdquo;
-              </p>
-            </div>
-
-            {deletingPost.featuredImagePublicId ? (
-              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-left flex items-start gap-2.5 text-[11px] text-amber-900">
-                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Cloudinary Asset Cleanup:</strong> The associated cover image (
-                  <code className="font-mono text-[10px] bg-amber-100/80 px-1 py-0.5 rounded">
-                    {deletingPost.featuredImagePublicId}
-                  </code>
-                  ) will also be permanently deleted from Cloudinary.
-                </span>
-              </div>
-            ) : deletingPost.featuredImage ? (
-              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-left flex items-start gap-2.5 text-[11px] text-amber-900">
-                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Note:</strong> Associated cloud image assets will also be wiped from Cloudinary.
-                </span>
-              </div>
-            ) : null}
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeletingPost(null)}
-                disabled={isDeletingPost}
-                className="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDeletePost}
-                disabled={isDeletingPost}
-                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-lg shadow-rose-600/20 transition-all disabled:opacity-50"
-              >
-                {isDeletingPost ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Deleting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Yes, Delete</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Article Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deletingPost)}
+        onClose={() => !isDeletingPost && setDeletingPost(null)}
+        onConfirm={handleConfirmDeletePost}
+        title="Delete Article"
+        itemName={deletingPost?.title}
+        warningDetails={
+          deletingPost?.featuredImagePublicId
+            ? `The associated cover image (${deletingPost.featuredImagePublicId}) will also be permanently deleted from Cloudinary.`
+            : deletingPost?.featuredImage
+            ? 'Associated cloud image assets will also be wiped from Cloudinary.'
+            : ''
+        }
+        isDeleting={isDeletingPost}
+      />
     </div>
   );
 }

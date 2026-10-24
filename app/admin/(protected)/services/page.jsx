@@ -17,6 +17,9 @@ import {
   Link2,
 } from 'lucide-react';
 
+import { useServiceStore } from '@/store/useServiceStore';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
+
 const ICON_OPTIONS = [
   { value: 'TrendingUp', label: 'TrendingUp (Growth)' },
   { value: 'Compass', label: 'Compass (Planning)' },
@@ -53,31 +56,31 @@ function autoSlug(name) {
 }
 
 export default function AdminServicesPage() {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    adminServices: services,
+    isLoading: loading,
+    isSaving: saving,
+    fetchServices,
+    createService,
+    updateService,
+    deleteService,
+    uploadMediaImage,
+  } = useServiceStore();
+
   const [editingService, setEditingService] = useState(null);
   const [isNew, setIsNew] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ type: '', text: '' });
   const [activeTab, setActiveTab] = useState('basic');
   const [imageUploading, setImageUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
   const imageInputRef = useRef(null);
   const bannerInputRef = useRef(null);
 
-  const fetchServices = async () => {
-    try {
-      const res = await fetch('/api/v1/admin/services');
-      const json = await res.json();
-      if (json.success) setServices(json.data);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchServices();
-  }, []);
+    fetchServices(true);
+  }, [fetchServices]);
 
   const handleOpenNew = () => {
     setIsNew(true);
@@ -95,76 +98,50 @@ export default function AdminServicesPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setMsg({ type: '', text: '' });
 
     try {
-      const method = isNew ? 'POST' : 'PUT';
-      const payload = isNew
-        ? editingService
-        : { id: editingService._id, ...editingService };
-
-      const res = await fetch('/api/v1/admin/services', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-
-      if (data.success) {
+      if (isNew) {
+        await createService(editingService);
         setMsg({ type: 'success', text: `Service "${editingService.name}" saved successfully!` });
-        setEditingService(null);
-        fetchServices();
       } else {
-        setMsg({ type: 'error', text: data.message || 'Failed to save service' });
+        await updateService(editingService._id, editingService);
+        setMsg({ type: 'success', text: `Service "${editingService.name}" updated successfully!` });
       }
-    } catch {
-      setMsg({ type: 'error', text: 'Network error — please try again.' });
-    } finally {
-      setSaving(false);
+      setEditingService(null);
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Failed to save service' });
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  const handleDelete = (id, name) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeletingTarget(true);
     try {
-      const res = await fetch(`/api/v1/admin/services?id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setMsg({ type: 'success', text: `Service "${name}" deleted.` });
-        fetchServices();
-      } else {
-        setMsg({ type: 'error', text: data.message || 'Delete failed' });
-      }
-    } catch {
-      setMsg({ type: 'error', text: 'Error deleting service' });
+      await deleteService(deleteTarget.id);
+      setMsg({ type: 'success', text: `Service "${deleteTarget.name}" deleted successfully.` });
+      setDeleteTarget(null);
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Delete failed' });
+    } finally {
+      setIsDeletingTarget(false);
     }
   };
 
-  // Upload image to media library API
+  // Upload image to media library API using Axios via store
   const uploadImage = async (file, field) => {
     const setUploading = field === 'image' ? setImageUploading : setBannerUploading;
     setUploading(true);
     try {
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        const base64 = ev.target.result;
-        const res = await fetch('/api/v1/admin/media', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: base64, filename: file.name, mimeType: file.type }),
-        });
-        const data = await res.json();
-        if (data.success && data.data?.url) {
-          setEditingService((prev) => ({ ...prev, [field]: data.data.url }));
-        } else {
-          // Fallback: use base64 directly if media API unavailable
-          setEditingService((prev) => ({ ...prev, [field]: base64 }));
-        }
-        setUploading(false);
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadMediaImage(file);
+      setEditingService((prev) => ({ ...prev, [field]: url }));
     } catch {
+      setMsg({ type: 'error', text: 'Error uploading image' });
+    } finally {
       setUploading(false);
     }
   };
@@ -910,6 +887,17 @@ export default function AdminServicesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Service"
+        itemName={deleteTarget?.name}
+        warningDetails="This will permanently delete this service discipline from the database and remove its public URL."
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }

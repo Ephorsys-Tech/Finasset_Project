@@ -278,7 +278,11 @@ export const authService = {
 
   async forgotPassword({ email, req }) {
     await connectToDatabase();
-    const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
+    const cleanEmail = (email || '').toLowerCase().trim();
+    if (!cleanEmail) {
+      throw new Error('Email is required');
+    }
+    const admin = await Admin.findOne({ email: cleanEmail });
     if (!admin) {
       // Return true to avoid revealing existence
       return true;

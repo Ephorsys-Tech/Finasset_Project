@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useEffect, use } from 'react';
 import Link from 'next/link';
 import {
   Calendar,
@@ -12,23 +12,28 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { useBlogStore } from '@/store/useBlogStore';
 
 export default function BlogDetailPage({ params }) {
   const unwrappedParams = use(params);
   const slug = unwrappedParams.slug;
 
-  const [blogData, setBlogData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    currentPost: post,
+    relatedPosts,
+    isDetailLoading: loading,
+    fetchPostBySlug,
+    clearCurrentPost,
+  } = useBlogStore();
 
   useEffect(() => {
-    fetch(`/api/v1/public/blog/${slug}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success) setBlogData(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [slug]);
+    if (slug) {
+      fetchPostBySlug(slug);
+    }
+    return () => {
+      clearCurrentPost();
+    };
+  }, [slug, fetchPostBySlug, clearCurrentPost]);
 
   if (loading) {
     return (
@@ -38,9 +43,6 @@ export default function BlogDetailPage({ params }) {
       </div>
     );
   }
-
-  const post = blogData?.post || (blogData?._id ? blogData : null);
-  const relatedPosts = blogData?.relatedPosts || [];
 
   if (!post) {
     return (
