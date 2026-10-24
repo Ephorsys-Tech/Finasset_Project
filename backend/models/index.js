@@ -19,6 +19,7 @@ import Enquiry from './Enquiry';
 import Media from './Media';
 import NriItem from './NriItem';
 import Video from './Video';
+import TaxationItem from './TaxationItem';
 
 export {
   Admin,
@@ -42,6 +43,7 @@ export {
   Media,
   NriItem,
   Video,
+  TaxationItem,
 };
 
 export default {
@@ -66,4 +68,5 @@ export default {
   Media,
   NriItem,
   Video,
+  TaxationItem,
 };
