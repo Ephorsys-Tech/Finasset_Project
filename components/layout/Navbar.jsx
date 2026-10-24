@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useServiceStore } from '@/store/useServiceStore';
 import {
   Phone,
   Mail,
@@ -42,7 +43,7 @@ export default function Navbar() {
   const [servicesDropdown, setServicesDropdown] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [servicesList, setServicesList] = useState([]);
+  const { services: servicesList, fetchServices } = useServiceStore();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -60,19 +61,10 @@ export default function Navbar() {
     setMobileServicesOpen(false);
   }, [pathname]);
 
-  // Fetch published services for the dropdown
+  // Fetch published services for the dropdown via Zustand and Axios
   useEffect(() => {
-    fetch('/api/v1/public/services')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success && Array.isArray(json.data)) {
-          setServicesList(json.data);
-        }
-      })
-      .catch(() => {
-        // Silently fail — dropdown will be empty or show fallback
-      });
-  }, []);
+    fetchServices(false);
+  }, [fetchServices]);
 
   // Don't render public navbar inside /admin routes
   if (pathname.startsWith('/admin')) {
