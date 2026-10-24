@@ -169,10 +169,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-r from-[#0f2b44] to-[#164366] rounded-3xl p-8 sm:p-14 text-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center shadow-xl">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#89b441] text-xs font-bold uppercase tracking-wider">
+              {/* <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#89b441] text-xs font-bold uppercase tracking-wider">
                 <Smartphone className="w-3.5 h-3.5 text-[#89b441]" />
                 <span>Wealth Anywhere</span>
-              </div>
+              </div> */}
 
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
                 Track, Analyze & Rebalance Your Wealth on the Go

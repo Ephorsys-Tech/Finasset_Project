@@ -33,6 +33,7 @@ export default function NriCornerPage() {
   const [loadingItems, setLoadingItems] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState(null);
+  const [hoveredId, setHoveredId] = useState(null);
 
   // Fetch dynamic NRI topics created by admin
   useEffect(() => {
@@ -191,10 +192,7 @@ export default function NriCornerPage() {
           <div id="knowledge-base" className="space-y-8 scroll-mt-24">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-flex items-center gap-1.5 mb-2.5">
-                  {/* <Sparkles className="w-3.5 h-3.5 text-[#f87b1f]" /> */}
-                  <span>NRI Knowledge Base &amp; Regulatory Guidelines</span>
-                </span>
+
                 <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0f2b44]">
                   Essential NRI Investment &amp; Regulatory Insights
                 </h2>
@@ -232,42 +230,73 @@ export default function NriCornerPage() {
             ) : (
               <div className="space-y-4">
                 {filteredItems.map((item, idx) => {
-                  const isExpanded = expandedId === item._id;
+                  const isOpen = expandedId === item._id || hoveredId === item._id;
                   return (
                     <div
                       key={item._id}
-                      className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:border-[#2376b8]/40 hover:shadow-md transition-all overflow-hidden"
+                      onMouseEnter={() => setHoveredId(item._id)}
+                      onMouseLeave={() => setHoveredId(null)}
+                      className={`group bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${
+                        isOpen
+                          ? 'border-[#2376b8]/50 shadow-md ring-1 ring-[#2376b8]/15'
+                          : 'border-slate-200/90 shadow-sm hover:border-[#2376b8]/40 hover:shadow-md'
+                      }`}
                     >
                       <button
                         type="button"
-                        onClick={() => setExpandedId(isExpanded ? null : item._id)}
-                        className="w-full p-6 text-left flex items-start justify-between gap-4 hover:bg-slate-50/50 transition-colors"
+                        onClick={() => setExpandedId(expandedId === item._id ? null : item._id)}
+                        className="w-full p-5 sm:p-6 text-left flex items-start justify-between gap-4 hover:bg-slate-50/60 transition-colors cursor-pointer"
+                        aria-expanded={isOpen}
                       >
                         <div className="flex items-start gap-3.5">
-                          <span className="w-7 h-7 rounded-lg bg-[#2376b8]/10 text-[#2376b8] font-black text-xs flex items-center justify-center shrink-0 mt-0.5 border border-[#2376b8]/15">
+                          <span
+                            className={`w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center shrink-0 mt-0.5 border transition-colors duration-300 ${
+                              isOpen
+                                ? 'bg-[#2376b8] text-white border-[#2376b8]'
+                                : 'bg-[#2376b8]/10 text-[#2376b8] border-[#2376b8]/15 group-hover:bg-[#2376b8]/20'
+                            }`}
+                          >
                             {idx + 1}
                           </span>
-                          <h3 className="text-base sm:text-lg font-bold text-[#0f2b44] leading-snug">
+                          <h3
+                            className={`text-base sm:text-lg font-bold leading-snug transition-colors duration-300 ${
+                              isOpen ? 'text-[#2376b8]' : 'text-[#0f2b44] group-hover:text-[#2376b8]'
+                            }`}
+                          >
                             {item.title}
                           </h3>
                         </div>
-                        <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 mt-0.5">
-                          {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-[#2376b8]" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-all duration-300 ${
+                            isOpen
+                              ? 'bg-[#2376b8]/10 text-[#2376b8]'
+                              : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                          }`}
+                        >
+                          <ChevronDown
+                            className={`w-4 h-4 transition-transform duration-300 ease-out ${
+                              isOpen ? 'rotate-180' : 'rotate-0'
+                            }`}
+                          />
                         </div>
                       </button>
 
-                      {/* Content Description (Visible or Expandable) */}
+                      {/* Smooth Transition Answer Container */}
                       <div
-                        className={`px-6 pb-6 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line border-t border-slate-100 ${
-                          isExpanded ? 'block' : 'block'
+                        className={`grid transition-all duration-300 ease-out ${
+                          isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                         }`}
+                        style={{
+                          gridTemplateRows: isOpen ? '1fr' : '0fr',
+                          transition: 'grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms ease-out',
+                        }}
                       >
-                        <div className="pl-10 text-slate-700 font-normal">
-                          {item.description}
+                        <div className="overflow-hidden">
+                          <div className="px-5 sm:px-6 pb-6 pt-2 text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line border-t border-slate-100">
+                            <div className="pl-0 sm:pl-10 text-slate-700 font-normal">
+                              {item.description}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
