@@ -123,13 +123,13 @@ export default function ClientPartners({ initialPartners = [] }) {
       `}</style>
 
       <div className="mx-auto mb-8 max-w-7xl px-4 text-center sm:mb-12 sm:px-6 lg:px-8">
-        <span className="inline-block rounded-full bg-[#2376b8]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#2376b8]">
+        {/* <span className="inline-block rounded-full bg-[#2376b8]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#2376b8]">
           Trusted By
-        </span>
+        </span> */}
         <h2 className="mt-3 text-2xl font-bold tracking-tight text-[#2376b8] sm:text-3xl lg:text-[34px]">
           Client Partners
         </h2>
-        <div className="mx-auto mt-2.5 h-1 w-12 rounded-full bg-[#2376b8]" />
+        {/* <div className="mx-auto mt-2.5 h-1 w-12 rounded-full bg-[#2376b8]" /> */}
       </div>
 
       {displayPartners.length === 0 ? (
