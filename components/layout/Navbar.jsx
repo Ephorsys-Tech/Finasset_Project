@@ -43,6 +43,7 @@ export default function Navbar() {
   const [servicesDropdown, setServicesDropdown] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [topBarHovered, setTopBarHovered] = useState(false);
   const { services: servicesList, fetchServices } = useServiceStore();
   const pathname = usePathname();
 
@@ -71,13 +72,25 @@ export default function Navbar() {
     return null;
   }
 
+  const isTopBarVisible = !scrolled || topBarHovered;
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white transition-all duration-300">
-      {/* Top Bar for Client & Employee Login & Contacts (Desktop Only, Right-aligned with Hover Slide-to-Left Reveal) */}
-      <div className="hidden sm:block bg-[#0f2b44] text-slate-300 text-xs py-1.5 px-4 sm:px-6 lg:px-8 border-b border-[#1b5d92]/40">
-        <div className="max-w-7xl mx-auto flex items-center justify-end">
+    <header
+      onMouseEnter={() => setTopBarHovered(true)}
+      onMouseLeave={() => setTopBarHovered(false)}
+      className="group/header sticky top-0 z-50 w-full bg-white transition-all duration-300"
+    >
+      {/* Top Bar for Client & Employee Login & Contacts (Collapses on scroll, smoothly reappears on hover) */}
+      <div
+        className={`w-full bg-[#0f2b44] text-slate-300 text-xs transition-all duration-300 ease-in-out border-b ${
+          isTopBarVisible
+            ? 'max-h-12 opacity-100 py-1.5 border-[#1b5d92]/40 pointer-events-auto overflow-hidden sm:overflow-visible'
+            : 'max-h-0 opacity-0 py-0 border-transparent overflow-hidden pointer-events-none group-hover/header:max-h-12 group-hover/header:opacity-100 group-hover/header:py-1.5 group-hover/header:border-[#1b5d92]/40 group-hover/header:pointer-events-auto'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-end">
           {/* 4 Interactive Logo Icon Sections on the Right */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* 1. Phone / Call Icon */}
             <a
               href="tel:+919437012345"
@@ -85,9 +98,9 @@ export default function Navbar() {
               className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#2376b8]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
             >
               <span className="w-4 h-4 flex items-center justify-center shrink-0">
-                <Phone className="w-3.5 h-3.5 text-[#2376b8] group-hover:text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
+                <Phone className="w-3.5 h-3.5 text-[#ffffff] group-hover:text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
               </span>
-              <span className="max-w-0 opacity-0 group-hover:max-w-[200px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-medium text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+              <span className="hidden sm:inline-block max-w-0 opacity-0 group-hover:max-w-[200px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-medium text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
                 +91 94370 12345
               </span>
             </a>
@@ -99,14 +112,12 @@ export default function Navbar() {
               className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#2376b8]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
             >
               <span className="w-4 h-4 flex items-center justify-center shrink-0">
-                <Mail className="w-3.5 h-3.5 text-[#2376b8] group-hover:text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
+                <Mail className="w-3.5 h-3.5 text-[#ffffff] group-hover:text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
               </span>
-              <span className="max-w-0 opacity-0 group-hover:max-w-[220px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-medium text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+              <span className="hidden sm:inline-block max-w-0 opacity-0 group-hover:max-w-[220px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-medium text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
                 contact@finassetwealth.com
               </span>
             </a>
-
-            <span className="text-slate-700 select-none">|</span>
 
             {/* 3. Client Login Icon */}
             <Link
@@ -115,9 +126,9 @@ export default function Navbar() {
               className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#f87b1f]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
             >
               <span className="w-4 h-4 flex items-center justify-center shrink-0">
-                <User className="w-3.5 h-3.5 text-[#f87b1f] group-hover:scale-110 transition-all duration-200" />
+                <User className="w-3.5 h-3.5 text-[#ffffff] group-hover:scale-110 transition-all duration-200" />
               </span>
-              <span className="max-w-0 opacity-0 group-hover:max-w-[160px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-semibold text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+              <span className="hidden sm:inline-block max-w-0 opacity-0 group-hover:max-w-[160px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-semibold text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
                 Client Login
               </span>
             </Link>
@@ -129,9 +140,9 @@ export default function Navbar() {
               className="group relative inline-flex items-center flex-row-reverse h-7 rounded-full bg-white/[0.07] hover:bg-[#163a5c] border border-white/10 hover:border-[#89b441]/60 px-2 transition-all duration-300 ease-out cursor-pointer"
             >
               <span className="w-4 h-4 flex items-center justify-center shrink-0">
-                <Briefcase className="w-3.5 h-3.5 text-[#89b441] group-hover:scale-110 transition-all duration-200" />
+                <Briefcase className="w-3.5 h-3.5 text-[#ffffff] group-hover:scale-110 transition-all duration-200" />
               </span>
-              <span className="max-w-0 opacity-0 group-hover:max-w-[160px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-semibold text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
+              <span className="hidden sm:inline-block max-w-0 opacity-0 group-hover:max-w-[160px] group-hover:opacity-100 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out text-[11px] font-semibold text-slate-200 pr-0 group-hover:pr-2 transform translate-x-2 group-hover:translate-x-0">
                 Employee Login
               </span>
             </Link>
