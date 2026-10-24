@@ -140,6 +140,7 @@ export default function AdminEnquiriesPage() {
 
   const getTypeBadgeClass = (type) => {
     const t = (type || '').toLowerCase();
+    if (t.includes('taxation') || t.includes('tax')) return 'bg-orange-100 text-orange-800 border-orange-300 font-extrabold';
     if (t.includes('nri')) return 'bg-cyan-100 text-cyan-800 border-cyan-300 font-extrabold';
     if (t.includes('consult')) return 'bg-indigo-100 text-indigo-800 border-indigo-200';
     if (t.includes('callback')) return 'bg-amber-100 text-amber-800 border-amber-200';
@@ -195,6 +196,16 @@ export default function AdminEnquiriesPage() {
           >
             <span>NRI Corner Enquiries</span>
           </button>
+          <button
+            onClick={() => setTypeFilter(typeFilter === 'taxation' ? 'ALL' : 'taxation')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              typeFilter === 'taxation'
+                ? 'bg-[#f87b1f] text-white shadow-xs'
+                : 'bg-orange-50 text-orange-800 border border-orange-200 hover:bg-orange-100'
+            }`}
+          >
+            <span>Taxation Enquiries</span>
+          </button>
         </div>
 
         {/* Type & Search */}
@@ -205,6 +216,7 @@ export default function AdminEnquiriesPage() {
             className="bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none"
           >
             <option value="ALL">All Sources & Types</option>
+            <option value="taxation">Taxation Enquiries</option>
             <option value="nri">NRI Consultations</option>
             <option value="consultation">Consultation Requests</option>
             <option value="callback">Callback Requests</option>
