@@ -1,180 +1,36 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import {
-  ExternalLink,
   ShieldCheck,
   Search,
   CheckCircle2,
   Info,
   Building2,
-  CreditCard,
   Lock,
   ArrowUpRight,
   X,
+  CreditCard,
 } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
-
-// Verified Life Insurance Companies - Direct Official Payment URLs
-const LIFE_INSURERS = [
-  {
-    id: 1,
-    name: 'Aegon Life Insurance',
-    alias: 'Now Bandhan Life',
-    code: 'BL',
-    url: 'https://www.bandhanlife.com/pay-premium',
-    description: 'Direct renewal payment portal for individual protection and life savings plans.',
-  },
-  {
-    id: 2,
-    name: 'Aviva Life Insurance',
-    alias: 'Aviva India',
-    code: 'AV',
-    url: 'https://online.avivaindia.com/online/paypremium',
-    description: 'Instant online premium payment gateway with immediate digital receipt acknowledgment.',
-  },
-  {
-    id: 3,
-    name: 'Bajaj Allianz Life Insurance',
-    alias: 'Bajaj Allianz Life',
-    code: 'BA',
-    url: 'https://www.bajajallianzlife.com/pay-premium-online.html',
-    description: 'Pay renewal premium seamlessly for savings, term, retirement, and ULIP policies.',
-  },
-  {
-    id: 4,
-    name: 'Birla Sun Life Insurance',
-    alias: 'Aditya Birla Sun Life Insurance',
-    code: 'AB',
-    url: 'https://lifeinsurance.adityabirlacapital.com/quick-pay',
-    description: 'Aditya Birla Capital Quick Pay gateway for fast, secure policy renewal.',
-  },
-  {
-    id: 5,
-    name: 'Bharti AXA Life Insurance',
-    alias: 'Bharti AXA Life',
-    code: 'BX',
-    url: 'https://www.bhartiaxalife.com/pay-premium',
-    description: 'Instant renewal portal for traditional, term, and investment-linked life plans.',
-  },
-  {
-    id: 6,
-    name: 'Canara HSBC OBC Life Insurance',
-    alias: 'Canara HSBC Life',
-    code: 'CH',
-    url: 'https://online.canarahsbclife.com/pay-premium.html',
-    description: 'Direct online payment gateway for Canara HSBC life insurance policies.',
-  },
-  {
-    id: 7,
-    name: 'DHFL Pramerica Life Insurance',
-    alias: 'Pramerica Life',
-    code: 'PL',
-    url: 'https://www.pramericalife.in/quick-pay',
-    description: 'Quick-Pay renewal gateway for individual protection and child education plans.',
-  },
-  {
-    id: 8,
-    name: 'Future Generali India Life Insurance',
-    alias: 'Future Generali Life',
-    code: 'FG',
-    url: 'https://life.futuregenerali.in/pay-premium',
-    description: 'Fast digital renewal premium payment via UPI, net banking, or debit card.',
-  },
-  {
-    id: 9,
-    name: 'HDFC Life Insurance',
-    alias: 'HDFC Life Quick Pay',
-    code: 'HD',
-    url: 'https://onlinepayments.hdfclife.com/',
-    description: 'Official instant online payments gateway for all HDFC Life policy renewals.',
-  },
-  {
-    id: 10,
-    name: 'ICICI Prudential Life Insurance',
-    alias: 'ICICI Pru Life',
-    code: 'IP',
-    url: 'https://pay.iciciprulife.com/portal/',
-    description: 'Direct renewal payment portal for ICICI Pru iProtect, term, and savings plans.',
-  },
-  {
-    id: 11,
-    name: 'IDBI Federal Life Insurance',
-    alias: 'Ageas Federal Life',
-    code: 'AF',
-    url: 'https://www.ageasfederal.com/pay-premium',
-    description: 'Official online payment portal for policy renewals and revival premiums.',
-  },
-  {
-    id: 12,
-    name: 'Tata AIA Life Insurance',
-    alias: 'Tata AIA QuickPay',
-    code: 'TA',
-    url: 'https://payment.tataaia.com/quickpay/',
-    description: 'Direct QuickPay portal for Sampoorna Raksha, term, and wealth plans.',
-  },
-  {
-    id: 13,
-    name: 'Kotak Mahindra Life Insurance',
-    alias: 'Kotak Life',
-    code: 'KM',
-    url: 'https://www.kotaklife.com/pay-premium-online',
-    description: 'Pay premium online directly using policy number and date of birth.',
-  },
-  {
-    id: 14,
-    name: 'LIC (Life Insurance Corporation of India)',
-    alias: 'LIC of India',
-    code: 'LIC',
-    url: 'https://licindia.in/payment-through-alternate-channels',
-    description: 'Official direct payment gateway for all individual and group LIC life policies.',
-  },
-  {
-    id: 15,
-    name: 'Max Life Insurance',
-    alias: 'Max Life Quick Pay',
-    code: 'ML',
-    url: 'https://www.maxlifeinsurance.com/pay-premium-online',
-    description: 'Online premium payment portal for Max Life Smart Secure Plus and savings plans.',
-  },
-  {
-    id: 16,
-    name: 'PNB MetLife India Insurance',
-    alias: 'PNB MetLife QuickPay',
-    code: 'PM',
-    url: 'https://online.pnbmetlife.com/quickpay',
-    description: 'QuickPay renewal portal for PNB MetLife protection and retirement policies.',
-  },
-  {
-    id: 17,
-    name: 'Reliance Nippon Life Insurance',
-    alias: 'Reliance Nippon Life',
-    code: 'RN',
-    url: 'https://www.reliancenipponlife.com/pay-premium-online',
-    description: 'Pay renewal premium online securely with instant digital payment receipt.',
-  },
-  {
-    id: 18,
-    name: 'SBI Life Insurance',
-    alias: 'SBI Life Quick Pay',
-    code: 'SB',
-    url: 'https://www.sbilife.co.in/pay-premium-online',
-    description: 'Official direct payment gateway for SBI Life eShield, Smart Shield, and pension plans.',
-  },
-];
+import { usePayPremiumStore } from '@/store/usePayPremiumStore';
 
 export default function PayPremiumPage() {
+  const { items, isLoading, fetchItems } = usePayPremiumStore();
   const [search, setSearch] = useState('');
 
-  const filteredInsurers = LIFE_INSURERS.filter((ins) => {
+  useEffect(() => {
+    fetchItems(false);
+  }, [fetchItems]);
+
+  const filteredInsurers = items.filter((ins) => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
-      ins.name.toLowerCase().includes(q) ||
-      ins.alias.toLowerCase().includes(q) ||
-      ins.code.toLowerCase().includes(q) ||
-      ins.description.toLowerCase().includes(q)
+      (ins.title || '').toLowerCase().includes(q) ||
+      (ins.shortTitle || '').toLowerCase().includes(q) ||
+      (ins.description || '').toLowerCase().includes(q) ||
+      (ins.link || '').toLowerCase().includes(q)
     );
   });
 
@@ -231,7 +87,7 @@ export default function PayPremiumPage() {
           {/* Results Summary */}
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>
-              Showing <span className="font-bold text-[#0f2b44]">{filteredInsurers.length}</span> of {LIFE_INSURERS.length} life insurance companies
+              Showing <span className="font-bold text-[#0f2b44]">{filteredInsurers.length}</span> of {items.length} life insurance companies
             </span>
             <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 font-semibold text-[11px]">
               <Lock className="w-3 h-3 text-emerald-600" />
@@ -239,72 +95,92 @@ export default function PayPremiumPage() {
             </span>
           </div>
 
-          {/* Clean Minimal Insurers Grid */}
-          {filteredInsurers.length === 0 ? (
+          {/* Loading State */}
+          {isLoading && items.length === 0 ? (
+            <div className="bg-white rounded-3xl p-16 border border-slate-200 text-center space-y-4">
+              <div className="animate-spin w-10 h-10 border-4 border-[#2376b8] border-t-transparent rounded-full mx-auto" />
+              <p className="text-xs font-semibold text-slate-500">
+                Loading official insurance payment gateways...
+              </p>
+            </div>
+          ) : filteredInsurers.length === 0 ? (
             <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-3">
               <Building2 className="w-10 h-10 text-slate-300 mx-auto" />
-              <h4 className="text-sm font-bold text-[#0f2b44]">No insurer found</h4>
-              <p className="text-xs text-slate-500">
-                No insurance company matches &ldquo;{search}&rdquo;. Try searching by name, short code, or parent company.
+              <h4 className="text-sm font-bold text-[#0f2b44]">
+                {items.length === 0 ? 'No Insurance Gateways Available' : 'No insurer found'}
+              </h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                {items.length === 0
+                  ? 'There are currently no insurer payment gateways published. Insurers added by the administrator will appear here.'
+                  : `No insurance company matches "${search}". Try searching by name, short code, or description.`}
               </p>
-              <button
-                type="button"
-                onClick={() => setSearch('')}
-                className="text-xs font-bold text-[#2376b8] hover:underline pt-2 block mx-auto"
-              >
-                Clear Search Filter
-              </button>
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="text-xs font-bold text-[#2376b8] hover:underline pt-2 block mx-auto"
+                >
+                  Clear Search Filter
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredInsurers.map((ins, index) => (
-                <div
-                  key={ins.id}
-                  className="group bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm hover:border-[#2376b8]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Top Header inside Card */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className="w-11 h-11 rounded-xl bg-[#0f2b44]/5 text-[#0f2b44] font-black text-xs flex items-center justify-center border border-[#0f2b44]/10 group-hover:bg-[#2376b8] group-hover:text-white group-hover:border-[#2376b8] transition-colors duration-300 shrink-0">
-                        {ins.code}
+              {filteredInsurers.map((ins) => {
+                const avatarCode =
+                  (ins.shortTitle || ins.title || 'IN')
+                    .slice(0, 3)
+                    .toUpperCase();
+
+                return (
+                  <div
+                    key={ins._id || ins.id}
+                    className="group bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm hover:border-[#2376b8]/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Top Header inside Card */}
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="w-11 h-11 rounded-xl bg-[#0f2b44]/5 text-[#0f2b44] font-black text-xs flex items-center justify-center border border-[#0f2b44]/10 group-hover:bg-[#2376b8] group-hover:text-white group-hover:border-[#2376b8] transition-colors duration-300 shrink-0">
+                          {avatarCode}
+                        </div>
+                        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2.5 py-1 rounded-full flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span>Direct Gateway</span>
+                        </span>
                       </div>
-                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50/90 border border-emerald-200/80 px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                        <span>Direct Gateway</span>
-                      </span>
+
+                      {/* Company Details */}
+                      <div className="space-y-1">
+                        <h3 className="text-base sm:text-lg font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors duration-300 leading-snug">
+                          {ins.title}
+                        </h3>
+                        {ins.shortTitle && (
+                          <p className="text-[11px] font-medium text-slate-500">
+                            {ins.shortTitle}
+                          </p>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-slate-600 leading-relaxed mt-3 pt-3 border-t border-slate-100">
+                        {ins.description}
+                      </p>
                     </div>
 
-                    {/* Company Details */}
-                    <div className="space-y-1">
-                      <h3 className="text-base sm:text-lg font-bold text-[#0f2b44] group-hover:text-[#2376b8] transition-colors duration-300 leading-snug">
-                        {ins.name}
-                      </h3>
-                      {ins.alias && (
-                        <p className="text-[11px] font-medium text-slate-500">
-                          {ins.alias}
-                        </p>
-                      )}
+                    {/* Direct Action Button */}
+                    <div className="pt-5 mt-4">
+                      <a
+                        href={ins.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-[#0f2b44] hover:bg-[#2376b8] text-white text-xs font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 group/btn shadow-sm"
+                      >
+                        <span>Pay Premium Online</span>
+                        <ArrowUpRight className="w-4 h-4 text-[#f87b1f] group-hover/btn:text-white group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all duration-200" />
+                      </a>
                     </div>
-
-                    <p className="text-xs text-slate-600 leading-relaxed mt-3 pt-3 border-t border-slate-100">
-                      {ins.description}
-                    </p>
                   </div>
-
-                  {/* Direct Action Button */}
-                  <div className="pt-5 mt-4">
-                    <a
-                      href={ins.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-[#0f2b44] hover:bg-[#2376b8] text-white text-xs font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 group/btn shadow-sm"
-                    >
-                      <span>Pay Premium Online</span>
-                      <ArrowUpRight className="w-4 h-4 text-[#f87b1f] group-hover/btn:text-white group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all duration-200" />
-                    </a>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
