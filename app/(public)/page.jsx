@@ -15,15 +15,10 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Phone,
-  Mail,
-  Clock,
   Sparkles,
   ExternalLink,
   Award,
-  Users,
   Target,
-  FileText,
   CreditCard,
   Zap,
   Play,
@@ -37,6 +32,7 @@ export default function HomePage () {
   const [loading, setLoading] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [newsTab, setNewsTab] = useState('popular')
+
   const [callbackForm, setCallbackForm] = useState({
     name: '',
     phone: '',
@@ -44,48 +40,89 @@ export default function HomePage () {
     preferredTime: 'Anytime',
     message: ''
   })
+
   const [submitting, setSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
+    let cancelled = false
+
     async function fetchHomeData () {
       try {
         const res = await fetch('/api/v1/public/home')
+
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`)
+        }
+
         const json = await res.json()
-        if (json.success) {
-          setHomeData(json.data)
+
+        if (!cancelled && json?.success) {
+          setHomeData(json.data || {})
         }
       } catch (err) {
-        console.error('Failed to fetch home data:', err)
+        if (!cancelled) {
+          console.error('Failed to fetch home data:', err)
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
+
     fetchHomeData()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  // Slide carousel timer
+  const slides = Array.isArray(homeData?.heroSlides) ? homeData.heroSlides : []
+
+  const services = Array.isArray(homeData?.services) ? homeData.services : []
+
+  const investorTools = Array.isArray(homeData?.investorTools)
+    ? homeData.investorTools
+    : []
+
+  const marketIndices = Array.isArray(homeData?.marketIndices)
+    ? homeData.marketIndices
+    : []
+
+  const newsItems = Array.isArray(homeData?.newsItems) ? homeData.newsItems : []
+
+  const testimonials = Array.isArray(homeData?.testimonials)
+    ? homeData.testimonials
+    : []
+
+  const partners = Array.isArray(homeData?.partners) ? homeData.partners : []
+
   useEffect(() => {
-    if (!homeData?.heroSlides?.length) return
+    if (slides.length <= 1) {
+      setCurrentSlide(0)
+      return
+    }
+
     const timer = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % homeData.heroSlides.length)
+      setCurrentSlide(prev => (prev + 1) % slides.length)
     }, 6000)
+
     return () => clearInterval(timer)
-  }, [homeData?.heroSlides])
+  }, [slides.length])
 
-  const slides = homeData?.heroSlides || []
-  const services = homeData?.services || []
-  const investorTools = homeData?.investorTools || []
-  const marketIndices = homeData?.marketIndices || []
-  const newsItems = homeData?.newsItems || []
-  const testimonials = homeData?.testimonials || []
-  const partners = homeData?.partners || []
+  // Keep the selected slide within the valid range if API data changes.
+  const activeSlide =
+    slides.length > 0 ? slides[currentSlide % slides.length] : null
 
-  const filteredNews = newsItems.filter(n => n.tab === newsTab)
+  const filteredNews = newsItems.filter(item => item?.tab === newsTab)
 
   const handleCallbackSubmit = async e => {
     e.preventDefault()
+
+    if (submitting) return
+
     setSubmitting(true)
     setSubmitError('')
     setSubmitSuccess(false)
@@ -93,29 +130,35 @@ export default function HomePage () {
     try {
       const res = await fetch('/api/v1/public/enquiry', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           ...callbackForm,
           type: 'callback',
           sourcePage: 'Homepage Call Back Form'
         })
       })
+
       const data = await res.json()
-      if (data.success) {
-        setSubmitSuccess(true)
-        setCallbackForm({
-          name: '',
-          phone: '',
-          serviceOfInterest: 'Mutual Funds & SIP',
-          preferredTime: 'Anytime',
-          message: ''
-        })
-      } else {
-        setSubmitError(data.message || 'Failed to submit request')
+
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || 'Failed to submit request')
       }
-    } catch {
+
+      setSubmitSuccess(true)
+
+      setCallbackForm({
+        name: '',
+        phone: '',
+        serviceOfInterest: 'Mutual Funds & SIP',
+        preferredTime: 'Anytime',
+        message: ''
+      })
+    } catch (err) {
       setSubmitError(
-        'Network error. Please try again or call our office directly.'
+        err.message ||
+          'Network error. Please try again or call our office directly.'
       )
     } finally {
       setSubmitting(false)
@@ -123,38 +166,42 @@ export default function HomePage () {
   }
 
   const getServiceIcon = iconName => {
+    const iconClass = 'w-6 h-6 text-[#C7A76C]'
+
     switch (iconName) {
       case 'Compass':
-        return <Compass className='w-6 h-6 text-[#C7A76C]' />
+        return <Compass className={iconClass} />
       case 'TrendingUp':
-        return <TrendingUp className='w-6 h-6 text-[#C7A76C]' />
+        return <TrendingUp className={iconClass} />
       case 'ShieldCheck':
-        return <ShieldCheck className='w-6 h-6 text-[#C7A76C]' />
+        return <ShieldCheck className={iconClass} />
       case 'Building':
-        return <Building className='w-6 h-6 text-[#C7A76C]' />
+        return <Building className={iconClass} />
       case 'Landmark':
-        return <Landmark className='w-6 h-6 text-[#C7A76C]' />
+        return <Landmark className={iconClass} />
       case 'PieChart':
-        return <PieChart className='w-6 h-6 text-[#C7A76C]' />
+        return <PieChart className={iconClass} />
       default:
-        return <TrendingUp className='w-6 h-6 text-[#C7A76C]' />
+        return <TrendingUp className={iconClass} />
     }
   }
 
   const getToolIcon = iconName => {
+    const iconClass = 'w-7 h-7 text-[#C7A76C]'
+
     switch (iconName) {
       case 'Calculator':
-        return <Calculator className='w-7 h-7 text-[#C7A76C]' />
+        return <Calculator className={iconClass} />
       case 'Target':
-        return <Target className='w-7 h-7 text-[#C7A76C]' />
+        return <Target className={iconClass} />
       case 'Activity':
-        return <TrendingUp className='w-7 h-7 text-[#C7A76C]' />
+        return <TrendingUp className={iconClass} />
       case 'CreditCard':
-        return <CreditCard className='w-7 h-7 text-[#C7A76C]' />
+        return <CreditCard className={iconClass} />
       case 'Zap':
-        return <Zap className='w-7 h-7 text-[#C7A76C]' />
+        return <Zap className={iconClass} />
       default:
-        return <Calculator className='w-7 h-7 text-[#C7A76C]' />
+        return <Calculator className={iconClass} />
     }
   }
 
@@ -162,93 +209,76 @@ export default function HomePage () {
     <div className='w-full'>
       {/* 1. HERO BANNER CAROUSEL */}
       <section className='relative w-full min-h-[580px] lg:min-h-[640px] bg-[#10243A] text-white flex items-center overflow-hidden'>
-        {/* Background gradient overlay */}
-        <div className='absolute inset-0 bg-gradient-to-r from-[#10243A] via-[#10243A]/90 to-[#10243A]/60 z-10' />
+        {activeSlide?.bgImageUrl || activeSlide?.imageUrl ? (
+          <div
+            className='absolute inset-0 bg-cover bg-center transition-all duration-1000 transform scale-105'
+            style={{
+              backgroundImage: `url("${
+                activeSlide.bgImageUrl || activeSlide.imageUrl
+              }")`
+            }}
+          />
+        ) : null}
 
-        {/* Slide Background Image */}
-        {slides.length > 0 &&
-          (slides[currentSlide]?.bgImageUrl ||
-            slides[currentSlide]?.imageUrl) && (
-            <div
-              className='absolute inset-0 bg-cover bg-center transition-all duration-1000 transform scale-105'
-              style={{
-                backgroundImage: `url(${
-                  slides[currentSlide].bgImageUrl ||
-                  slides[currentSlide].imageUrl
-                })`
-              }}
-            />
-          )}
+        <div className='absolute inset-0 bg-gradient-to-r from-[#10243A] via-[#10243A]/90 to-[#10243A]/60 z-10' />
 
         <div className='relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full'>
           <div className='max-w-3xl'>
-            {/* Slide Badge */}
             <div className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/40 text-[#dfc593] text-xs font-semibold uppercase tracking-wider mb-6'>
               <Sparkles className='w-3.5 h-3.5 text-[#C7A76C]' />
               <span>
-                {slides[currentSlide]?.badge ||
-                  slides[currentSlide]?.badgeText ||
+                {activeSlide?.badge ||
+                  activeSlide?.badgeText ||
                   'Finasset Wealth Management'}
               </span>
             </div>
 
-            {/* Slide Title */}
             <h1 className='text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-6'>
-              {slides[currentSlide]?.title ||
+              {activeSlide?.title ||
                 'Architecting Generational Wealth for Discerning Families'}
             </h1>
 
-            {/* Slide Subtitle */}
             <p className='text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl'>
-              {slides[currentSlide]?.description ||
-                slides[currentSlide]?.subtitle ||
+              {activeSlide?.description ||
+                activeSlide?.subtitle ||
                 'Personalized wealth management, structured portfolio strategies, and bespoke financial solutions guided by seasoned advisors in Bhubaneswar.'}
             </p>
 
-            {/* CTA Buttons */}
             <div className='flex flex-wrap items-center gap-4'>
               <Link
-                href={slides[currentSlide]?.cta1Url || '/services'}
+                href={activeSlide?.cta1Url || '/services'}
                 className='bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-sm sm:text-base px-6 py-3.5 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2 group'
               >
-                <span>
-                  {slides[currentSlide]?.cta1Text || 'Explore Our Services'}
-                </span>
+                <span>{activeSlide?.cta1Text || 'Explore Our Services'}</span>
                 <ArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
               </Link>
 
               <Link
-                href={
-                  slides[currentSlide]?.cta2Url ||
-                  '/investor/financial-calculator'
-                }
+                href={activeSlide?.cta2Url || '/investor/financial-calculator'}
                 className='bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-lg transition-all backdrop-blur-sm flex items-center gap-2'
               >
                 <Calculator className='w-4 h-4 text-[#C7A76C]' />
-                <span>
-                  {slides[currentSlide]?.cta2Text || 'Calculate Your Wealth'}
-                </span>
+                <span>{activeSlide?.cta2Text || 'Calculate Your Wealth'}</span>
               </Link>
             </div>
 
-            {/* Trust Pill */}
-            {slides[currentSlide]?.statsHighlight && (
+            {activeSlide?.statsHighlight && (
               <div className='mt-10 pt-6 border-t border-slate-700/60 inline-flex items-center gap-4 text-xs sm:text-sm text-slate-300'>
                 <div className='flex items-center gap-1.5 text-[#C7A76C] font-semibold'>
                   <ShieldCheck className='w-4 h-4' />
-                  <span>{slides[currentSlide].statsHighlight.label}:</span>
+                  <span>{activeSlide.statsHighlight.label}:</span>
                 </div>
                 <span className='text-white font-bold'>
-                  {slides[currentSlide].statsHighlight.value}
+                  {activeSlide.statsHighlight.value}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Carousel Arrows & Dots */}
           {slides.length > 1 && (
             <div className='flex items-center gap-4 mt-8'>
               <button
+                type='button'
                 onClick={() =>
                   setCurrentSlide(
                     prev => (prev - 1 + slides.length) % slides.length
@@ -259,10 +289,12 @@ export default function HomePage () {
               >
                 <ChevronLeft className='w-5 h-5' />
               </button>
+
               <div className='flex gap-1.5'>
                 {slides.map((_, idx) => (
                   <button
                     key={idx}
+                    type='button'
                     onClick={() => setCurrentSlide(idx)}
                     className={`h-2 rounded-full transition-all ${
                       currentSlide === idx
@@ -273,7 +305,9 @@ export default function HomePage () {
                   />
                 ))}
               </div>
+
               <button
+                type='button'
                 onClick={() =>
                   setCurrentSlide(prev => (prev + 1) % slides.length)
                 }
@@ -287,7 +321,7 @@ export default function HomePage () {
         </div>
       </section>
 
-      {/* 2. MARKET WATCH STRIP (Sensex, Nifty, Bank Nifty, Gold) */}
+      {/* 2. MARKET WATCH STRIP */}
       <section className='bg-white border-b border-slate-200 py-3 shadow-sm'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex flex-col md:flex-row items-center justify-between gap-4'>
@@ -298,29 +332,27 @@ export default function HomePage () {
 
             <div className='flex items-center gap-6 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 text-xs'>
               {marketIndices.map((idx, index) => {
-                // API fields can be missing or returned as strings. Validate them
-                // before calling toFixed() so incomplete market data cannot crash the page.
-                const changeValue = Number(idx?.change)
-                const percentChangeValue = Number(idx?.percentChange)
-                const currentValue = Number(idx?.currentValue)
+                const hasValue = value =>
+                  value !== null &&
+                  value !== undefined &&
+                  value !== '' &&
+                  Number.isFinite(Number(value))
 
-                const hasChange =
-                  idx?.change !== null &&
-                  idx?.change !== undefined &&
-                  idx?.change !== '' &&
-                  Number.isFinite(changeValue)
-                const hasPercentChange =
-                  idx?.percentChange !== null &&
-                  idx?.percentChange !== undefined &&
-                  idx?.percentChange !== '' &&
-                  Number.isFinite(percentChangeValue)
-                const hasCurrentValue =
-                  idx?.currentValue !== null &&
-                  idx?.currentValue !== undefined &&
-                  idx?.currentValue !== '' &&
-                  Number.isFinite(currentValue)
+                const hasChange = hasValue(idx?.change)
+                const hasPercentChange = hasValue(idx?.percentChange)
+                const hasCurrentValue = hasValue(idx?.currentValue)
 
-                const isPositive = hasChange ? changeValue >= 0 : true
+                const changeValue = hasChange ? Number(idx.change) : 0
+
+                const percentChangeValue = hasPercentChange
+                  ? Number(idx.percentChange)
+                  : 0
+
+                const currentValue = hasCurrentValue
+                  ? Number(idx.currentValue)
+                  : 0
+
+                const isPositive = changeValue >= 0
 
                 return (
                   <div
@@ -330,9 +362,11 @@ export default function HomePage () {
                     <span className='font-bold text-slate-700'>
                       {idx?.name || 'Market Index'}
                     </span>
+
                     <span className='font-semibold text-slate-900'>
                       {hasCurrentValue ? formatINR(currentValue) : 'N/A'}
                     </span>
+
                     <span
                       className={`font-semibold flex items-center ${
                         !hasChange
@@ -350,7 +384,9 @@ export default function HomePage () {
                       ) : (
                         'N/A'
                       )}
+
                       {' ('}
+
                       {hasPercentChange ? (
                         <>
                           {percentChangeValue >= 0 ? '+' : ''}
@@ -359,6 +395,7 @@ export default function HomePage () {
                       ) : (
                         'N/A'
                       )}
+
                       {')'}
                     </span>
                   </div>
@@ -377,7 +414,7 @@ export default function HomePage () {
         </div>
       </section>
 
-      {/* 3. INTRODUCTION TO FINASSET WEALTH (NLF Adhira Asset Services LLP) */}
+      {/* 3. INTRODUCTION TO FINASSET WEALTH */}
       <section className='py-20 bg-[#F8F7F3]'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
@@ -401,56 +438,46 @@ export default function HomePage () {
               </p>
 
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8'>
-                <div className='flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm'>
-                  <CheckCircle2 className='w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5' />
-                  <div>
-                    <h3 className='font-bold text-sm text-[#10243A]'>
-                      Goal-Based Portfolios
-                    </h3>
-                    <p className='text-xs text-slate-500 mt-0.5'>
-                      SIPs mapped to tangible retirement and education goals.
-                    </p>
+                {[
+                  {
+                    title: 'Goal-Based Portfolios',
+                    description:
+                      'SIPs mapped to tangible retirement and education goals.'
+                  },
+                  {
+                    title: '35+ Leading AMCs',
+                    description:
+                      'Unbiased fund selection across top mutual fund houses.'
+                  },
+                  {
+                    title: 'Comprehensive Protection',
+                    description:
+                      'High-cover pure term and indemnity health insurance.'
+                  },
+                  {
+                    title: 'Global NRI Solutions',
+                    description:
+                      'FEMA, NRE/NRO banking & repatriation assistance.'
+                  }
+                ].map(item => (
+                  <div
+                    key={item.title}
+                    className='flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm'
+                  >
+                    <CheckCircle2 className='w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5' />
+                    <div>
+                      <h3 className='font-bold text-sm text-[#10243A]'>
+                        {item.title}
+                      </h3>
+                      <p className='text-xs text-slate-500 mt-0.5'>
+                        {item.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                <div className='flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm'>
-                  <CheckCircle2 className='w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5' />
-                  <div>
-                    <h3 className='font-bold text-sm text-[#10243A]'>
-                      35+ Leading AMCs
-                    </h3>
-                    <p className='text-xs text-slate-500 mt-0.5'>
-                      Unbiased fund selection across top mutual fund houses.
-                    </p>
-                  </div>
-                </div>
-
-                <div className='flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm'>
-                  <CheckCircle2 className='w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5' />
-                  <div>
-                    <h3 className='font-bold text-sm text-[#10243A]'>
-                      Comprehensive Protection
-                    </h3>
-                    <p className='text-xs text-slate-500 mt-0.5'>
-                      High-cover pure term and indemnity health insurance.
-                    </p>
-                  </div>
-                </div>
-
-                <div className='flex items-start gap-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm'>
-                  <CheckCircle2 className='w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5' />
-                  <div>
-                    <h3 className='font-bold text-sm text-[#10243A]'>
-                      Global NRI Solutions
-                    </h3>
-                    <p className='text-xs text-slate-500 mt-0.5'>
-                      FEMA, NRE/NRO banking & repatriation assistance.
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
 
-              <div className='flex items-center gap-4'>
+              <div className='flex flex-wrap items-center gap-4'>
                 <Link
                   href='/about-us'
                   className='bg-[#10243A] hover:bg-[#1b3858] text-white font-semibold text-sm px-5 py-3 rounded-lg transition-all flex items-center gap-2'
@@ -469,7 +496,6 @@ export default function HomePage () {
               </div>
             </div>
 
-            {/* Visual Box / Image */}
             <div className='relative'>
               <div className='relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white'>
                 <img
@@ -477,11 +503,14 @@ export default function HomePage () {
                   alt='Finasset Wealth Financial Advisory'
                   className='w-full h-[440px] object-cover'
                 />
+
                 <div className='absolute inset-0 bg-gradient-to-t from-[#10243A] via-transparent to-transparent' />
+
                 <div className='absolute bottom-6 left-6 right-6 text-white'>
                   <span className='text-xs font-bold text-[#C7A76C] uppercase tracking-wider block'>
                     Our Commitment
                   </span>
+
                   <p className='text-lg font-bold leading-snug mt-1'>
                     &quot;We don&apos;t just allocate funds; we engineer your
                     family&apos;s peace of mind.&quot;
@@ -489,12 +518,12 @@ export default function HomePage () {
                 </div>
               </div>
 
-              {/* Floating Stat Card */}
               <div className='absolute -bottom-6 -right-4 sm:right-6 bg-white p-4 rounded-xl shadow-xl border border-slate-100 max-w-xs hidden sm:block'>
                 <div className='flex items-center gap-3'>
                   <div className='w-12 h-12 rounded-lg bg-[#10243A] flex items-center justify-center text-[#C7A76C]'>
                     <Shield className='w-6 h-6' />
                   </div>
+
                   <div>
                     <div className='text-xl font-extrabold text-[#10243A]'>
                       15+ Years
@@ -510,16 +539,18 @@ export default function HomePage () {
         </div>
       </section>
 
-      {/* 4. OUR SERVICES (6 Core Services) */}
+      {/* 4. OUR SERVICES */}
       <section className='py-20 bg-white'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='text-center max-w-3xl mx-auto mb-16'>
             <span className='text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2'>
               Holistic Wealth Solutions
             </span>
+
             <h2 className='text-3xl sm:text-4xl font-extrabold text-[#10243A] tracking-tight'>
               Bespoke Advisory Built Around Your Life Goals
             </h2>
+
             <p className='text-slate-600 mt-4 leading-relaxed'>
               Every financial journey is distinct. Explore our six core wealth
               disciplines designed to grow, safeguard, and transition your
@@ -528,47 +559,47 @@ export default function HomePage () {
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {services.map(service => (
+            {services.map((service, index) => (
               <div
-                key={service.slug}
+                key={service?.slug || index}
                 className='bg-[#F8F7F3] rounded-2xl p-7 border border-slate-200/80 hover:border-[#C7A76C]/60 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group'
               >
                 <div>
                   <div className='w-14 h-14 rounded-xl bg-[#10243A] flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform'>
-                    {getServiceIcon(service.iconName)}
+                    {getServiceIcon(service?.iconName)}
                   </div>
 
                   <h3 className='text-xl font-bold text-[#10243A] mb-3 group-hover:text-[#C7A76C] transition-colors'>
-                    {service.name}
+                    {service?.name || 'Financial Service'}
                   </h3>
 
                   <p className='text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3'>
-                    {service.shortDescription}
+                    {service?.shortDescription || ''}
                   </p>
 
-                  {/* Key Benefits Preview */}
-                  {service.keyBenefits && service.keyBenefits.length > 0 && (
-                    <ul className='space-y-2 mb-6 border-t border-slate-200/60 pt-4'>
-                      {service.keyBenefits.slice(0, 2).map((b, i) => (
-                        <li
-                          key={i}
-                          className='text-xs text-slate-700 flex items-center gap-2'
-                        >
-                          <CheckCircle2 className='w-3.5 h-3.5 text-[#C7A76C] shrink-0' />
-                          <span className='font-medium line-clamp-1'>
-                            {b.title}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  {Array.isArray(service?.keyBenefits) &&
+                    service.keyBenefits.length > 0 && (
+                      <ul className='space-y-2 mb-6 border-t border-slate-200/60 pt-4'>
+                        {service.keyBenefits.slice(0, 2).map((benefit, i) => (
+                          <li
+                            key={i}
+                            className='text-xs text-slate-700 flex items-center gap-2'
+                          >
+                            <CheckCircle2 className='w-3.5 h-3.5 text-[#C7A76C] shrink-0' />
+                            <span className='font-medium line-clamp-1'>
+                              {benefit?.title || ''}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                 </div>
 
                 <Link
-                  href={`/services/${service.slug}`}
+                  href={`/services/${service?.slug || ''}`}
                   className='inline-flex items-center gap-2 text-sm font-bold text-[#10243A] group-hover:text-[#C7A76C] transition-colors mt-2'
                 >
-                  <span>Explore {service.name}</span>
+                  <span>Explore {service?.name || 'Service'}</span>
                   <ArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
                 </Link>
               </div>
@@ -587,7 +618,7 @@ export default function HomePage () {
         </div>
       </section>
 
-      {/* 5. INVESTOR'S CORNER (5 Configurable Interactive Tiles) */}
+      {/* 5. INVESTOR'S CORNER */}
       <section className='py-20 bg-[#10243A] text-white relative overflow-hidden'>
         <div className='absolute top-0 right-0 w-96 h-96 bg-[#C7A76C]/10 rounded-full blur-3xl pointer-events-none' />
         <div className='absolute bottom-0 left-0 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl pointer-events-none' />
@@ -597,9 +628,11 @@ export default function HomePage () {
             <span className='text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2'>
               Investor Empowerment
             </span>
+
             <h2 className='text-3xl sm:text-4xl font-extrabold text-white tracking-tight'>
               Investor&apos;s Corner — Interactive Tools & Portals
             </h2>
+
             <p className='text-slate-300 mt-4 leading-relaxed'>
               Equip yourself with institutional-grade financial utilities.
               Calculate compounding wealth, test your risk tolerance, diagnose
@@ -608,35 +641,36 @@ export default function HomePage () {
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {investorTools.map(tool => (
+            {investorTools.map((tool, index) => (
               <div
-                key={tool.key}
+                key={tool?.key || index}
                 className='bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-[#C7A76C]/60 transition-all duration-300 flex flex-col justify-between group backdrop-blur-sm'
               >
                 <div>
                   <div className='flex items-center justify-between mb-4'>
                     <div className='w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center'>
-                      {getToolIcon(tool.iconName)}
+                      {getToolIcon(tool?.iconName)}
                     </div>
+
                     <span className='text-[11px] font-bold uppercase tracking-wider text-[#dfc593] bg-[#C7A76C]/15 px-2.5 py-1 rounded-full border border-[#C7A76C]/30'>
-                      {tool.badge}
+                      {tool?.badge || 'Investor Tool'}
                     </span>
                   </div>
 
                   <h3 className='text-xl font-bold text-white mb-2 group-hover:text-[#C7A76C] transition-colors'>
-                    {tool.title}
+                    {tool?.title || 'Financial Tool'}
                   </h3>
 
                   <p className='text-slate-300 text-sm leading-relaxed mb-6'>
-                    {tool.shortDescription}
+                    {tool?.shortDescription || ''}
                   </p>
                 </div>
 
                 <Link
-                  href={tool.url}
+                  href={tool?.url || '/investor/financial-calculator'}
                   className='bg-[#C7A76C] hover:bg-[#dfc593] text-[#10243A] font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 group-hover:shadow-md'
                 >
-                  <span>{tool.actionText}</span>
+                  <span>{tool?.actionText || 'Explore Tool'}</span>
                   <ArrowRight className='w-3.5 h-3.5' />
                 </Link>
               </div>
@@ -645,7 +679,7 @@ export default function HomePage () {
         </div>
       </section>
 
-      {/* 6. NEWS TABS (Popular, IPO, Market) */}
+      {/* 6. NEWS TABS */}
       <section className='py-20 bg-white'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex flex-col md:flex-row items-center justify-between mb-12 gap-6'>
@@ -653,79 +687,76 @@ export default function HomePage () {
               <span className='text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-1'>
                 Market Intelligence
               </span>
+
               <h2 className='text-3xl font-extrabold text-[#10243A] tracking-tight'>
                 Latest Financial Insights & Market News
               </h2>
             </div>
 
-            {/* Tab Buttons */}
             <div className='flex items-center bg-[#F8F7F3] p-1.5 rounded-xl border border-slate-200'>
-              <button
-                onClick={() => setNewsTab('popular')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  newsTab === 'popular'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#10243A]'
-                }`}
-              >
-                Popular
-              </button>
-              <button
-                onClick={() => setNewsTab('ipo')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  newsTab === 'ipo'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#10243A]'
-                }`}
-              >
-                IPO Watch
-              </button>
-              <button
-                onClick={() => setNewsTab('market')}
-                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
-                  newsTab === 'market'
-                    ? 'bg-[#10243A] text-white shadow-sm'
-                    : 'text-slate-600 hover:text-[#10243A]'
-                }`}
-              >
-                Market Desk
-              </button>
+              {[
+                { value: 'popular', label: 'Popular' },
+                { value: 'ipo', label: 'IPO Watch' },
+                { value: 'market', label: 'Market Desk' }
+              ].map(tab => (
+                <button
+                  key={tab.value}
+                  type='button'
+                  onClick={() => setNewsTab(tab.value)}
+                  className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+                    newsTab === tab.value
+                      ? 'bg-[#10243A] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-[#10243A]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {filteredNews.map((item, idx) => (
-              <div
-                key={idx}
-                className='bg-[#F8F7F3] rounded-2xl p-6 border border-slate-200/80 hover:shadow-md transition-shadow flex flex-col justify-between'
-              >
-                <div>
-                  <div className='flex items-center justify-between text-xs text-slate-400 mb-3'>
-                    <span className='font-semibold text-[#10243A] bg-white px-2.5 py-1 rounded border border-slate-200'>
-                      {item.badge}
-                    </span>
-                    <span>{item.source}</span>
+          {filteredNews.length > 0 ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+              {filteredNews.map((item, index) => (
+                <div
+                  key={item?._id || item?.id || index}
+                  className='bg-[#F8F7F3] rounded-2xl p-6 border border-slate-200/80 hover:shadow-md transition-shadow flex flex-col justify-between'
+                >
+                  <div>
+                    <div className='flex items-center justify-between text-xs text-slate-400 mb-3 gap-2'>
+                      <span className='font-semibold text-[#10243A] bg-white px-2.5 py-1 rounded border border-slate-200'>
+                        {item?.badge || 'Market Update'}
+                      </span>
+
+                      <span>{item?.source || ''}</span>
+                    </div>
+
+                    <h3 className='text-lg font-bold text-[#10243A] mb-3 leading-snug hover:text-[#C7A76C] transition-colors'>
+                      {item?.title || 'Financial Market Update'}
+                    </h3>
+
+                    <p className='text-sm text-slate-600 leading-relaxed mb-6'>
+                      {item?.summary || ''}
+                    </p>
                   </div>
 
-                  <h3 className='text-lg font-bold text-[#10243A] mb-3 leading-snug hover:text-[#C7A76C] transition-colors'>
-                    {item.title}
-                  </h3>
-
-                  <p className='text-sm text-slate-600 leading-relaxed mb-6'>
-                    {item.summary}
-                  </p>
+                  <Link
+                    href={item?.url || '/market-update'}
+                    className='text-xs font-bold text-[#C7A76C] hover:text-[#a88547] flex items-center gap-1.5'
+                  >
+                    <span>Read Full Market Brief</span>
+                    <ArrowRight className='w-3.5 h-3.5' />
+                  </Link>
                 </div>
-
-                <Link
-                  href={item.url || '/market-update'}
-                  className='text-xs font-bold text-[#C7A76C] hover:text-[#a88547] flex items-center gap-1.5'
-                >
-                  <span>Read Full Market Brief</span>
-                  <ArrowRight className='w-3.5 h-3.5' />
-                </Link>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className='text-center py-12 bg-[#F8F7F3] rounded-2xl border border-slate-200'>
+              <p className='text-slate-600 text-sm'>
+                No news available in this category right now.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -751,24 +782,19 @@ export default function HomePage () {
               </p>
 
               <div className='space-y-3 mb-8'>
-                <div className='flex items-center gap-3 text-sm text-slate-200'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C] shrink-0' />
-                  <span>
-                    Historical rolling returns of Nifty 50 over 15 years
-                  </span>
-                </div>
-                <div className='flex items-center gap-3 text-sm text-slate-200'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C] shrink-0' />
-                  <span>
-                    The psychological trap of waiting for market corrections
-                  </span>
-                </div>
-                <div className='flex items-center gap-3 text-sm text-slate-200'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C] shrink-0' />
-                  <span>
-                    Step-up SIP strategies for salaried and business clients
-                  </span>
-                </div>
+                {[
+                  'Historical rolling returns of Nifty 50 over 15 years',
+                  'The psychological trap of waiting for market corrections',
+                  'Step-up SIP strategies for salaried and business clients'
+                ].map(item => (
+                  <div
+                    key={item}
+                    className='flex items-center gap-3 text-sm text-slate-200'
+                  >
+                    <CheckCircle2 className='w-4 h-4 text-[#C7A76C] shrink-0' />
+                    <span>{item}</span>
+                  </div>
+                ))}
               </div>
 
               <Link
@@ -780,19 +806,20 @@ export default function HomePage () {
               </Link>
             </div>
 
-            {/* Video Thumbnail / Mockup */}
             <div className='lg:col-span-6 relative bg-slate-900 flex items-center justify-center p-8 min-h-[320px]'>
-              <div className='relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer'>
+              <div className='relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 group'>
                 <img
                   src='https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=1200&auto=format&fit=crop'
                   alt='Financial Planning Video'
                   className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
                 />
+
                 <div className='absolute inset-0 bg-black/40 flex items-center justify-center'>
-                  <div className='w-16 h-16 rounded-full bg-[#C7A76C] text-[#10243A] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform'>
+                  <div className='w-16 h-16 rounded-full bg-[#C7A76C] text-[#10243A] flex items-center justify-center shadow-xl'>
                     <Play className='w-7 h-7 fill-current ml-1' />
                   </div>
                 </div>
+
                 <div className='absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm p-3 rounded-lg text-xs text-white'>
                   Finasset Wealth Masterclass: Disciplined Rupee Compounding
                   (Odisha Edition)
@@ -811,7 +838,7 @@ export default function HomePage () {
               <div className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#dfc593] text-xs font-bold uppercase tracking-wider'>
                 <Smartphone className='w-3.5 h-3.5 text-[#C7A76C]' />
                 <span>Wealth Anywhere</span>
-              </div> */}
+              </div>
 
               <h2 className='text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight'>
                 Track, Analyze & Rebalance Your Wealth on the Go
@@ -825,22 +852,17 @@ export default function HomePage () {
               </p>
 
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-200'>
-                <div className='flex items-center gap-2'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C]' />
-                  <span>Consolidated Multi-AMC Tracking</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C]' />
-                  <span>One-Click Capital Gains (Tax) Reports</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C]' />
-                  <span>Bank-Grade 256-Bit Security</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <CheckCircle2 className='w-4 h-4 text-[#C7A76C]' />
-                  <span>Family Portfolio Aggregation</span>
-                </div>
+                {[
+                  'Consolidated Multi-AMC Tracking',
+                  'One-Click Capital Gains (Tax) Reports',
+                  'Bank-Grade 256-Bit Security',
+                  'Family Portfolio Aggregation'
+                ].map(item => (
+                  <div key={item} className='flex items-center gap-2'>
+                    <CheckCircle2 className='w-4 h-4 text-[#C7A76C]' />
+                    <span>{item}</span>
+                  </div>
+                ))}
               </div>
 
               <div className='pt-4 flex flex-wrap items-center gap-4'>
@@ -866,12 +888,15 @@ export default function HomePage () {
                       <span>Finasset Wealth</span>
                       <span className='text-emerald-400'>● LIVE</span>
                     </div>
+
                     <div className='text-xs text-slate-400 font-medium'>
                       Total Family Portfolio
                     </div>
+
                     <div className='text-2xl font-extrabold text-white mt-1'>
                       ₹1,42,85,920
                     </div>
+
                     <div className='text-xs text-emerald-400 font-semibold mt-1'>
                       ▲ +14.8% Annualized CAGR
                     </div>
@@ -881,10 +906,12 @@ export default function HomePage () {
                         <span className='text-slate-300'>Equity Funds</span>
                         <span className='font-bold text-[#C7A76C]'>65%</span>
                       </div>
+
                       <div className='bg-slate-900 p-2.5 rounded-xl flex justify-between items-center text-xs'>
                         <span className='text-slate-300'>Debt & FDs</span>
                         <span className='font-bold text-slate-300'>25%</span>
                       </div>
+
                       <div className='bg-slate-900 p-2.5 rounded-xl flex justify-between items-center text-xs'>
                         <span className='text-slate-300'>Gold & Sovereign</span>
                         <span className='font-bold text-amber-400'>10%</span>
@@ -909,9 +936,11 @@ export default function HomePage () {
             <span className='text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2'>
               Client Trust & Voices
             </span>
+
             <h2 className='text-3xl sm:text-4xl font-extrabold text-[#10243A] tracking-tight'>
               Trusted by Discerning Families Across Odisha
             </h2>
+
             <p className='text-slate-600 mt-4 leading-relaxed'>
               Real stories of financial discipline, goal achievement, and
               transparent fiduciary stewardship.
@@ -919,36 +948,49 @@ export default function HomePage () {
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-            {testimonials.map((t, idx) => (
-              <div
-                key={idx}
-                className='bg-white rounded-2xl p-7 border border-slate-200/80 shadow-sm flex flex-col justify-between'
-              >
-                <div>
-                  <div className='flex items-center gap-1 text-amber-400 mb-4'>
-                    {[...Array(t.rating || 5)].map((_, i) => (
-                      <Star key={i} className='w-4 h-4 fill-current' />
-                    ))}
-                  </div>
+            {testimonials.map((testimonial, index) => {
+              const rating = Math.max(
+                0,
+                Math.min(5, Number(testimonial?.rating) || 5)
+              )
 
-                  <p className='text-slate-700 text-sm leading-relaxed mb-6 italic'>
-                    &quot;{t.reviewText}&quot;
-                  </p>
-                </div>
+              const clientName = testimonial?.clientName || 'Client'
 
-                <div className='flex items-center gap-3 pt-4 border-t border-slate-100'>
-                  <div className='w-10 h-10 rounded-full bg-[#10243A] text-[#C7A76C] flex items-center justify-center font-bold text-sm'>
-                    {t.clientName.charAt(0)}
-                  </div>
+              return (
+                <div
+                  key={testimonial?._id || index}
+                  className='bg-white rounded-2xl p-7 border border-slate-200/80 shadow-sm flex flex-col justify-between'
+                >
                   <div>
-                    <h3 className='font-bold text-sm text-[#10243A]'>
-                      {t.clientName}
-                    </h3>
-                    <p className='text-xs text-slate-500'>{t.designation}</p>
+                    <div className='flex items-center gap-1 text-amber-400 mb-4'>
+                      {Array.from({ length: rating }).map((_, i) => (
+                        <Star key={i} className='w-4 h-4 fill-current' />
+                      ))}
+                    </div>
+
+                    <p className='text-slate-700 text-sm leading-relaxed mb-6 italic'>
+                      &quot;{testimonial?.reviewText || ''}&quot;
+                    </p>
+                  </div>
+
+                  <div className='flex items-center gap-3 pt-4 border-t border-slate-100'>
+                    <div className='w-10 h-10 rounded-full bg-[#10243A] text-[#C7A76C] flex items-center justify-center font-bold text-sm'>
+                      {clientName.charAt(0)}
+                    </div>
+
+                    <div>
+                      <h3 className='font-bold text-sm text-[#10243A]'>
+                        {clientName}
+                      </h3>
+
+                      <p className='text-xs text-slate-500'>
+                        {testimonial?.designation || ''}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -964,16 +1006,17 @@ export default function HomePage () {
           </div>
 
           <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 items-center'>
-            {partners.map((p, idx) => (
+            {partners.map((partner, index) => (
               <div
-                key={idx}
+                key={partner?._id || index}
                 className='bg-[#F8F7F3] p-4 rounded-xl border border-slate-200/60 text-center hover:border-[#C7A76C] transition-colors'
               >
                 <span className='text-xs font-bold text-[#10243A] block'>
-                  {p.name}
+                  {partner?.name || 'Partner'}
                 </span>
+
                 <span className='text-[10px] text-slate-400 block mt-0.5'>
-                  {p.category}
+                  {partner?.category || ''}
                 </span>
               </div>
             ))}
@@ -981,7 +1024,7 @@ export default function HomePage () {
         </div>
       </section>
 
-      {/* 11. REQUEST A CALL BACK FORM (Working End-to-End) */}
+      {/* 11. REQUEST A CALL BACK FORM */}
       <section id='callback' className='py-20 bg-[#10243A] text-white'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='max-w-4xl mx-auto bg-slate-900 rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-2xl'>
@@ -989,9 +1032,11 @@ export default function HomePage () {
               <span className='text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-2'>
                 Personalized Consultation
               </span>
+
               <h2 className='text-3xl font-extrabold text-white tracking-tight'>
                 Request a Confidential Call Back
               </h2>
+
               <p className='text-slate-300 text-sm mt-3 leading-relaxed'>
                 Connect with our senior wealth advisors in Bhubaneswar to
                 discuss your financial roadmap, portfolio health checkup, or
@@ -1002,14 +1047,18 @@ export default function HomePage () {
             {submitSuccess ? (
               <div className='bg-emerald-950/60 border border-emerald-500/50 p-6 rounded-2xl text-center space-y-3'>
                 <CheckCircle2 className='w-12 h-12 text-emerald-400 mx-auto' />
+
                 <h3 className='text-lg font-bold text-white'>
                   Request Received Successfully
                 </h3>
+
                 <p className='text-sm text-slate-300'>
                   Thank you! Our advisory team at Saheed Nagar / Jaydev Vihar
                   will contact you at your preferred time.
                 </p>
+
                 <button
+                  type='button'
                   onClick={() => setSubmitSuccess(false)}
                   className='mt-2 text-xs font-semibold text-[#C7A76C] underline'
                 >
@@ -1019,45 +1068,61 @@ export default function HomePage () {
             ) : (
               <form onSubmit={handleCallbackSubmit} className='space-y-5'>
                 {submitError && (
-                  <div className='bg-rose-950/60 border border-rose-500/50 text-rose-200 text-sm p-4 rounded-xl'>
+                  <div
+                    role='alert'
+                    className='bg-rose-950/60 border border-rose-500/50 text-rose-200 text-sm p-4 rounded-xl'
+                  >
                     {submitError}
                   </div>
                 )}
 
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
                   <div>
-                    <label className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'>
+                    <label
+                      htmlFor='callback-name'
+                      className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'
+                    >
                       Your Full Name *
                     </label>
+
                     <input
+                      id='callback-name'
                       type='text'
                       required
+                      autoComplete='name'
                       placeholder='e.g. Ramesh Mohanty'
                       value={callbackForm.name}
                       onChange={e =>
-                        setCallbackForm({
-                          ...callbackForm,
+                        setCallbackForm(prev => ({
+                          ...prev,
                           name: e.target.value
-                        })
+                        }))
                       }
                       className='w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#C7A76C]'
                     />
                   </div>
 
                   <div>
-                    <label className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'>
+                    <label
+                      htmlFor='callback-phone'
+                      className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'
+                    >
                       Phone Number *
                     </label>
+
                     <input
+                      id='callback-phone'
                       type='tel'
                       required
+                      autoComplete='tel'
+                      inputMode='tel'
                       placeholder='e.g. +91 94370 12345'
                       value={callbackForm.phone}
                       onChange={e =>
-                        setCallbackForm({
-                          ...callbackForm,
+                        setCallbackForm(prev => ({
+                          ...prev,
                           phone: e.target.value
-                        })
+                        }))
                       }
                       className='w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#C7A76C]'
                     />
@@ -1066,37 +1131,48 @@ export default function HomePage () {
 
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
                   <div>
-                    <label className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'>
+                    <label
+                      htmlFor='callback-service'
+                      className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'
+                    >
                       Area of Interest
                     </label>
+
                     <select
+                      id='callback-service'
                       value={callbackForm.serviceOfInterest}
                       onChange={e =>
-                        setCallbackForm({
-                          ...callbackForm,
+                        setCallbackForm(prev => ({
+                          ...prev,
                           serviceOfInterest: e.target.value
-                        })
+                        }))
                       }
                       className='w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#C7A76C]'
                     >
                       <option value='Mutual Funds & SIP'>
                         Mutual Funds & Systematic Investment Plan (SIP)
                       </option>
+
                       <option value='Comprehensive Financial Planning'>
                         Comprehensive Financial Planning
                       </option>
+
                       <option value='Life & Health Insurance'>
                         Life & Health Insurance Planning
                       </option>
+
                       <option value='NRI Wealth Advisory'>
                         NRI Wealth & Repatriation Advisory
                       </option>
+
                       <option value='Real Estate Advisory'>
                         Real Estate Property Advisory
                       </option>
+
                       <option value='Fixed Deposits & Bonds'>
                         Fixed Deposits & Bonds
                       </option>
+
                       <option value='Portfolio Management (PMS)'>
                         Portfolio Management Service (PMS)
                       </option>
@@ -1104,28 +1180,36 @@ export default function HomePage () {
                   </div>
 
                   <div>
-                    <label className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'>
+                    <label
+                      htmlFor='callback-time'
+                      className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'
+                    >
                       Preferred Callback Window
                     </label>
+
                     <select
+                      id='callback-time'
                       value={callbackForm.preferredTime}
                       onChange={e =>
-                        setCallbackForm({
-                          ...callbackForm,
+                        setCallbackForm(prev => ({
+                          ...prev,
                           preferredTime: e.target.value
-                        })
+                        }))
                       }
                       className='w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#C7A76C]'
                     >
                       <option value='Anytime'>
                         Anytime during business hours
                       </option>
+
                       <option value='Morning (10:00 AM - 1:00 PM)'>
                         Morning (10:00 AM - 1:00 PM)
                       </option>
+
                       <option value='Afternoon (1:00 PM - 4:00 PM)'>
                         Afternoon (1:00 PM - 4:00 PM)
                       </option>
+
                       <option value='Evening (4:00 PM - 7:00 PM)'>
                         Evening (4:00 PM - 7:00 PM)
                       </option>
@@ -1134,18 +1218,23 @@ export default function HomePage () {
                 </div>
 
                 <div>
-                  <label className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'>
+                  <label
+                    htmlFor='callback-message'
+                    className='block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider'
+                  >
                     Brief Note or Question (Optional)
                   </label>
+
                   <textarea
+                    id='callback-message'
                     rows={3}
                     placeholder='Tell us about your investment horizon or specific financial question...'
                     value={callbackForm.message}
                     onChange={e =>
-                      setCallbackForm({
-                        ...callbackForm,
+                      setCallbackForm(prev => ({
+                        ...prev,
                         message: e.target.value
-                      })
+                      }))
                     }
                     className='w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#C7A76C]'
                   />
@@ -1155,12 +1244,13 @@ export default function HomePage () {
                   <button
                     type='submit'
                     disabled={submitting}
-                    className='w-full sm:w-auto bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 text-[#10243A] font-extrabold text-sm sm:text-base px-8 py-4 rounded-xl shadow-lg transition-all'
+                    className='w-full sm:w-auto bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 disabled:cursor-not-allowed text-[#10243A] font-extrabold text-sm sm:text-base px-8 py-4 rounded-xl shadow-lg transition-all'
                   >
                     {submitting
                       ? 'Submitting Request...'
                       : 'Schedule Confidential Call Back'}
                   </button>
+
                   <p className='text-xs text-slate-500 mt-3'>
                     We maintain strict confidentiality. Your details will never
                     be shared with third parties.
