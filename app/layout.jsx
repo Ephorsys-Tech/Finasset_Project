@@ -1,6 +1,7 @@
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import Providers from '@/context/Providers';
 
 export const metadata = {
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <main className="flex-grow">{children}</main>
           <Footer />
+          <WhatsAppButton />
         </Providers>
       </body>
     </html>
