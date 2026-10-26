@@ -3,6 +3,18 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
+  // Handle bare /admin path
+  if (pathname === '/admin') {
+    const accessToken =
+      request.cookies.get('finasset_access_token')?.value ||
+      request.cookies.get('admin_access_token')?.value;
+    const refreshToken =
+      request.cookies.get('finasset_refresh_token')?.value ||
+      request.cookies.get('admin_refresh_token')?.value;
+    const isAuthed = Boolean(accessToken || refreshToken);
+    return NextResponse.redirect(new URL(isAuthed ? '/admin/dashboard' : '/admin/login', request.url));
+  }
+
   // Protect admin protected routes
   const isAuthPage =
     pathname === '/admin/login' ||
@@ -11,8 +23,12 @@ export function middleware(request) {
 
   const isAdminRoute = pathname.startsWith('/admin') && !pathname.startsWith('/api');
 
-  const accessToken = request.cookies.get('admin_access_token')?.value;
-  const refreshToken = request.cookies.get('admin_refresh_token')?.value;
+  const accessToken =
+    request.cookies.get('finasset_access_token')?.value ||
+    request.cookies.get('admin_access_token')?.value;
+  const refreshToken =
+    request.cookies.get('finasset_refresh_token')?.value ||
+    request.cookies.get('admin_refresh_token')?.value;
   const isAuthenticated = Boolean(accessToken || refreshToken);
 
   // If user is on an auth page but already logged in, redirect to dashboard

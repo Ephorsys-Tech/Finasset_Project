@@ -14,8 +14,12 @@ import {
   Mail,
   X,
   Plus,
+  Eye,
+  Calendar,
+  Compass,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState([]);
@@ -25,8 +29,12 @@ export default function AdminEnquiriesPage() {
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [search, setSearch] = useState('');
   const [activeNotesEnquiry, setActiveNotesEnquiry] = useState(null);
+  const [selectedDetailsEnquiry, setSelectedDetailsEnquiry] = useState(null);
   const [newNoteText, setNewNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeletingTarget, setIsDeletingTarget] = useState(false);
 
   const fetchEnquiries = async (page = 1) => {
     setLoading(true);
@@ -40,7 +48,13 @@ export default function AdminEnquiriesPage() {
       const json = await res.json();
       if (json.success) {
         setEnquiries(json.data.enquiries || []);
-        setPagination(json.data.pagination || { page: 1, totalPages: 1, total: 0 });
+        setPagination(
+          json.data.pagination || {
+            page: json.data.page || 1,
+            totalPages: json.data.totalPages || 1,
+            total: json.data.total || 0,
+          }
+        );
       }
     } finally {
       setLoading(false);
@@ -61,6 +75,9 @@ export default function AdminEnquiriesPage() {
       const data = await res.json();
       if (data.success) {
         fetchEnquiries(pagination.page);
+        if (selectedDetailsEnquiry && selectedDetailsEnquiry._id === id) {
+          setSelectedDetailsEnquiry((prev) => ({ ...prev, status }));
+        }
       }
     } catch {
       alert('Error updating status');
@@ -89,17 +106,47 @@ export default function AdminEnquiriesPage() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Delete enquiry from ${name}?`)) return;
+  const handleDelete = (id, name) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { id } = deleteTarget;
+    setIsDeletingTarget(true);
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/v1/admin/enquiries?id=${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
+        if (selectedDetailsEnquiry && selectedDetailsEnquiry._id === id) {
+          setSelectedDetailsEnquiry(null);
+        }
+        if (activeNotesEnquiry && activeNotesEnquiry._id === id) {
+          setActiveNotesEnquiry(null);
+        }
         fetchEnquiries(pagination.page);
+        setDeleteTarget(null);
+      } else {
+        alert(data.message || 'Error deleting enquiry');
       }
     } catch {
-      alert('Error deleting enquiry');
+      alert('Network error while deleting enquiry');
+    } finally {
+      setIsDeletingTarget(false);
+      setDeletingId(null);
     }
+  };
+
+  const getTypeBadgeClass = (type) => {
+    const t = (type || '').toLowerCase();
+    if (t.includes('taxation') || t.includes('tax')) return 'bg-orange-100 text-orange-800 border-orange-300 font-extrabold';
+    if (t.includes('nri')) return 'bg-cyan-100 text-cyan-800 border-cyan-300 font-extrabold';
+    if (t.includes('consult')) return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+    if (t.includes('callback')) return 'bg-amber-100 text-amber-800 border-amber-200';
+    if (t.includes('contact')) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+    if (t.includes('career')) return 'bg-purple-100 text-purple-800 border-purple-200';
+    return 'bg-slate-100 text-slate-700 border-slate-200';
   };
 
   return (
@@ -107,9 +154,9 @@ export default function AdminEnquiriesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#10243A]">Enquiry Management</h1>
+          <h1 className="text-2xl font-extrabold text-[#10243A]">Enquiry & Consultation Requests</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Track, update status, append internal notes, and export callback and contact requests.
+            Track, update status, view details, append internal notes, or delete client consultation and portfolio requests.
           </p>
         </div>
         <a
@@ -123,7 +170,7 @@ export default function AdminEnquiriesPage() {
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Status Pills */}
+          {/* Status Pills */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {['ALL', 'NEW', 'CONTACTED', 'CLOSED'].map((st) => (
             <button
@@ -138,6 +185,27 @@ export default function AdminEnquiriesPage() {
               {st}
             </button>
           ))}
+          <span className="text-slate-300 mx-1 hidden sm:inline">|</span>
+          <button
+            onClick={() => setTypeFilter(typeFilter === 'nri' ? 'ALL' : 'nri')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              typeFilter === 'nri'
+                ? 'bg-cyan-700 text-white shadow-xs'
+                : 'bg-cyan-50 text-cyan-800 border border-cyan-200 hover:bg-cyan-100'
+            }`}
+          >
+            <span>NRI Corner Enquiries</span>
+          </button>
+          <button
+            onClick={() => setTypeFilter(typeFilter === 'taxation' ? 'ALL' : 'taxation')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              typeFilter === 'taxation'
+                ? 'bg-[#f87b1f] text-white shadow-xs'
+                : 'bg-orange-50 text-orange-800 border border-orange-200 hover:bg-orange-100'
+            }`}
+          >
+            <span>Taxation Enquiries</span>
+          </button>
         </div>
 
         {/* Type & Search */}
@@ -147,18 +215,20 @@ export default function AdminEnquiriesPage() {
             onChange={(e) => setTypeFilter(e.target.value)}
             className="bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none"
           >
-            <option value="ALL">All Sources</option>
-            <option value="callback">Callback</option>
-            <option value="contact">Contact Form</option>
-            <option value="career">Career Application</option>
-            <option value="consultation">Consultation</option>
+            <option value="ALL">All Sources & Types</option>
+            <option value="taxation">Taxation Enquiries</option>
+            <option value="nri">NRI Consultations</option>
+            <option value="consultation">Consultation Requests</option>
+            <option value="callback">Callback Requests</option>
+            <option value="contact">Contact Messages</option>
+            <option value="career">Career Applications</option>
           </select>
 
           <div className="relative w-full md:w-64">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
-              placeholder="Search name, phone..."
+              placeholder="Search name, phone, email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
@@ -175,7 +245,7 @@ export default function AdminEnquiriesPage() {
           </div>
         ) : enquiries.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-xs">
-            No matching enquiries found.
+            No matching requests found.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -186,7 +256,7 @@ export default function AdminEnquiriesPage() {
                   <th className="py-4 px-4">Type</th>
                   <th className="py-4 px-4">Client Name</th>
                   <th className="py-4 px-4">Phone & Email</th>
-                  <th className="py-4 px-4">Interest / Source</th>
+                  <th className="py-4 px-4">Service / Source</th>
                   <th className="py-4 px-4">Status</th>
                   <th className="py-4 px-4">Notes</th>
                   <th className="py-4 px-4 text-right">Actions</th>
@@ -199,7 +269,11 @@ export default function AdminEnquiriesPage() {
                       {formatDate(e.createdAt)}
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getTypeBadgeClass(
+                          e.type
+                        )}`}
+                      >
                         {e.type}
                       </span>
                     </td>
@@ -207,12 +281,23 @@ export default function AdminEnquiriesPage() {
                       {e.name}
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-mono text-slate-800 font-bold">{e.phone}</div>
-                      {e.email && <div className="text-[10px] text-slate-400">{e.email}</div>}
+                      <a href={`tel:${e.phone}`} className="font-mono text-slate-800 font-bold hover:underline block">
+                        {e.phone}
+                      </a>
+                      {e.email ? (
+                        <a href={`mailto:${e.email}`} className="text-[11px] text-blue-600 hover:underline block truncate max-w-[180px]">
+                          {e.email}
+                        </a>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 italic">No email</span>
+                      )}
                     </td>
-                    <td className="py-4 px-4 max-w-[160px] truncate text-slate-600">
-                      <div>{e.serviceOfInterest}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{e.sourcePage}</div>
+                    <td className="py-4 px-4 max-w-[170px] truncate text-slate-600">
+                      <div className="font-semibold text-slate-800 truncate">{e.serviceOfInterest}</div>
+                      <div className="text-[10px] text-slate-400 truncate flex items-center gap-1 mt-0.5">
+                        {e.country && <span className="font-bold text-cyan-700 bg-cyan-50 px-1.5 py-0.2 rounded border border-cyan-200">[{e.country}]</span>}
+                        <span>{e.sourcePage}</span>
+                      </div>
                     </td>
                     <td className="py-4 px-4">
                       <select
@@ -240,14 +325,24 @@ export default function AdminEnquiriesPage() {
                         <span>{e.notes?.length || 0} notes</span>
                       </button>
                     </td>
-                    <td className="py-4 px-4 text-right">
-                      <button
-                        onClick={() => handleDelete(e._id, e.name)}
-                        className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                    <td className="py-4 px-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => setSelectedDetailsEnquiry(e)}
+                          className="p-1.5 text-slate-500 hover:text-[#10243A] hover:bg-slate-100 rounded-lg transition-colors"
+                          title="View Full Request Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          disabled={deletingId === e._id}
+                          onClick={() => handleDelete(e._id, e.name)}
+                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 disabled:opacity-40 rounded-lg transition-colors"
+                          title="Delete Request"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -282,6 +377,118 @@ export default function AdminEnquiriesPage() {
           </div>
         </div>
       </div>
+
+      {/* Full Request Details Modal */}
+      {selectedDetailsEnquiry && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                  Request Details ({selectedDetailsEnquiry.trackingNumber || 'Ref'})
+                </span>
+                <h3 className="font-extrabold text-base text-[#10243A]">
+                  {selectedDetailsEnquiry.name}
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedDetailsEnquiry(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Phone Number</span>
+                <a href={`tel:${selectedDetailsEnquiry.phone}`} className="font-bold text-[#10243A] hover:underline flex items-center gap-1 mt-0.5">
+                  <Phone className="w-3 h-3 text-[#89b441]" />
+                  <span>{selectedDetailsEnquiry.phone}</span>
+                </a>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Email Address</span>
+                {selectedDetailsEnquiry.email ? (
+                  <a href={`mailto:${selectedDetailsEnquiry.email}`} className="font-bold text-blue-600 hover:underline flex items-center gap-1 mt-0.5 truncate">
+                    <Mail className="w-3 h-3 text-blue-500 shrink-0" />
+                    <span className="truncate">{selectedDetailsEnquiry.email}</span>
+                  </a>
+                ) : (
+                  <span className="text-slate-400 italic">Not provided</span>
+                )}
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Service / Topic</span>
+                <span className="font-bold text-slate-800 block mt-0.5">
+                  {selectedDetailsEnquiry.serviceOfInterest || 'General Advisory'}
+                </span>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Request Type</span>
+                <span className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getTypeBadgeClass(selectedDetailsEnquiry.type)}`}>
+                  {selectedDetailsEnquiry.type}
+                </span>
+              </div>
+              {selectedDetailsEnquiry.preferredTime && (
+                <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200/70 col-span-2">
+                  <span className="text-amber-800 block text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-amber-600" />
+                    Preferred Callback Time
+                  </span>
+                  <span className="font-bold text-amber-950 block mt-0.5 text-xs">
+                    {selectedDetailsEnquiry.preferredTime}
+                  </span>
+                </div>
+              )}
+              {selectedDetailsEnquiry.country && (
+                <div className="bg-cyan-50/70 p-3 rounded-xl border border-cyan-200/80 col-span-2">
+                  <span className="text-cyan-800 block text-[10px] uppercase font-bold tracking-wider">
+                    Country of Residence
+                  </span>
+                  <span className="font-extrabold text-cyan-950 block mt-0.5 text-sm">
+                    {selectedDetailsEnquiry.country}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {selectedDetailsEnquiry.message && (
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-700">
+                <span className="font-bold text-[#10243A] block mb-1">Client Message:</span>
+                <p className="whitespace-pre-line leading-relaxed">&quot;{selectedDetailsEnquiry.message}&quot;</p>
+              </div>
+            )}
+
+            <div className="text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
+              <span>Received: {formatDate(selectedDetailsEnquiry.createdAt)}</span>
+              <span>Source: {selectedDetailsEnquiry.sourcePage || 'Website'}</span>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 font-medium">Status:</span>
+                <select
+                  value={selectedDetailsEnquiry.status}
+                  onChange={(e) => handleUpdateStatus(selectedDetailsEnquiry._id, e.target.value)}
+                  className="bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-bold"
+                >
+                  <option value="NEW">NEW</option>
+                  <option value="CONTACTED">CONTACTED</option>
+                  <option value="CLOSED">CLOSED</option>
+                </select>
+              </div>
+              <button
+                onClick={() => handleDelete(selectedDetailsEnquiry._id, selectedDetailsEnquiry.name)}
+                className="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Internal Notes Modal */}
       {activeNotesEnquiry && (
@@ -352,6 +559,17 @@ export default function AdminEnquiriesPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => !isDeletingTarget && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Enquiry Request"
+        itemName={deleteTarget?.name}
+        warningDetails="This will permanently delete this client enquiry and all its internal notes from the database."
+        isDeleting={isDeletingTarget}
+      />
     </div>
   );
 }

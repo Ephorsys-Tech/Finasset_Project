@@ -13,8 +13,8 @@ export default function SectionHeader({
         <span
           className={`inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
             theme === 'dark'
-              ? 'bg-[#C7A76C]/20 text-[#C7A76C] border border-[#C7A76C]/30'
-              : 'bg-[#10243A]/5 text-[#C7A76C] border border-[#C7A76C]/20'
+              ? 'bg-[#f87b1f]/20 text-[#fb994b] border border-[#f87b1f]/30'
+              : 'bg-[#2376b8]/10 text-[#2376b8] border border-[#2376b8]/20'
           }`}
         >
           {badge}
@@ -23,7 +23,7 @@ export default function SectionHeader({
       {title && (
         <h2
           className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${
-            theme === 'dark' ? 'text-white' : 'text-[#10243A]'
+            theme === 'dark' ? 'text-white' : 'text-[#0f2b44]'
           }`}
         >
           {title}

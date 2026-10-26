@@ -241,8 +241,8 @@ export default function MarketUpdatePage () {
                   onClick={() => setActiveTab('popular')}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeTab === 'popular'
-                      ? 'bg-[#10243A] text-white shadow-sm'
-                      : 'text-slate-600 hover:text-[#10243A]'
+                      ? 'bg-[#2376b8] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-[#2376b8]'
                   }`}
                 >
                   Popular Trends
@@ -253,8 +253,8 @@ export default function MarketUpdatePage () {
                   onClick={() => setActiveTab('ipo')}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeTab === 'ipo'
-                      ? 'bg-[#10243A] text-white shadow-sm'
-                      : 'text-slate-600 hover:text-[#10243A]'
+                      ? 'bg-[#2376b8] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-[#2376b8]'
                   }`}
                 >
                   Upcoming IPOs
@@ -265,8 +265,8 @@ export default function MarketUpdatePage () {
                   onClick={() => setActiveTab('market')}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeTab === 'market'
-                      ? 'bg-[#10243A] text-white shadow-sm'
-                      : 'text-slate-600 hover:text-[#10243A]'
+                      ? 'bg-[#2376b8] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-[#2376b8]'
                   }`}
                 >
                   Technical Desk

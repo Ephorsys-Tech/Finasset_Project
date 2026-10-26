@@ -811,7 +811,7 @@ export default function HomePage () {
               <div className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#dfc593] text-xs font-bold uppercase tracking-wider'>
                 <Smartphone className='w-3.5 h-3.5 text-[#C7A76C]' />
                 <span>Wealth Anywhere</span>
-              </div>
+              </div> */}
 
               <h2 className='text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight'>
                 Track, Analyze & Rebalance Your Wealth on the Go

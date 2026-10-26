@@ -8,11 +8,31 @@ const EnquiryNoteSchema = new mongoose.Schema({
 
 const EnquirySchema = new mongoose.Schema(
   {
+    trackingNumber: {
+      type: String,
+      default: '',
+    },
     type: {
       type: String,
       required: true,
-      enum: ['callback', 'contact', 'career', 'consultation'],
-      default: 'callback',
+      enum: [
+        'callback',
+        'contact',
+        'career',
+        'consultation',
+        'nri',
+        'taxation',
+        'CALLBACK',
+        'CONTACT',
+        'CAREER',
+        'CONSULTATION',
+        'NRI',
+        'TAXATION',
+        'TAX_CONSULTATION',
+        'NRI_CONSULTATION',
+        'SERVICE_CONSULTATION',
+      ],
+      default: 'consultation',
     },
     name: {
       type: String,
@@ -29,6 +49,11 @@ const EnquirySchema = new mongoose.Schema(
       default: '',
       trim: true,
       lowercase: true,
+    },
+    country: {
+      type: String,
+      default: '',
+      trim: true,
     },
     serviceOfInterest: {
       type: String,
@@ -60,4 +85,8 @@ const EnquirySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Enquiry || mongoose.model('Enquiry', EnquirySchema);
+if (mongoose.models.Enquiry) {
+  delete mongoose.models.Enquiry;
+}
+
+export default mongoose.model('Enquiry', EnquirySchema);

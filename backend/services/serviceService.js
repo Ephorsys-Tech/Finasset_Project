@@ -8,9 +8,11 @@ export const serviceService = {
     try {
       await connectToDatabase();
       const services = await Service.find({ isPublished: true }).sort({ displayOrder: 1 }).lean();
-      return (services && services.length) ? services : fallbackServices;
+      // Return only real DB services — never fall back to static data.
+      // An empty array is the correct response when no services have been created yet.
+      return services || [];
     } catch {
-      return fallbackServices;
+      return [];
     }
   },
 
@@ -18,13 +20,22 @@ export const serviceService = {
     try {
       await connectToDatabase();
       const service = await Service.findOne({ slug, isPublished: true }).lean();
-      if (service) return service;
+      if (service) {
+        const otherServices = await Service.find({ isPublished: true, slug: { $ne: slug } })
+          .sort({ displayOrder: 1 })
+          .select('name slug iconName shortDescription')
+          .lean();
+        return { service, otherServices };
+      }
     } catch {
       // Fallback
     }
 
-    const fallback = fallbackServices.find((s) => s.slug === slug);
-    if (fallback) return fallback;
+    const fallbackService = fallbackServices.find((s) => s.slug === slug);
+    if (fallbackService) {
+      const otherServices = fallbackServices.filter((s) => s.slug !== slug);
+      return { service: fallbackService, otherServices };
+    }
     throw new Error('Service not found');
   },
 
@@ -41,7 +52,7 @@ export const serviceService = {
       action: 'CREATE_SERVICE',
       entity: 'Service',
       entityId: service._id,
-      summary: `Created service: ${service.title}`,
+      summary: `Created service: ${service.name}`,
       req,
     });
     return service;
@@ -57,7 +68,7 @@ export const serviceService = {
       action: 'UPDATE_SERVICE',
       entity: 'Service',
       entityId: id,
-      summary: `Updated service: ${service.title}`,
+      summary: `Updated service: ${service.name}`,
       req,
     });
     return service;
@@ -73,7 +84,7 @@ export const serviceService = {
       action: 'DELETE_SERVICE',
       entity: 'Service',
       entityId: id,
-      summary: `Deleted service: ${service.title}`,
+      summary: `Deleted service: ${service.name}`,
       req,
     });
     return true;

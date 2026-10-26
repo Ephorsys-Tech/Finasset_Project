@@ -16,11 +16,15 @@ const BlogPostSchema = new mongoose.Schema(
     },
     excerpt: {
       type: String,
-      required: true,
+      default: '',
     },
     content: {
       type: String,
-      required: true,
+      default: '',
+    },
+    description: {
+      type: String,
+      default: '',
     },
     category: {
       type: String,
@@ -32,6 +36,10 @@ const BlogPostSchema = new mongoose.Schema(
       default: 'Finasset Research Desk',
     },
     featuredImage: {
+      type: String,
+      default: '',
+    },
+    featuredImagePublicId: {
       type: String,
       default: '',
     },

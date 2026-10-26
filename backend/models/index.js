@@ -17,6 +17,10 @@ import BlogPost from './BlogPost';
 import Page from './Page';
 import Enquiry from './Enquiry';
 import Media from './Media';
+import NriItem from './NriItem';
+import Video from './Video';
+import TaxationItem from './TaxationItem';
+import PayPremium from './PayPremium';
 
 export {
   Admin,
@@ -38,6 +42,10 @@ export {
   Page,
   Enquiry,
   Media,
+  NriItem,
+  Video,
+  TaxationItem,
+  PayPremium,
 };
 
 export default {
@@ -60,4 +68,8 @@ export default {
   Page,
   Enquiry,
   Media,
+  NriItem,
+  Video,
+  TaxationItem,
+  PayPremium,
 };

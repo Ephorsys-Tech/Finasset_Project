@@ -11,6 +11,7 @@ import {
   MapPin,
   Send,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
 
 export default function CareerPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', role: 'Senior Wealth Manager', message: '' });
@@ -68,22 +69,14 @@ export default function CareerPage() {
   ];
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 sm:py-20 text-center relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <Briefcase className="w-3.5 h-3.5 text-[#C7A76C]" />
-            <span>Join Our Team</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Careers at Finasset Wealth
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            Build a rewarding career in ethical wealth management, research, and client relationship advisory at our Bhubaneswar headquarters.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Careers at Finasset Wealth"
+        description="Build a rewarding career in ethical wealth management, research, and client relationship advisory at our Bhubaneswar headquarters."
+        imageSrc="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Careers at Finasset Wealth"
+      />
 
       {/* Main Content */}
       <section className="py-20">
@@ -91,10 +84,10 @@ export default function CareerPage() {
           {/* Current Openings */}
           <div>
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2">
                 Explore Roles
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#10243A] mt-1">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44] mt-1">
                 Current Opportunities in Bhubaneswar
               </h2>
             </div>
@@ -103,18 +96,18 @@ export default function CareerPage() {
               {openings.map((job, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+                  className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:border-[#2376b8]/50 hover:shadow-md transition-all flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-                      <span className="flex items-center gap-1 text-[#C7A76C]">
+                      <span className="flex items-center gap-1 text-[#2376b8] font-bold">
                         <MapPin className="w-3.5 h-3.5" />
                         {job.location}
                       </span>
                       <span>{job.experience}</span>
                     </div>
 
-                    <h3 className="text-xl font-bold text-[#10243A]">{job.title}</h3>
+                    <h3 className="text-xl font-bold text-[#0f2b44]">{job.title}</h3>
                     <p className="text-xs text-slate-600 leading-relaxed">{job.description}</p>
                   </div>
 
@@ -124,7 +117,7 @@ export default function CareerPage() {
                         setForm((prev) => ({ ...prev, role: job.title }));
                         document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="w-full bg-[#10243A] hover:bg-[#1b3858] text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-xl transition-all"
+                      className="w-full bg-[#2376b8] hover:bg-[#1b5d92] text-white text-xs font-bold uppercase tracking-wider py-3 rounded-xl transition-all shadow-sm"
                     >
                       Apply for this Role
                     </button>
@@ -135,12 +128,12 @@ export default function CareerPage() {
           </div>
 
           {/* Application Form */}
-          <div id="apply-form" className="max-w-3xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-xl space-y-6">
+          <div id="apply-form" className="max-w-3xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-xl space-y-6">
             <div className="text-center space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3.5 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-1">
                 Candidate Application
               </span>
-              <h2 className="text-2xl font-bold text-[#10243A]">
+              <h2 className="text-2xl font-bold text-[#0f2b44]">
                 Submit Your Application to Our Talent Desk
               </h2>
               <p className="text-xs text-slate-500">
@@ -150,7 +143,7 @@ export default function CareerPage() {
 
             {submitted ? (
               <div className="bg-emerald-950/60 border border-emerald-500/50 p-6 rounded-2xl text-center space-y-2">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                <CheckCircle2 className="w-12 h-12 text-[#89b441] mx-auto" />
                 <h3 className="text-lg font-bold text-white">Application Received</h3>
                 <p className="text-xs text-slate-300">
                   Our HR talent desk will review your credentials and contact you for initial discussions.
@@ -160,7 +153,7 @@ export default function CareerPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                       Full Name *
                     </label>
                     <input
@@ -169,11 +162,11 @@ export default function CareerPage() {
                       placeholder="e.g. Sambit Mishra"
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                       Mobile Number *
                     </label>
                     <input
@@ -182,14 +175,14 @@ export default function CareerPage() {
                       placeholder="+91 94370..."
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                       Email Address *
                     </label>
                     <input
@@ -198,17 +191,17 @@ export default function CareerPage() {
                       placeholder="sambit@example.com"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                       Applying For Role
                     </label>
                     <select
                       value={form.role}
                       onChange={(e) => setForm({ ...form, role: e.target.value })}
-                      className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                     >
                       <option value="Senior Wealth Manager">Senior Wealth Manager</option>
                       <option value="Mutual Fund & Equity Research Analyst">Mutual Fund & Equity Research Analyst</option>
@@ -219,7 +212,7 @@ export default function CareerPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                     Summary of Qualifications, Certifications & LinkedIn Profile
                   </label>
                   <textarea
@@ -227,7 +220,7 @@ export default function CareerPage() {
                     placeholder="Mention NISM / AMFI certifications, current organization, and LinkedIn link..."
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                    className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                   />
                 </div>
 
@@ -235,7 +228,7 @@ export default function CareerPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-[#10243A] hover:bg-[#1b3858] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition-all shadow"
+                    className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-extrabold text-sm uppercase tracking-wider py-4 rounded-xl transition-all shadow-lg shadow-[#f87b1f]/20"
                   >
                     {submitting ? 'Submitting Application...' : 'Submit Job Application'}
                   </button>

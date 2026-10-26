@@ -10,10 +10,33 @@ import NewsItem from '@/backend/models/NewsItem';
 import { logAdminActivity } from '@/backend/lib/auth';
 import {
   fallbackTestimonials,
-  fallbackPartners,
   fallbackMarketIndices,
   fallbackNewsItems,
 } from '@/lib/fallbackData';
+import { cloudinary } from '@/backend/config/cloudinary';
+
+const extractCloudinaryPublicId = (url) => {
+  if (!url || typeof url !== 'string' || !url.includes('cloudinary.com')) return null;
+  try {
+    const parts = url.split('/upload/');
+    if (parts.length < 2) return null;
+    const afterUpload = parts[1];
+    const withoutVersion = afterUpload.replace(/^v\d+\//, '');
+    const publicId = withoutVersion.substring(0, withoutVersion.lastIndexOf('.'));
+    return publicId || null;
+  } catch {
+    return null;
+  }
+};
+
+const deleteCloudinaryAsset = async (publicId) => {
+  if (!publicId) return;
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (err) {
+    console.warn('Failed to delete asset from Cloudinary:', err?.message || err);
+  }
+};
 
 export const contentService = {
   // Settings
@@ -98,6 +121,16 @@ export const contentService = {
 
   async createBlogPost(data, adminEmail, req) {
     await connectToDatabase();
+    if (data.description && !data.content) {
+      data.content = data.description;
+    } else if (data.content && !data.description) {
+      data.description = data.content;
+    }
+    if (!data.excerpt && (data.description || data.content)) {
+      const plain = (data.description || data.content).replace(/[#*`_\[\]]/g, '').trim();
+      data.excerpt = plain.length > 160 ? plain.substring(0, 157) + '...' : plain;
+    }
+
     const post = await BlogPost.create(data);
     await logAdminActivity({
       adminEmail,
@@ -112,8 +145,37 @@ export const contentService = {
 
   async updateBlogPost(id, data, adminEmail, req) {
     await connectToDatabase();
+    const existing = await BlogPost.findById(id);
+    if (!existing) throw new Error('Post not found');
+
+    if (data.description && !data.content) {
+      data.content = data.description;
+    } else if (data.content && !data.description) {
+      data.description = data.content;
+    }
+    if (!data.excerpt && (data.description || data.content)) {
+      const plain = (data.description || data.content).replace(/[#*`_\[\]]/g, '').trim();
+      data.excerpt = plain.length > 160 ? plain.substring(0, 157) + '...' : plain;
+    }
+
+    // Clean up previous image on Cloudinary if replaced or removed
+    if (
+      existing.featuredImagePublicId &&
+      data.featuredImagePublicId !== undefined &&
+      existing.featuredImagePublicId !== data.featuredImagePublicId
+    ) {
+      await deleteCloudinaryAsset(existing.featuredImagePublicId);
+    } else if (
+      !existing.featuredImagePublicId &&
+      existing.featuredImage &&
+      data.featuredImage !== undefined &&
+      existing.featuredImage !== data.featuredImage
+    ) {
+      const oldPublicId = extractCloudinaryPublicId(existing.featuredImage);
+      if (oldPublicId) await deleteCloudinaryAsset(oldPublicId);
+    }
+
     const post = await BlogPost.findByIdAndUpdate(id, { $set: data }, { new: true });
-    if (!post) throw new Error('Post not found');
     await logAdminActivity({
       adminEmail,
       action: 'UPDATE_BLOG_POST',
@@ -127,8 +189,18 @@ export const contentService = {
 
   async deleteBlogPost(id, adminEmail, req) {
     await connectToDatabase();
-    const post = await BlogPost.findByIdAndDelete(id);
+    const post = await BlogPost.findById(id);
     if (!post) throw new Error('Post not found');
+
+    // Clean up image from Cloudinary when blog post is deleted
+    if (post.featuredImagePublicId) {
+      await deleteCloudinaryAsset(post.featuredImagePublicId);
+    } else if (post.featuredImage) {
+      const publicId = extractCloudinaryPublicId(post.featuredImage);
+      if (publicId) await deleteCloudinaryAsset(publicId);
+    }
+
+    await BlogPost.findByIdAndDelete(id);
     await logAdminActivity({
       adminEmail,
       action: 'DELETE_BLOG_POST',
@@ -262,9 +334,9 @@ export const contentService = {
     try {
       await connectToDatabase();
       const list = await Partner.find({ isPublished: true }).sort({ order: 1 }).lean();
-      return (list && list.length) ? list : fallbackPartners;
+      return list || [];
     } catch {
-      return fallbackPartners;
+      return [];
     }
   },
 
@@ -275,13 +347,18 @@ export const contentService = {
 
   async createPartner(data, adminEmail, req) {
     await connectToDatabase();
+    if (data.imageUrl && !data.logoUrl) data.logoUrl = data.imageUrl;
+    if (data.logoUrl && !data.imageUrl) data.imageUrl = data.logoUrl;
+    if (data.imagePublicId && !data.logoPublicId) data.logoPublicId = data.imagePublicId;
+    if (data.logoPublicId && !data.imagePublicId) data.imagePublicId = data.logoPublicId;
+
     const p = await Partner.create(data);
     await logAdminActivity({
       adminEmail,
       action: 'CREATE_PARTNER',
       entity: 'Partner',
       entityId: p._id,
-      summary: `Added partner: ${p.name}`,
+      summary: `Added partner: ${p.name || 'Client Partner'}`,
       req,
     });
     return p;
@@ -289,8 +366,30 @@ export const contentService = {
 
   async updatePartner(id, data, adminEmail, req) {
     await connectToDatabase();
+    const existing = await Partner.findById(id);
+    if (!existing) throw new Error('Partner not found');
+
+    const newPublicId = data.imagePublicId || data.logoPublicId;
+    const oldPublicId = existing.imagePublicId || existing.logoPublicId || extractCloudinaryPublicId(existing.imageUrl || existing.logoUrl);
+
+    // If new image uploaded and replacing old one, destroy previous asset from Cloudinary
+    if (newPublicId && oldPublicId && newPublicId !== oldPublicId) {
+      await deleteCloudinaryAsset(oldPublicId);
+    } else if (
+      (data.imageUrl || data.logoUrl) &&
+      (data.imageUrl !== existing.imageUrl || data.logoUrl !== existing.logoUrl) &&
+      oldPublicId &&
+      !newPublicId
+    ) {
+      await deleteCloudinaryAsset(oldPublicId);
+    }
+
+    if (data.imageUrl && !data.logoUrl) data.logoUrl = data.imageUrl;
+    if (data.logoUrl && !data.imageUrl) data.imageUrl = data.logoUrl;
+    if (data.imagePublicId && !data.logoPublicId) data.logoPublicId = data.imagePublicId;
+    if (data.logoPublicId && !data.imagePublicId) data.imagePublicId = data.logoPublicId;
+
     const p = await Partner.findByIdAndUpdate(id, { $set: data }, { new: true });
-    if (!p) throw new Error('Partner not found');
     await logAdminActivity({
       adminEmail,
       action: 'UPDATE_PARTNER',
@@ -304,8 +403,16 @@ export const contentService = {
 
   async deletePartner(id, adminEmail, req) {
     await connectToDatabase();
-    const p = await Partner.findByIdAndDelete(id);
+    const p = await Partner.findById(id);
     if (!p) throw new Error('Partner not found');
+
+    // Clean up remote asset on Cloudinary if publicId exists or can be extracted
+    const publicId = p.imagePublicId || p.logoPublicId || extractCloudinaryPublicId(p.imageUrl || p.logoUrl);
+    if (publicId) {
+      await deleteCloudinaryAsset(publicId);
+    }
+
+    await Partner.findByIdAndDelete(id);
     await logAdminActivity({
       adminEmail,
       action: 'DELETE_PARTNER',
@@ -327,7 +434,7 @@ export const contentService = {
       ]);
 
       const activeIndices = (indices && indices.length) ? indices : fallbackMarketIndices;
-      const activeNews = (newsItems && newsItems.length) ? newsItems : fallbackNewsItems;
+      const activeNews = (newsItems && newsItems.length) ? newsItems : [];
 
       return {
         indices: activeIndices,
@@ -342,9 +449,9 @@ export const contentService = {
       return {
         indices: fallbackMarketIndices,
         news: {
-          popular: fallbackNewsItems,
-          ipo: fallbackNewsItems,
-          market: fallbackNewsItems,
+          popular: [],
+          ipo: [],
+          market: [],
         },
         lastUpdated: new Date(),
       };

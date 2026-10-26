@@ -38,7 +38,7 @@ export default function NotFound() {
         <div className="mt-12 pt-8 border-t border-gray-200/80 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-gray-500">
           <Link href="/services" className="hover:text-brand-navy transition-colors">Our Services</Link>
           <Link href="/investor/financial-calculator" className="hover:text-brand-navy transition-colors">SIP Calculator</Link>
-          <Link href="/investor/risk-profile" className="hover:text-brand-navy transition-colors">Risk Assessment</Link>
+          <Link href="/contact-us" className="hover:text-brand-navy transition-colors">Contact Us</Link>
         </div>
       </div>
     </div>

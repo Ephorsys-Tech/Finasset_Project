@@ -71,7 +71,7 @@ function ResetPasswordForm() {
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
       <div className="text-center space-y-2">
-        <div className="w-12 h-12 rounded-xl bg-white/10 text-[#C7A76C] flex items-center justify-center mx-auto">
+        <div className="w-12 h-12 rounded-xl bg-white/10 text-[#f87b1f] flex items-center justify-center mx-auto">
           <Lock className="w-6 h-6" />
         </div>
         <h1 className="text-xl font-bold text-white">Create New Password</h1>
@@ -89,14 +89,14 @@ function ResetPasswordForm() {
 
       {success ? (
         <div className="bg-emerald-950/60 border border-emerald-500/50 p-6 rounded-2xl text-center space-y-3">
-          <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+          <CheckCircle2 className="w-10 h-10 text-[#89b441] mx-auto" />
           <h2 className="text-base font-bold text-white">Password Updated Successfully</h2>
           <p className="text-xs text-slate-300">
             All previous sessions have been invalidated. Redirecting to admin sign in...
           </p>
           <Link
             href="/admin/login"
-            className="inline-block mt-2 text-xs font-bold text-[#C7A76C] underline"
+            className="inline-block mt-2 text-xs font-bold text-[#f87b1f] underline"
           >
             Click here to sign in now
           </Link>
@@ -113,7 +113,7 @@ function ResetPasswordForm() {
               placeholder="Paste 64-character token"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-[#C7A76C]"
+              className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-[#2376b8]"
             />
           </div>
 
@@ -128,7 +128,7 @@ function ResetPasswordForm() {
                 placeholder="••••••••••••"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+                className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#2376b8]"
               />
               <button
                 type="button"
@@ -150,14 +150,14 @@ function ResetPasswordForm() {
               placeholder="••••••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#C7A76C]"
+              className="w-full px-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-[#2376b8]"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#C7A76C] hover:bg-[#dfc593] disabled:opacity-50 text-[#10243A] font-bold text-sm py-3.5 rounded-xl transition-all flex items-center justify-center gap-2"
+            className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-bold text-sm py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#f87b1f]/20"
           >
             <span>{loading ? 'Updating Password...' : 'Save New Password & Sign In'}</span>
             <ArrowRight className="w-4 h-4" />
@@ -170,7 +170,7 @@ function ResetPasswordForm() {
 
 export default function AdminResetPasswordPage() {
   return (
-    <div className="min-h-screen bg-[#10243A] flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-[#0f2b44] flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md space-y-6">
         <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
           <ResetPasswordForm />

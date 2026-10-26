@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MapPin,
   Phone,
@@ -10,18 +10,35 @@ import {
   Send,
   Shield,
 } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
+import { useServiceStore } from '@/store/useServiceStore';
 
 export default function ContactUsPage() {
+  const { services, isLoading: loadingServices, fetchServices } = useServiceStore();
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
-    serviceOfInterest: 'General Financial Advisory',
+    serviceOfInterest: '',
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Fetch dynamic published services created by admin via Zustand and Axios
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const serviceParam = params.get('service');
+      if (serviceParam) {
+        setForm((prev) => ({ ...prev, serviceOfInterest: serviceParam }));
+      }
+    }
+
+    fetchServices(false);
+  }, [fetchServices]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +61,7 @@ export default function ContactUsPage() {
           name: '',
           phone: '',
           email: '',
-          serviceOfInterest: 'General Financial Advisory',
+          serviceOfInterest: '',
           message: '',
         });
       } else {
@@ -58,22 +75,14 @@ export default function ContactUsPage() {
   };
 
   return (
-    <div className="w-full bg-[#F8F7F3]">
+    <div className="w-full bg-[#f8fafc]">
       {/* Banner */}
-      <section className="bg-[#10243A] text-white py-16 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A76C]/20 border border-[#C7A76C]/30 text-[#dfc593] text-xs font-bold uppercase tracking-wider mb-4">
-            <MapPin className="w-3.5 h-3.5 text-[#C7A76C]" />
-            <span>Bhubaneswar Advisory Office</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Connect With Finasset Wealth
-          </h1>
-          <p className="text-slate-300 mt-4 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-            We welcome you to visit our office in Bhubaneswar or reach out via phone and email. Our senior wealth consultants are ready to assist you.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title="Connect With Finasset Wealth"
+        description="We welcome you to visit our office in Bhubaneswar or reach out via phone and email. Our senior wealth consultants are ready to assist you."
+        imageSrc="https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1200&auto=format&fit=crop"
+        imageAlt="Connect With Finasset Wealth"
+      />
 
       {/* Main Grid */}
       <section className="py-16">
@@ -81,12 +90,12 @@ export default function ContactUsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Contact Information (5 cols) */}
             <div className="lg:col-span-5 space-y-8">
-              <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm space-y-6">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm space-y-6">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2">
                     Corporate Office
                   </span>
-                  <h2 className="text-2xl font-bold text-[#10243A]">
+                  <h2 className="text-2xl font-bold text-[#0f2b44]">
                     Finasset Wealth Headquarters
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">
@@ -96,9 +105,9 @@ export default function ContactUsPage() {
 
                 <div className="space-y-5 text-sm">
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                    <MapPin className="w-5 h-5 text-[#2376b8] shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-[#10243A]">Registered Office Address:</h4>
+                      <h4 className="font-bold text-[#0f2b44]">Registered Office Address:</h4>
                       <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                         Plot No. 124, Ground & 1st Floor, Saheed Nagar / Jaydev Vihar Corridor, Bhubaneswar, Odisha – 751007, India
                       </p>
@@ -106,10 +115,10 @@ export default function ContactUsPage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                    <Phone className="w-5 h-5 text-[#89b441] shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-[#10243A]">Telephone & Direct Lines:</h4>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <h4 className="font-bold text-[#0f2b44]">Telephone & Direct Lines:</h4>
+                      <p className="text-xs text-slate-600 mt-1 font-medium">
                         +91 94370 12345 (Client Advisory)
                       </p>
                       <p className="text-xs text-slate-600">
@@ -119,18 +128,18 @@ export default function ContactUsPage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                    <Mail className="w-5 h-5 text-[#f87b1f] shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-[#10243A]">Email Communication:</h4>
+                      <h4 className="font-bold text-[#0f2b44]">Email Communication:</h4>
                       <p className="text-xs text-slate-600 mt-1">contact@finassetwealth.com</p>
                       <p className="text-xs text-slate-600">support@adhiraassets.com</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-[#C7A76C] shrink-0 mt-0.5" />
+                    <Clock className="w-5 h-5 text-[#2376b8] shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-[#10243A]">Advisory Office Timings:</h4>
+                      <h4 className="font-bold text-[#0f2b44]">Advisory Office Timings:</h4>
                       <p className="text-xs text-slate-600 mt-1">
                         Monday – Saturday: 9:30 AM – 6:30 PM
                       </p>
@@ -142,7 +151,7 @@ export default function ContactUsPage() {
                 </div>
 
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-[#C7A76C] shrink-0" />
+                  <Shield className="w-4 h-4 text-[#89b441] shrink-0" />
                   <span>AMFI Registered Mutual Fund Distributor: ARN-189204</span>
                 </div>
               </div>
@@ -160,12 +169,12 @@ export default function ContactUsPage() {
             </div>
 
             {/* Interactive Contact Form (7 cols) */}
-            <div className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-sm space-y-8">
+            <div id="callback" className="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-sm space-y-8">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#C7A76C] block mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#2376b8] bg-[#f0f6fb] px-3 py-1 rounded-full border border-[#2376b8]/20 inline-block mb-2">
                   Online Inquiry
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#10243A]">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2b44]">
                   Send a Confidential Message
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
@@ -175,14 +184,14 @@ export default function ContactUsPage() {
 
               {submitted ? (
                 <div className="bg-emerald-950/60 border border-emerald-500/50 p-6 rounded-2xl text-center space-y-3">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                  <CheckCircle2 className="w-12 h-12 text-[#89b441] mx-auto" />
                   <h3 className="text-lg font-bold text-white">Message Dispatched</h3>
                   <p className="text-sm text-slate-300">
                     Thank you! Your inquiry has been routed to our Bhubaneswar wealth team. We will call or email you shortly.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
-                    className="text-xs text-[#C7A76C] font-semibold underline mt-2 block mx-auto"
+                    className="text-xs text-[#f87b1f] font-semibold underline mt-2 block mx-auto"
                   >
                     Send another inquiry
                   </button>
@@ -197,7 +206,7 @@ export default function ContactUsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                      <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                         Full Name *
                       </label>
                       <input
@@ -206,11 +215,11 @@ export default function ContactUsPage() {
                         placeholder="e.g. Priyabrata Das"
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                        className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                      <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                         Phone Number *
                       </label>
                       <input
@@ -219,14 +228,14 @@ export default function ContactUsPage() {
                         placeholder="+91 94370 12345"
                         value={form.phone}
                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                        className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                      <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                         Email Address
                       </label>
                       <input
@@ -234,31 +243,32 @@ export default function ContactUsPage() {
                         placeholder="priyabrata@example.com"
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                        className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                      <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                         Advisory Area
                       </label>
                       <select
                         value={form.serviceOfInterest}
                         onChange={(e) => setForm({ ...form, serviceOfInterest: e.target.value })}
-                        className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                        className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                       >
-                        <option value="General Financial Advisory">General Financial Advisory</option>
-                        <option value="Mutual Funds & SIP">Mutual Funds & SIP</option>
-                        <option value="Insurance Planning">Insurance Planning</option>
-                        <option value="NRI Wealth Advisory">NRI Wealth Advisory</option>
-                        <option value="Real Estate Advisory">Real Estate Advisory</option>
-                        <option value="Fixed Deposits & Bonds">Fixed Deposits & Bonds</option>
-                        <option value="Portfolio Management (PMS)">Portfolio Management (PMS)</option>
+                        <option value="">
+                          {loadingServices ? 'Loading services...' : 'Select Advisory Area'}
+                        </option>
+                        {services.map((service) => (
+                          <option key={service._id || service.slug || service.name} value={service.name}>
+                            {service.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-[#10243A] mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-[#0f2b44] mb-1.5 uppercase tracking-wider">
                       Your Message / Financial Questions
                     </label>
                     <textarea
@@ -266,7 +276,7 @@ export default function ContactUsPage() {
                       placeholder="Share details regarding your investment goals, portfolio size, or questions..."
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      className="w-full bg-[#F8F7F3] border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#C7A76C]"
+                      className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-[#2376b8]"
                     />
                   </div>
 
@@ -274,7 +284,7 @@ export default function ContactUsPage() {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="w-full bg-[#10243A] hover:bg-[#1b3858] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition-all shadow"
+                      className="w-full bg-[#f87b1f] hover:bg-[#d9620b] disabled:opacity-50 text-white font-extrabold text-sm uppercase tracking-wider py-4 rounded-xl transition-all shadow-lg shadow-[#f87b1f]/20"
                     >
                       {submitting ? 'Dispatching Message...' : 'Submit Inquiry'}
                     </button>
