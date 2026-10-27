@@ -301,6 +301,9 @@
 
 
 
+
+
+
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -381,7 +384,7 @@ export const DEFAULT_INVESTOR_FEATURES: FeatureItem[] = [
 ];
 
 const AUTO_PLAY_INTERVAL = 3500;
-const ITEM_HEIGHT = 56; // was 68 – tighter chip spacing
+const ITEM_HEIGHT = 56;
 
 const wrap = (min: number, max: number, v: number) => {
   const rangeSize = max - min;
@@ -392,13 +395,17 @@ export interface FeatureCarouselProps {
   features?: FeatureItem[];
 }
 
-export function FeatureCarousel({ features = DEFAULT_INVESTOR_FEATURES }: FeatureCarouselProps) {
+export function FeatureCarousel({
+  features = DEFAULT_INVESTOR_FEATURES,
+}: FeatureCarouselProps) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   const currentIndex =
-    ((step % features.length) + features.length) % features.length;
+    features.length > 0
+      ? ((step % features.length) + features.length) % features.length
+      : 0;
 
   const nextStep = useCallback(() => {
     setStep((prev) => prev + 1);
@@ -408,30 +415,42 @@ export function FeatureCarousel({ features = DEFAULT_INVESTOR_FEATURES }: Featur
     if (index === currentIndex) {
       router.push(feature.url);
     } else {
-      const diff = (index - currentIndex + features.length) % features.length;
-      if (diff > 0) setStep((s) => s + diff);
+      const diff =
+        (index - currentIndex + features.length) % features.length;
+
+      if (diff > 0) {
+        setStep((s) => s + diff);
+      }
     }
   };
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || features.length <= 1) return;
+
     const interval = setInterval(nextStep, AUTO_PLAY_INTERVAL);
+
     return () => clearInterval(interval);
-  }, [nextStep, isPaused]);
+  }, [nextStep, isPaused, features.length]);
 
   const getCardStatus = (index: number) => {
     const diff = index - currentIndex;
     const len = features.length;
 
     let normalizedDiff = diff;
+
     if (diff > len / 2) normalizedDiff -= len;
     if (diff < -len / 2) normalizedDiff += len;
 
     if (normalizedDiff === 0) return "active";
     if (normalizedDiff === -1) return "prev";
     if (normalizedDiff === 1) return "next";
+
     return "hidden";
   };
+
+  if (features.length === 0) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -439,26 +458,26 @@ export function FeatureCarousel({ features = DEFAULT_INVESTOR_FEATURES }: Featur
         {/* Left Column / Interactive Chips Carousel Strip */}
         <div className="w-full lg:w-[42%] h-[280px] lg:h-full relative z-30 flex flex-col items-start justify-center overflow-hidden px-6 sm:px-10 lg:pl-12 bg-[#2376b8]">
           <div className="absolute inset-x-0 top-0 h-10 md:h-12 bg-gradient-to-b from-[#2376b8] via-[#2376b8]/80 to-transparent z-40 pointer-events-none" />
+
           <div className="absolute inset-x-0 bottom-0 h-10 md:h-12 bg-gradient-to-t from-[#2376b8] via-[#2376b8]/80 to-transparent z-40 pointer-events-none" />
 
           <div className="relative w-full h-full flex items-center justify-center lg:justify-start z-20">
             {features.map((feature, index) => {
               const isActive = index === currentIndex;
               const distance = index - currentIndex;
+
               const wrappedDistance = wrap(
                 -(features.length / 2),
                 features.length / 2,
                 distance
               );
+
               const IconComponent = feature.icon;
 
               return (
                 <motion.div
                   key={feature.id}
-                  style={{
-                    height: ITEM_HEIGHT,
-                    width: "fit-content",
-                  }}
+                  className="absolute h-14 w-max flex items-center justify-start"
                   animate={{
                     y: wrappedDistance * ITEM_HEIGHT,
                     opacity: 1 - Math.abs(wrappedDistance) * 0.28,
@@ -469,13 +488,19 @@ export function FeatureCarousel({ features = DEFAULT_INVESTOR_FEATURES }: Featur
                     damping: 22,
                     mass: 1,
                   }}
-                  className="absolute flex items-center justify-start"
                 >
                   <button
+                    type="button"
                     onClick={() => handleChipClick(index, feature)}
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
-                    title={isActive ? `Open ${feature.label}` : `View ${feature.label}`}
+                    onFocus={() => setIsPaused(true)}
+                    onBlur={() => setIsPaused(false)}
+                    title={
+                      isActive
+                        ? `Open ${feature.label}`
+                        : `View ${feature.label}`
+                    }
                     className={cn(
                       "relative flex items-center gap-3 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all duration-500 text-left group border cursor-pointer",
                       isActive
@@ -566,7 +591,9 @@ export function FeatureCarousel({ features = DEFAULT_INVESTOR_FEATURES }: Featur
                           className="absolute inset-x-0 bottom-0 p-4 sm:p-5 pt-20 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent flex flex-col justify-end"
                         >
                           <div className="bg-white text-[#0f2b44] px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit shadow-md mb-2 flex items-center gap-1.5">
-                            <span>{index + 1} • {feature.label}</span>
+                            <span>
+                              {index + 1} • {feature.label}
+                            </span>
                             <ArrowUpRight className="w-3 h-3 text-[#2376b8]" />
                           </div>
 
@@ -589,6 +616,7 @@ export function FeatureCarousel({ features = DEFAULT_INVESTOR_FEATURES }: Featur
                       )}
                     >
                       <div className="w-1.5 h-1.5 rounded-full bg-[#89b441] shadow-[0_0_8px_#89b441]" />
+
                       <span className="text-white text-[10px] font-bold uppercase tracking-[0.2em]">
                         Investor Tool
                       </span>
